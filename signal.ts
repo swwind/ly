@@ -1,18 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
 
-const isSSR = false;
-
-export type Node = {
-  _type: "ref" | "computed" | "effect";
-  _dirty: number;
-  _dsts: Set<Node>;
-  _update(): void;
-  _remove?(): void;
-};
-
 export type RuntimeContext = {
-  dependencies: Set<Node> | null;
-  dirtyNodes: Set<Node>;
+  dependencies: Set<GraphNode> | null;
+  dirtyNodes: Set<GraphNode>;
   queueUpdate: boolean;
 };
 
@@ -22,51 +12,195 @@ export const context: RuntimeContext = {
   queueUpdate: false,
 };
 
-export type Ref<T = any> = {
+export class GraphNode {
+  _dirty = 0;
+  _dests = new Set<GraphNode>();
+
+  _update() {}
+  _remove() {}
+}
+
+export type Callback<T> = (t: T) => void;
+export type Unsubscribe = () => void;
+
+export class ValueNode<T = any> extends GraphNode {
+  _state: T;
+  _callbacks = new Set<Callback<T>>();
+
+  constructor(initial: T) {
+    super();
+    this._state = initial;
+  }
+
+  get value(): T {
+    context.dependencies?.add(this);
+    return this._state;
+  }
+
+  _subscribe(fn: Callback<T>): Unsubscribe {
+    fn(this._state);
+    this._callbacks.add(fn);
+    return () => {
+      this._callbacks.delete(fn);
+    };
+  }
+
+  override _update(): void {
+    for (const callback of this._callbacks) {
+      callback(this._state);
+    }
+  }
+}
+
+export class RefNode<T = any> extends ValueNode<T> {
+  constructor(initial: T) {
+    super(initial);
+  }
+
+  get value(): T {
+    return super.value;
+  }
+
+  set value(state: T) {
+    if (state !== this._state) {
+      context.dirtyNodes.add(this);
+      this._state = state;
+      enqueueUpdate();
+    }
+  }
+}
+
+export class ComputedNode<T = any> extends ValueNode<T> {
+  private _compute: () => T;
+  private _sources: Set<GraphNode>;
+
+  constructor(compute: () => T) {
+    const [state, sources] = capture(compute);
+    super(state);
+    this._compute = compute;
+    this._sources = sources;
+    for (const node of sources) {
+      node._dests.add(this);
+    }
+  }
+
+  get value(): T {
+    return super.value;
+  }
+
+  override _update(): void {
+    for (const node of this._sources) {
+      node._dests.delete(this);
+    }
+    const [state, sources] = capture(this._compute);
+    this._state = state;
+    this._sources = sources;
+    for (const node of sources) {
+      node._dests.add(this);
+    }
+    super._update();
+  }
+
+  override _remove(): void {
+    for (const node of this._sources) {
+      node._dests.delete(this);
+    }
+  }
+}
+
+export type EffectClearFunction = () => void;
+export type EffectFunction = () => EffectClearFunction | void;
+
+export class EffectNode extends GraphNode {
+  private _clear: ReturnType<EffectFunction>;
+  private _effect: EffectFunction;
+  private _sources: Set<GraphNode>;
+
+  constructor(effect: EffectFunction) {
+    super();
+
+    this._effect = effect;
+
+    const [clear, sources] = capture(effect);
+    this._clear = clear;
+    this._sources = sources;
+    for (const node of sources) {
+      node._dests.add(this);
+    }
+  }
+
+  override _update(): void {
+    if (typeof this._clear === "function") {
+      (0, this._clear)();
+    }
+    for (const node of this._sources) {
+      node._dests.delete(this);
+    }
+
+    const [clear, sources] = capture(this._effect);
+    this._clear = clear;
+    this._sources = sources;
+    for (const node of sources) {
+      node._dests.add(this);
+    }
+  }
+
+  override _remove(): void {
+    if (typeof this._clear === "function") {
+      (0, this._clear)();
+    }
+    for (const node of this._sources) {
+      node._dests.delete(this);
+    }
+  }
+}
+
+export interface Ref<T = any> {
   value: T;
-};
+}
 
-export type Computed<T = any> = {
+export interface Computed<T = any> {
   readonly value: T;
-};
+}
 
-export type RefExt<T = any> = {
-  _subscribe(fn: (t: T) => void): void;
-  _unsubscribe(fn: (t: T) => void): void;
-};
+export function ref<T>(): Ref<T | null>;
+export function ref<T>(t: T): Ref<T>;
+export function ref<T>(t: T = null as T): Ref<T> {
+  return new RefNode(t);
+}
 
-export function isRef<T>(ref: unknown): ref is Ref<T> {
-  return (
-    typeof ref === "object" &&
-    ref !== null &&
-    "_type" in ref &&
-    ref._type === "ref"
-  );
+export function computed<T>(fn: () => T): Computed<T> {
+  return new ComputedNode(fn);
+}
+
+export function effect(fn: EffectFunction): void {
+  new EffectNode(fn);
 }
 
 function update() {
   context.queueUpdate = false;
 
   while (context.dirtyNodes.size > 0) {
-    const dirtyNodes = context.dirtyNodes;
+    const queue: GraphNode[] = [...context.dirtyNodes];
     context.dirtyNodes = new Set();
 
-    const queue: Node[] = [];
-    const enqueue = (node: Node) => {
-      queue.push(node);
-      for (const to of node._dsts) {
-        ++to._dirty;
+    const mark = (node: GraphNode) => {
+      if (!node._dirty++) {
+        for (const dest of node._dests) {
+          mark(dest);
+        }
       }
     };
-
-    dirtyNodes.forEach((node) => enqueue(node));
+    for (const node of queue) {
+      mark(node);
+    }
 
     while (queue.length > 0) {
       const node = queue.shift()!;
       node._update();
-      for (const to of node._dsts) {
-        if (!--to._dirty) {
-          enqueue(to);
+      for (const dest of node._dests) {
+        if (!--dest._dirty) {
+          queue.push(dest);
         }
       }
     }
@@ -76,9 +210,7 @@ function update() {
 function enqueueUpdate() {
   if (!context.queueUpdate) {
     context.queueUpdate = true;
-    setTimeout(() => {
-      update();
-    });
+    setTimeout(() => update());
   }
 }
 
@@ -87,7 +219,7 @@ function capture<T>(fn: () => T) {
   const value = fn();
   const states = context.dependencies;
   context.dependencies = null;
-  return [value, states] as [T, Set<Node>];
+  return [value, states] as [T, Set<GraphNode>];
 }
 
 export function take<T>(ref: Ref<T> | Computed<T>) {
@@ -96,126 +228,4 @@ export function take<T>(ref: Ref<T> | Computed<T>) {
   const value = ref.value;
   context.dependencies = deps;
   return value;
-}
-
-export function ref<T>(): Ref<T | null>;
-export function ref<T>(t: T): Ref<T>;
-export function ref<T>(t: T = null as T): Ref<T> {
-  let state = t;
-  const callbacks = new Set<(t: T) => void>();
-
-  const signal: Ref<T> & Node & RefExt<T> = {
-    get value(): T {
-      context.dependencies?.add(signal);
-      return state;
-    },
-    set value(t: T) {
-      if (state !== t) {
-        state = t;
-        context.dirtyNodes.add(signal);
-        enqueueUpdate();
-      }
-    },
-    _type: "ref",
-    _dirty: 0,
-    _dsts: new Set(),
-    _update() {
-      for (const callback of callbacks) {
-        callback(state);
-      }
-    },
-    _subscribe(fn) {
-      callbacks.add(fn);
-    },
-    _unsubscribe(fn) {
-      callbacks.delete(fn);
-    },
-  };
-  return signal;
-}
-
-export function computed<T>(fn: () => T): Computed<T> {
-  if (isSSR) return { value: fn() };
-
-  const callbacks = new Set<(t: T) => void>();
-  let [state, sources] = capture(fn);
-
-  const computes: Computed<T> & Node & RefExt<T> = {
-    get value() {
-      context.dependencies?.add(computes);
-      return state;
-    },
-    _type: "computed",
-    _dirty: 0,
-    _dsts: new Set(),
-    _update() {
-      for (const node of sources) {
-        node._dsts.delete(computes);
-      }
-      [state, sources] = capture(fn);
-      for (const node of sources) {
-        node._dsts.add(computes);
-      }
-      for (const callback of callbacks) {
-        callback(state);
-      }
-    },
-    _remove() {
-      for (const node of sources) {
-        node._dsts.delete(computes);
-      }
-    },
-    _subscribe(fn) {
-      callbacks.add(fn);
-    },
-    _unsubscribe(fn) {
-      callbacks.delete(fn);
-    },
-  };
-
-  for (const node of sources) {
-    node._dsts.add(computes);
-  }
-
-  return computes;
-}
-
-export type EffectClearFunction = () => void;
-export type EffectFunction = () => EffectClearFunction | void;
-
-export function effect(fn: EffectFunction): void {
-  if (isSSR) return;
-
-  let [clear, sources] = capture(fn);
-
-  const effect: Node = {
-    _type: "effect",
-    _dirty: 0,
-    _dsts: new Set(),
-    _update() {
-      if (typeof clear === "function") {
-        clear();
-      }
-      for (const node of sources) {
-        node._dsts.delete(effect);
-      }
-
-      [clear, sources] = capture(fn);
-      for (const node of sources) {
-        node._dsts.add(effect);
-      }
-    },
-    _remove() {
-      if (typeof clear === "function") {
-        clear();
-      }
-      for (const node of sources) {
-        node._dsts.delete(this);
-      }
-    },
-  };
-
-  for (const node of sources) {
-    node._dsts.add(effect);
-  }
 }

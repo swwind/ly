@@ -1,15 +1,5 @@
-// deno-lint-ignore-file no-explicit-any
-import type { ComponentType, Key, VNode } from "./types.ts";
+import { h } from "./vnode.ts";
 
-function createVNode(
-  type: string | ComponentType,
-  props: Record<string, any>,
-  key?: Key
-): VNode {
-  const { ref, children, ...remains } = props;
-  return { type, props: remains, key, ref, children };
-}
-
-export { createVNode as jsx };
-export { createVNode as jsxs };
-export { createVNode as jsxDEV };
+export { h as jsx };
+export { h as jsxs };
+export { h as jsxDEV };

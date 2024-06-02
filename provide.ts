@@ -33,5 +33,5 @@ export function inject<T>(key: ProvideKey, fallback?: T): T | undefined {
     return fallback;
   }
 
-  return currentProvides.get(key)!;
+  return currentProvides.get(key);
 }
