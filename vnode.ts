@@ -2,10 +2,7 @@
 import { isComputed, isRef, type Computed, type Ref } from "./signal.ts";
 import { isArray } from "./utils.ts";
 
-type Key = string | number;
-type MaybeRef<T> = Ref<T> | T;
-type MaybeComputed<T> = Computed<T> | T;
-type MaybeArray<T> = Array<T> | T;
+export type Key = string | number;
 
 export type VNode = {
   type: string | ComponentType | null;
@@ -44,7 +41,7 @@ export function component$<P extends Props = {}>(
   return component;
 }
 
-export const Fragment = component$(() => h(Slot, null));
+export const Fragment = component$(() => createElement(Slot, null));
 export const Slot = component$<{ name?: string }>(() => {
   throw new Error("Usage of <Slot /> outside of components");
 });
@@ -62,22 +59,16 @@ export function provideSlots<T>(slots: Slots, callback: () => T) {
   }
 }
 
-export function h(
+export function createElement(
   type: string | ComponentType | null,
   props: Props | null,
-  key?: Key
+  ...children: ComponentChild[]
 ): VNode {
   props ??= {};
 
   if (type === Slot) {
     const name = props["name"] || DEFAULT_SLOT_NAME;
-    if (currentSlots && name in currentSlots) {
-      return h(null, { children: currentSlots[name] }, key);
-    } else if ("children" in props) {
-      return h(null, { children: props.children }, key);
-    } else {
-      return h(null, null, key);
-    }
+    return createElement(null, null, ...(currentSlots?.[name] ?? children));
   }
 
   const slots: Slots = {};
@@ -85,35 +76,31 @@ export function h(
 
   let ref: Ref | undefined = undefined;
 
+  for (const child of children) {
+    if (isComputed(child)) {
+      slots[DEFAULT_SLOT_NAME] ??= [];
+      slots[DEFAULT_SLOT_NAME].push(child);
+    } else if (isArray(child)) {
+      slots[DEFAULT_SLOT_NAME] ??= [];
+      slots[DEFAULT_SLOT_NAME].push(...child);
+    } else if (
+      typeof child === "object" &&
+      child !== null &&
+      child.type === "template"
+    ) {
+      const name = child.props["slot"] || DEFAULT_SLOT_NAME;
+      slots[name] ??= [];
+      slots[name].push(...(child.slots[DEFAULT_SLOT_NAME] ?? []));
+    } else {
+      slots[DEFAULT_SLOT_NAME] ??= [];
+      slots[DEFAULT_SLOT_NAME].push(child);
+    }
+  }
+
   for (const key in props) {
     const value = props[key];
 
-    if (key === "children") {
-      const children: ComponentChild[] = (
-        isArray(value) ? value : [value]
-      ).flat(Infinity);
-
-      for (const child of children) {
-        if (isComputed(child)) {
-          slots[DEFAULT_SLOT_NAME] ??= [];
-          slots[DEFAULT_SLOT_NAME].push(child);
-        } else if (isArray(child)) {
-          slots[DEFAULT_SLOT_NAME] ??= [];
-          slots[DEFAULT_SLOT_NAME].push(...child);
-        } else if (
-          typeof child === "object" &&
-          child !== null &&
-          child.type === "template"
-        ) {
-          const name = child.props["slot"] || DEFAULT_SLOT_NAME;
-          slots[name] ??= [];
-          slots[name].push(...(child.slots[DEFAULT_SLOT_NAME] ?? []));
-        } else {
-          slots[DEFAULT_SLOT_NAME] ??= [];
-          slots[DEFAULT_SLOT_NAME].push(child);
-        }
-      }
-    } else if (key === "ref") {
+    if (key === "ref") {
       if (isRef(value)) {
         ref = value;
       }
@@ -122,5 +109,5 @@ export function h(
     }
   }
 
-  return { type, props: normalizedProps, slots, key, ref };
+  return { type, props: normalizedProps, slots, key: undefined, ref };
 }
