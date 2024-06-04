@@ -1,231 +1,294 @@
 // deno-lint-ignore-file no-explicit-any
 
-export type RuntimeContext = {
-  dependencies: Set<GraphNode> | null;
-  dirtyNodes: Set<GraphNode>;
-  queueUpdate: boolean;
+export type Ref<T = any> = { value: T };
+export type Computed<T = any> = { readonly value: T };
+
+export type State = RefState | ComputedState | EffectState;
+type Capture = {
+  _getters: Set<RefState | ComputedState>;
+  _setters: Set<RefState>;
 };
 
-export const context: RuntimeContext = {
-  dependencies: null,
-  dirtyNodes: new Set(),
-  queueUpdate: false,
-};
+let currentCapture: Capture | null = null;
 
-export class GraphNode {
-  _dirty = 0;
-  _dests = new Set<GraphNode>();
-
-  _update() {}
-  _remove() {}
+let dirtyStates = new Set<RefState>();
+let currentUpdate = false;
+function enqueueUpdate(node: RefState) {
+  dirtyStates.add(node);
+  if (!currentUpdate) {
+    currentUpdate = true;
+    setTimeout(updateStates);
+  }
 }
 
-export type Callback<T> = (t: T) => void;
-export type Unsubscribe = () => void;
-
-export class ValueNode<T = any> extends GraphNode {
-  _state: T;
-  _callbacks = new Set<Callback<T>>();
-
-  constructor(initial: T) {
-    super();
-    this._state = initial;
-  }
-
-  get value(): T {
-    context.dependencies?.add(this);
-    return this._state;
-  }
-
-  _subscribe(fn: Callback<T>): Unsubscribe {
-    fn(this._state);
-    this._callbacks.add(fn);
-    return () => {
-      this._callbacks.delete(fn);
-    };
-  }
-
-  override _update(): void {
-    for (const callback of this._callbacks) {
-      callback(this._state);
+function mark(node: RefState | ComputedState) {
+  for (const listener of node._listeners) {
+    if (!listener._dirty++ && listener instanceof ComputedState) {
+      mark(listener);
     }
   }
 }
 
-export class RefNode<T = any> extends ValueNode<T> {
-  constructor(initial: T) {
-    super(initial);
-  }
-
-  get value(): T {
-    return super.value;
-  }
-
-  set value(state: T) {
-    if (state !== this._state) {
-      context.dirtyNodes.add(this);
-      this._state = state;
-      enqueueUpdate();
+function unmark(node: RefState | ComputedState) {
+  for (const listener of node._listeners) {
+    if (!--listener._dirty && listener instanceof ComputedState) {
+      unmark(listener);
     }
   }
 }
 
-export class ComputedNode<T = any> extends ValueNode<T> {
-  private _compute: () => T;
-  private _sources: Set<GraphNode>;
+function updateStates() {
+  currentUpdate = false;
 
-  constructor(compute: () => T) {
-    const [state, sources] = capture(compute);
-    super(state);
-    this._compute = compute;
-    this._sources = sources;
-    for (const node of sources) {
-      node._dests.add(this);
-    }
-  }
+  while (dirtyStates.size > 0) {
+    const dirty = [...dirtyStates];
+    dirtyStates = new Set();
+    const queue: (ComputedState | EffectState)[] = [];
 
-  get value(): T {
-    return super.value;
-  }
-
-  override _update(): void {
-    for (const node of this._sources) {
-      node._dests.delete(this);
-    }
-    const [state, sources] = capture(this._compute);
-    this._state = state;
-    this._sources = sources;
-    for (const node of sources) {
-      node._dests.add(this);
-    }
-    super._update();
-  }
-
-  override _remove(): void {
-    for (const node of this._sources) {
-      node._dests.delete(this);
-    }
-  }
-}
-
-export type EffectClearFunction = () => void;
-export type EffectFunction = () => EffectClearFunction | void;
-
-export class EffectNode extends GraphNode {
-  private _clear: ReturnType<EffectFunction>;
-  private _effect: EffectFunction;
-  private _sources: Set<GraphNode>;
-
-  constructor(effect: EffectFunction) {
-    super();
-
-    this._effect = effect;
-
-    const [clear, sources] = capture(effect);
-    this._clear = clear;
-    this._sources = sources;
-    for (const node of sources) {
-      node._dests.add(this);
-    }
-  }
-
-  override _update(): void {
-    if (typeof this._clear === "function") {
-      (0, this._clear)();
-    }
-    for (const node of this._sources) {
-      node._dests.delete(this);
-    }
-
-    const [clear, sources] = capture(this._effect);
-    this._clear = clear;
-    this._sources = sources;
-    for (const node of sources) {
-      node._dests.add(this);
-    }
-  }
-
-  override _remove(): void {
-    if (typeof this._clear === "function") {
-      (0, this._clear)();
-    }
-    for (const node of this._sources) {
-      node._dests.delete(this);
-    }
-  }
-}
-
-export interface Ref<T = any> {
-  value: T;
-}
-
-export interface Computed<T = any> {
-  readonly value: T;
-}
-
-export function ref<T>(): Ref<T | null>;
-export function ref<T>(t: T): Ref<T>;
-export function ref<T>(t: T = null as T): Ref<T> {
-  return new RefNode(t);
-}
-
-export function computed<T>(fn: () => T): Computed<T> {
-  return new ComputedNode(fn);
-}
-
-export function effect(fn: EffectFunction): void {
-  new EffectNode(fn);
-}
-
-function update() {
-  context.queueUpdate = false;
-
-  while (context.dirtyNodes.size > 0) {
-    const queue: GraphNode[] = [...context.dirtyNodes];
-    context.dirtyNodes = new Set();
-
-    const mark = (node: GraphNode) => {
-      if (!node._dirty++) {
-        for (const dest of node._dests) {
-          mark(dest);
+    for (const node of dirty) mark(node);
+    for (const node of dirty) {
+      if (node._update()) {
+        for (const dest of node._listeners) {
+          if (!--dest._dirty) {
+            queue.push(dest);
+          }
         }
+      } else {
+        unmark(node);
       }
-    };
-    for (const node of queue) {
-      mark(node);
     }
 
     while (queue.length > 0) {
-      const node = queue.shift()!;
-      node._update();
-      for (const dest of node._dests) {
-        if (!--dest._dirty) {
-          queue.push(dest);
+      const node = queue.pop()!;
+
+      if (node._update()) {
+        for (const dest of (node as ComputedState)._listeners) {
+          if (!--dest._dirty) {
+            queue.push(dest);
+          }
         }
+      } else if (node instanceof ComputedState) {
+        unmark(node);
       }
     }
   }
 }
 
-function enqueueUpdate() {
-  if (!context.queueUpdate) {
-    context.queueUpdate = true;
-    setTimeout(() => update());
+let recursive: false | "computed" | "effect" = false;
+
+function assertRecursive(name: string) {
+  if (recursive) {
+    throw new TypeError(`Cannot construct ${name} inside ${recursive}`);
   }
 }
 
-function capture<T>(fn: () => T) {
-  context.dependencies = new Set();
-  const value = fn();
-  const states = context.dependencies;
-  context.dependencies = null;
-  return [value, states] as [T, Set<GraphNode>];
+export class RefState<T = any> {
+  private _old: T;
+  private _state: T;
+  private _pending: T;
+  _listeners: Set<ComputedState | EffectState> = new Set();
+
+  constructor(init: T) {
+    assertRecursive("ref");
+
+    this._old = init;
+    this._state = init;
+    this._pending = init;
+  }
+
+  get value(): T {
+    currentCapture?._getters.add(this);
+    return this._state;
+  }
+
+  set value(state: T) {
+    currentCapture?._setters.add(this);
+    if (state !== this._state) {
+      this._pending = state;
+      enqueueUpdate(this);
+    }
+  }
+
+  _update(): boolean {
+    if (this._state === this._pending) {
+      return false;
+    }
+    this._old = this._state;
+    this._state = this._pending;
+    return true;
+  }
 }
 
-export function take<T>(ref: Ref<T> | Computed<T>) {
-  const deps = context.dependencies;
-  context.dependencies = null;
-  const value = ref.value;
-  context.dependencies = deps;
-  return value;
+export class ComputedState<T = any> {
+  private _fn: () => T;
+  private _old: T;
+  private _state: T;
+  private _capture: Capture;
+  _count: number = 0;
+  _dirty: number = 0;
+  _listeners: Set<ComputedState | EffectState> = new Set();
+
+  constructor(fn: () => T) {
+    assertRecursive("computed");
+
+    this._fn = fn;
+    this._capture = createCapture();
+
+    recursive = "computed";
+    const state = runCapture(fn, this._capture);
+    recursive = false;
+
+    for (const node of this._capture._getters) {
+      node._listeners.add(this);
+    }
+    this._old = state;
+    this._state = state;
+  }
+
+  get value(): T {
+    currentCapture?._getters.add(this);
+    return this._state;
+  }
+
+  _update(): boolean {
+    // remove old links
+    for (const node of this._capture._getters) {
+      node._listeners.delete(this);
+    }
+
+    // capture new deps
+    this._capture = createCapture();
+    const state = runCapture(this._fn, this._capture);
+
+    // link to current getters
+    for (const node of this._capture._getters) {
+      node._listeners.add(this);
+    }
+
+    // skip graph update if nothing changes
+    if (state === this._state) {
+      return false;
+    }
+
+    // update current states
+    this._old = this._state;
+    this._state = state;
+
+    return true;
+  }
+
+  _remove() {
+    for (const node of this._capture._getters) {
+      node._listeners.delete(this);
+    }
+  }
+}
+
+export class EffectState {
+  private _fn: () => void | (() => void);
+  private _capture: Capture;
+  private _clear: void | (() => void);
+  _count: number = 0;
+  _dirty: number = 0;
+
+  constructor(fn: () => void | (() => void)) {
+    assertRecursive("effect");
+
+    this._fn = fn;
+    this._capture = createCapture();
+
+    recursive = "effect";
+    this._clear = runCapture(fn, this._capture);
+    recursive = false;
+
+    for (const node of this._capture._getters) {
+      node._listeners.add(this);
+    }
+  }
+
+  _update(): void {
+    if (typeof this._clear === "function") {
+      this._clear();
+    }
+    for (const node of this._capture._getters) {
+      node._listeners.delete(this);
+    }
+
+    this._capture = createCapture();
+    this._clear = runCapture(this._fn, this._capture);
+
+    for (const node of this._capture._getters) {
+      node._listeners.add(this);
+    }
+  }
+
+  _remove() {
+    if (typeof this._clear === "function") {
+      this._clear();
+    }
+    for (const node of this._capture._getters) {
+      node._listeners.delete(this);
+    }
+  }
+}
+
+function createCapture(): Capture {
+  return { _getters: new Set(), _setters: new Set() };
+}
+
+function runCapture<T>(fn: () => T, capture: Capture) {
+  const previousCapture = currentCapture;
+  currentCapture = capture;
+  try {
+    return fn();
+  } finally {
+    currentCapture = previousCapture;
+  }
+}
+
+let currentRefs: RefState[] | null = null;
+let currentComputes: ComputedState[] | null = null;
+let currentEffects: EffectState[] | null = null;
+
+export function ref<T>(): Ref<T | null>;
+export function ref<T>(init: T): Ref<T>;
+export function ref<T>(init: T = null as T): Ref<T> {
+  const state = new RefState(init);
+  currentRefs?.push(state);
+  return state;
+}
+
+export function computed<T>(fn: () => T): Computed<T> {
+  const state = new ComputedState(fn);
+  currentComputes?.push(state);
+  return state;
+}
+
+export function effect(fn: () => void | (() => void)): void {
+  const state = new EffectState(fn);
+  currentEffects?.push(state);
+}
+
+export function collect<T>(
+  fn: () => T
+): [T, RefState[], ComputedState[], EffectState[]] {
+  currentRefs = [];
+  currentComputes = [];
+  currentEffects = [];
+  try {
+    const ret = fn();
+    return [ret, currentRefs, currentComputes, currentEffects];
+  } finally {
+    currentRefs = null;
+    currentComputes = null;
+    currentEffects = null;
+  }
+}
+
+export function isComputed<T>(v: unknown): v is Computed<T> {
+  return v instanceof ComputedState || v instanceof RefState;
+}
+
+export function isRef<T>(v: unknown): v is Ref<T> {
+  return v instanceof RefState;
 }

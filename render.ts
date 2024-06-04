@@ -1,49 +1,131 @@
 import {
-  endSlots,
-  startSlots,
+  type ComponentChildren,
+  type Permitives,
+  provideSlots,
   type ComponentChild,
-  type ComponentType,
-  type Props,
-  type Slots,
   type VNode,
 } from "./vnode.ts";
-import { insertAfter, isArray, isComputed } from "./utils.ts";
-import type { ValueNode } from "./signal.ts";
-import { endProvide, startProvide } from "./provide.ts";
+import { isArray, toArray } from "./utils.ts";
+import {
+  type ComputedState,
+  EffectState,
+  collect,
+  isComputed,
+} from "./signal.ts";
 
-function setupVNode(comp: ComponentType, props: Props, slots: Slots) {
-  // startProvide(new Map());
-  startSlots(slots);
+type VDOM = {
+  children: VDOM[];
+  states: (ComputedState | EffectState)[];
+  doms: ChildNode[];
+  contain: boolean;
+};
 
-  const vnodes = comp(props);
-
-  endSlots();
-  // const provides = endProvide();
-
-  return vnodes;
+function createVDOM(contain: boolean = false): VDOM {
+  return { children: [], states: [], doms: [], contain };
 }
 
-function mountVNodes(
-  vnodes: ComponentChild[],
-  parent: Node,
-  after: Node | null
-) {
-  const comments = new Array(vnodes.length);
-
-  for (let i = 0; i < vnodes.length; ++i) {
-    comments[i] = document.createComment("/");
-    insertAfter(parent, i > 0 ? comments[i - 1] : after, comments[i]);
+function removeVDOM(vdom: VDOM, remove: boolean = true) {
+  for (const child of vdom.children) {
+    removeVDOM(child, remove && !vdom.contain);
   }
-
-  for (let i = 0; i < vnodes.length; ++i) {
-    mountVNode(vnodes[i], parent, comments[i]);
+  for (const state of vdom.states) {
+    state._remove();
+  }
+  if (remove) {
+    for (const dom of vdom.doms) {
+      dom.remove();
+    }
   }
 }
 
-function mountVNode(vnode: ComponentChild, parent: Node, after: Node | null) {
+type Mount = (node: Node) => void;
+
+function mountChildren(vnodes: ComponentChildren, mount: Mount): VDOM {
+  vnodes = toArray(vnodes);
+
+  const vdom = createVDOM();
+
+  for (let i = 0; i < vnodes.length; ++i) {
+    const child = mountChild(vnodes[i], mount);
+    vdom.children.push(child);
+    vdom.doms.push(...child.doms);
+  }
+
+  return vdom;
+}
+
+function setAttribute(elem: Element, key: string, value: unknown) {
+  if (value === false || value == null) {
+    elem.removeAttribute(key);
+  } else if (value === true) {
+    elem.setAttribute(key, "");
+  } else {
+    elem.setAttribute(key, String(value));
+  }
+}
+
+function mountVNode(vnode: VNode, mount: Mount): VDOM {
+  if (vnode.type === null) {
+    const children = vnode.slots["default"] ?? [];
+
+    return mountChildren(children, mount);
+  } else if (typeof vnode.type === "string") {
+    const elem = document.createElement(vnode.type);
+    const vdom = createVDOM(true);
+    vdom.doms.push(elem);
+
+    // TODO: set elem props
+    for (const key in vnode.props) {
+      const value = vnode.props[key];
+      if (key.startsWith("on")) {
+        const name = key.slice(2).toLowerCase();
+        elem.addEventListener(name, value);
+      } else if (isComputed(value)) {
+        vdom.states.push(
+          new EffectState(() => setAttribute(elem, key, value.value))
+        );
+      } else {
+        setAttribute(elem, key, value);
+      }
+    }
+
+    vdom.children.push(
+      mountChildren(vnode.slots["default"] ?? [], (node) => {
+        elem.appendChild(node);
+      })
+    );
+
+    mount(elem);
+
+    return vdom;
+  } else if (typeof vnode.type === "function") {
+    const { type, slots, props } = vnode;
+    const [vnodes, _refs, computes, effects] = collect(() =>
+      provideSlots(slots, () => type(props))
+    );
+
+    const vdom = createVDOM();
+    vdom.children.push(mountChildren(vnodes, mount));
+    vdom.states.push(...computes);
+    vdom.states.push(...effects);
+
+    return vdom;
+  } else {
+    throw new Error("Invalid VNode");
+  }
+}
+
+function mountPermitives(vnode: Permitives, mount: Mount): VDOM {
+  if (isArray(vnode)) {
+    const vdom = createVDOM();
+    for (const node of vnode) {
+      vdom.children.push(mountPermitives(node, mount));
+    }
+    return vdom;
+  }
+
   if (vnode == null || vnode === false) {
-    const text = document.createComment("null");
-    return insertAfter(parent, after, text);
+    return createVDOM();
   }
 
   if (
@@ -52,54 +134,39 @@ function mountVNode(vnode: ComponentChild, parent: Node, after: Node | null) {
     typeof vnode === "boolean" ||
     typeof vnode === "string"
   ) {
-    const text = document.createTextNode(String(vnode));
-    return insertAfter(parent, after, text);
+    const text = new Text(String(vnode));
+    const vdom = createVDOM();
+    vdom.doms.push(text);
+    mount(text);
+    return vdom;
   }
 
+  return mountVNode(vnode, mount);
+}
+
+function mountChild(vnode: ComponentChild, mount: Mount): VDOM {
   if (isComputed(vnode)) {
-    const computed = vnode as ValueNode<ComponentChild>;
-    computed._subscribe((vnode) => {
-      mountVNode(vnode, parent, after);
-    });
-    return;
+    const vdom = createVDOM();
+
+    const anchor = new Comment("/");
+    mount(anchor);
+
+    vdom.states.push(
+      new EffectState(() => {
+        const vnodes = vnode.value;
+        const child = mountChildren(vnodes, (node) => {
+          anchor.before(node);
+        });
+        vdom.children = [child];
+
+        return () => removeVDOM(child);
+      })
+    );
+
+    return vdom;
   }
 
-  if (vnode.type === null) {
-    const children = vnode.slots["default"] ?? [];
-    return mountVNodes(children, parent, after);
-  } else if (typeof vnode.type === "string") {
-    const elem = document.createElement(vnode.type);
-
-    // TODO: set elem props
-    for (const key in vnode.props) {
-      const value = vnode.props[key];
-      if (key.startsWith("on")) {
-        const name = key.slice(2).toLowerCase();
-        elem.addEventListener(name, vnode.props[key]);
-      } else {
-        if (isComputed(value)) {
-          (value as ValueNode)._subscribe((value) => {
-            elem.setAttribute(key, value);
-          });
-        } else {
-          elem.setAttribute(key, vnode.props[key]);
-        }
-      }
-    }
-
-    const children = vnode.slots["default"] ?? [];
-    mountVNodes(children, elem, null);
-
-    return insertAfter(parent, after, elem);
-  } else {
-    const vnodes = setupVNode(vnode.type, vnode.props, vnode.slots);
-
-    if (isArray(vnodes)) {
-      return mountVNodes(vnodes, parent, after);
-    }
-
-    return mountVNode(vnode, parent, after);
-  }
+  return mountPermitives(vnode, mount);
 }
 
 /**
@@ -120,8 +187,8 @@ function mountVNode(vnode: ComponentChild, parent: Node, after: Node | null) {
  * </parent>
  * ```
  */
-export function render(vnode: VNode, parent: Node, after: Node | null = null) {
-  mountVNode(vnode, parent, after);
+export function render(vnode: VNode, parent: Node) {
+  mountVNode(vnode, (node) => parent.appendChild(node));
 }
 
 /**
@@ -142,4 +209,6 @@ export function render(vnode: VNode, parent: Node, after: Node | null = null) {
  * </parent>
  * ```
  */
-export function hydrate(vnode: VNode, parent: Node, after: Node | null) {}
+export function hydrate(vnode: VNode, target: ChildNode) {
+  mountVNode(vnode, (node) => target.replaceWith(node));
+}

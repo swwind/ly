@@ -1,14 +1,11 @@
 // deno-lint-ignore-file ban-types no-explicit-any
-import type { Computed, Ref } from "./signal.ts";
-import { isArray, isComputed, isRef } from "./utils.ts";
+import { isComputed, isRef, type Computed, type Ref } from "./signal.ts";
+import { isArray } from "./utils.ts";
 
-export type Key = string | number;
-export type MaybeRef<T> = Ref<T> | T;
-export type MaybeComputed<T> = Computed<T> | T;
-export type MaybeArray<T> = Array<T> | T;
-
-export type Props = Record<string, any>;
-export type Slots = Record<string, ComponentChild[]>;
+type Key = string | number;
+type MaybeRef<T> = Ref<T> | T;
+type MaybeComputed<T> = Computed<T> | T;
+type MaybeArray<T> = Array<T> | T;
 
 export type VNode = {
   type: string | ComponentType | null;
@@ -18,25 +15,28 @@ export type VNode = {
   ref?: Ref;
 };
 
-export type ComponentType<P extends Props = {}> = (
-  props: P
-) => MaybeComputed<VNode | VNode[] | null>;
-
-export type ComponentChildVariants =
-  | VNode
+export type Permitives =
   | string
   | number
   | bigint
   | boolean
   | null
-  | undefined;
-export type ComponentChild = MaybeComputed<ComponentChildVariants>;
-export type ComponentChildren = MaybeArray<ComponentChild>;
+  | undefined
+  | VNode
+  | Permitives[];
+export type ComponentChild = Permitives | Computed<Permitives>;
+export type ComponentChildren = ComponentChild | ComponentChild[];
 
 export type Attributes<T = HTMLElement> = {
   key?: Key;
   ref?: Ref<T>;
 };
+
+export type Props = Record<string, any>;
+export type Slots = Record<string, ComponentChild[]>;
+export type ComponentType<P extends Props = {}> = (
+  props: P
+) => ComponentChildren;
 
 export function component$<P extends Props = {}>(
   component: ComponentType<P>
@@ -44,18 +44,22 @@ export function component$<P extends Props = {}>(
   return component;
 }
 
-export const Fragment = component$(() => h(null, { children: h(Slot, null) }));
-export const Slot = component$<{ name?: string }>(() => null);
+export const Fragment = component$(() => h(Slot, null));
+export const Slot = component$<{ name?: string }>(() => {
+  throw new Error("Usage of <Slot /> outside of components");
+});
 
 let currentSlots: Slots | null = null;
 const DEFAULT_SLOT_NAME = "default";
 
-export function startSlots(slots: Slots) {
+export function provideSlots<T>(slots: Slots, callback: () => T) {
+  const old = currentSlots;
   currentSlots = slots;
-}
-
-export function endSlots() {
-  currentSlots = null;
+  try {
+    return callback();
+  } finally {
+    currentSlots = old;
+  }
 }
 
 export function h(
@@ -66,9 +70,14 @@ export function h(
   props ??= {};
 
   if (type === Slot) {
-    const name = props["name"] || "default";
-    const children = currentSlots?.[name] || props["children"];
-    return h(null, children ? { children } : null, key);
+    const name = props["name"] || DEFAULT_SLOT_NAME;
+    if (currentSlots && name in currentSlots) {
+      return h(null, { children: currentSlots[name] }, key);
+    } else if ("children" in props) {
+      return h(null, { children: props.children }, key);
+    } else {
+      return h(null, null, key);
+    }
   }
 
   const slots: Slots = {};
@@ -80,12 +89,17 @@ export function h(
     const value = props[key];
 
     if (key === "children") {
-      const children: ComponentChild[] = isArray(value) ? value : [value];
+      const children: ComponentChild[] = (
+        isArray(value) ? value : [value]
+      ).flat(Infinity);
 
       for (const child of children) {
-        if (isRef(child) || isComputed(child)) {
+        if (isComputed(child)) {
           slots[DEFAULT_SLOT_NAME] ??= [];
           slots[DEFAULT_SLOT_NAME].push(child);
+        } else if (isArray(child)) {
+          slots[DEFAULT_SLOT_NAME] ??= [];
+          slots[DEFAULT_SLOT_NAME].push(...child);
         } else if (
           typeof child === "object" &&
           child !== null &&
@@ -100,7 +114,9 @@ export function h(
         }
       }
     } else if (key === "ref") {
-      ref = isRef(value) ? value : undefined;
+      if (isRef(value)) {
+        ref = value;
+      }
     } else {
       normalizedProps[key] = value;
     }

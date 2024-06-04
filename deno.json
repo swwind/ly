@@ -1,5 +1,5 @@
 {
-  "name": "@swwind/riakuto",
+  "name": "@swwind/ly",
   "version": "0.0.1",
   "exports": {
     ".": "./mod.ts",

@@ -1,7 +1,0 @@
-{
-  "version": "3",
-  "redirects": {
-    "https://esm.sh/preact": "https://esm.sh/preact@10.22.0"
-  },
-  "remote": {}
-}
