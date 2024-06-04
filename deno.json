@@ -1,6 +1,9 @@
 {
   "name": "@swwind/ly",
   "version": "0.0.1",
+  "tasks": {
+    "dev": "deno run -A npm:vite"
+  },
   "exports": {
     ".": "./mod.ts",
     "./jsx-runtime": "./jsx-runtime.ts"
