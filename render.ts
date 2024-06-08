@@ -4,13 +4,15 @@ import {
   provideSlots,
   type ComponentChild,
   type VNode,
+  isVNode,
 } from "./vnode.ts";
-import { isArray, toArray } from "./utils.ts";
+import { toArray } from "./utils.ts";
 import {
   type ComputedState,
   EffectState,
   collect,
   isComputed,
+  type Computed,
 } from "./signal.ts";
 
 type VDOM = {
@@ -104,6 +106,24 @@ function mountVNode(vnode: VNode, mount: Mount): VDOM {
       provideSlots(slots, () => type(props))
     );
 
+    if (typeof vnodes === "function") {
+      const vdom = createVDOM();
+
+      const anchor = new Comment("/");
+      mount(anchor);
+
+      vdom.states.push(
+        new EffectState(() => {
+          const children = mountChildren(vnodes(), (node) =>
+            anchor.before(node)
+          );
+          return () => removeVDOM(children);
+        })
+      );
+
+      return vdom;
+    }
+
     const vdom = createVDOM();
     vdom.children.push(mountChildren(vnodes, mount));
     vdom.states.push(...computes);
@@ -115,58 +135,37 @@ function mountVNode(vnode: VNode, mount: Mount): VDOM {
   }
 }
 
-function mountPermitives(vnode: Permitives, mount: Mount): VDOM {
-  if (isArray(vnode)) {
-    const vdom = createVDOM();
-    for (const node of vnode) {
-      vdom.children.push(mountPermitives(node, mount));
-    }
-    return vdom;
+function toString(permitive: Permitives) {
+  return permitive == null || permitive === false ? "" : String(permitive);
+}
+
+function mountPermitives(
+  vnode: Permitives | Computed<Permitives>,
+  mount: Mount
+): VDOM {
+  const vdom = createVDOM();
+  const text = new Text();
+  vdom.doms.push(text);
+
+  if (isComputed(vnode)) {
+    vdom.states.push(
+      new EffectState(() => {
+        console.log("update text.Content only", vnode.value);
+        text.textContent = toString(vnode.value);
+      })
+    );
+  } else {
+    text.textContent = toString(vnode);
   }
 
-  if (vnode == null || vnode === false) {
-    return createVDOM();
-  }
-
-  if (
-    typeof vnode === "number" ||
-    typeof vnode === "bigint" ||
-    typeof vnode === "boolean" ||
-    typeof vnode === "string"
-  ) {
-    const text = new Text(String(vnode));
-    const vdom = createVDOM();
-    vdom.doms.push(text);
-    mount(text);
-    return vdom;
-  }
-
-  return mountVNode(vnode, mount);
+  mount(text);
+  return vdom;
 }
 
 function mountChild(vnode: ComponentChild, mount: Mount): VDOM {
-  if (isComputed(vnode)) {
-    const vdom = createVDOM();
-
-    const anchor = new Comment("/");
-    mount(anchor);
-
-    vdom.states.push(
-      new EffectState(() => {
-        const vnodes = vnode.value;
-        const child = mountChildren(vnodes, (node) => {
-          anchor.before(node);
-        });
-        vdom.children = [child];
-
-        return () => removeVDOM(child);
-      })
-    );
-
-    return vdom;
-  }
-
-  return mountPermitives(vnode, mount);
+  return isVNode(vnode)
+    ? mountVNode(vnode, mount)
+    : mountPermitives(vnode, mount);
 }
 
 /**

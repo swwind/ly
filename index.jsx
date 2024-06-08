@@ -1,16 +1,29 @@
-import { effect, ref, render } from "ly";
+import { computed, effect, ref, render } from "ly";
+
+function John({ count }) {
+  const two = computed(() => count.value * 2);
+
+  return () => {
+    return count.value % 3 === 0
+      ? <p>count = {count}</p>
+      : <p>count * 2 = {two}</p>;
+  };
+}
 
 function App() {
   const count = ref(1);
 
   effect(() => console.log("count", count.value));
 
+  const two = computed(() => count.value * 2);
+  const four = computed(() => two.value * 2);
+
   return (
     <div>
       <button onClick={() => count.value++}>click</button>
-      <p>
-        count = {count}
-      </p>
+      <John count={count} />
+      <John count={two} />
+      <John count={four} />
     </div>
   );
 }

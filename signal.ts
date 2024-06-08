@@ -78,6 +78,7 @@ let recursive: false | "computed" | "effect" = false;
 
 function assertRecursive(name: string) {
   if (recursive) {
+    if (name === "effect" && recursive === "effect") return;
     throw new TypeError(`Cannot construct ${name} inside ${recursive}`);
   }
 }

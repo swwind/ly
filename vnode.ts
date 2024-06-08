@@ -1,27 +1,20 @@
 // deno-lint-ignore-file ban-types no-explicit-any
-import { isComputed, isRef, type Computed, type Ref } from "./signal.ts";
-import { isArray } from "./utils.ts";
+import { isRef, type Computed, type Ref } from "./signal.ts";
 
 export type Key = string | number;
 
-export type VNode = {
-  type: string | ComponentType | null;
-  props: Props;
-  slots: Slots;
-  key?: Key;
-  ref?: Ref;
-};
+export class VNode {
+  constructor(
+    public type: string | ComponentType | null,
+    public props: Props,
+    public slots: Slots,
+    public key?: Key,
+    public ref?: Ref
+  ) {}
+}
 
-export type Permitives =
-  | string
-  | number
-  | bigint
-  | boolean
-  | null
-  | undefined
-  | VNode
-  | Permitives[];
-export type ComponentChild = Permitives | Computed<Permitives>;
+export type Permitives = string | number | bigint | boolean | null | undefined;
+export type ComponentChild = Permitives | Computed<Permitives> | VNode;
 export type ComponentChildren = ComponentChild | ComponentChild[];
 
 export type Attributes<T = HTMLElement> = {
@@ -33,7 +26,7 @@ export type Props = Record<string, any>;
 export type Slots = Record<string, ComponentChild[]>;
 export type ComponentType<P extends Props = {}> = (
   props: P
-) => ComponentChildren;
+) => ComponentChildren | (() => ComponentChildren);
 
 export function component$<P extends Props = {}>(
   component: ComponentType<P>
@@ -77,17 +70,7 @@ export function createElement(
   let ref: Ref | undefined = undefined;
 
   for (const child of children) {
-    if (isComputed(child)) {
-      slots[DEFAULT_SLOT_NAME] ??= [];
-      slots[DEFAULT_SLOT_NAME].push(child);
-    } else if (isArray(child)) {
-      slots[DEFAULT_SLOT_NAME] ??= [];
-      slots[DEFAULT_SLOT_NAME].push(...child);
-    } else if (
-      typeof child === "object" &&
-      child !== null &&
-      child.type === "template"
-    ) {
+    if (isVNode(child) && child.type === "template") {
       const name = child.props["slot"] || DEFAULT_SLOT_NAME;
       slots[name] ??= [];
       slots[name].push(...(child.slots[DEFAULT_SLOT_NAME] ?? []));
@@ -109,5 +92,9 @@ export function createElement(
     }
   }
 
-  return { type, props: normalizedProps, slots, key: undefined, ref };
+  return new VNode(type, normalizedProps, slots, undefined, ref);
+}
+
+export function isVNode(vnode: unknown): vnode is VNode {
+  return vnode instanceof VNode;
 }
