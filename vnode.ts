@@ -24,11 +24,11 @@ export type Attributes<T = HTMLElement> = {
 
 export type Props = Record<string, any>;
 export type Slots = Record<string, ComponentChild[]>;
-export type ComponentType<P extends Props = {}> = (
+export type ComponentType<P = {}> = (
   props: P
 ) => ComponentChildren | (() => ComponentChildren);
 
-export function component$<P extends Props = {}>(
+export function component$<P = {}>(
   component: ComponentType<P>
 ): ComponentType<P> {
   return component;

@@ -6,6 +6,7 @@ import {
   type VNode,
   type ComponentType,
 } from "./vnode.ts";
+import type { JSXInternal } from "./jsx.d.ts";
 
 export function jsx(type: string, props: Props | null, key?: Key): VNode;
 export function jsx<P extends Props>(
@@ -27,3 +28,5 @@ export function jsx(
   props["key"] = key;
   return createElement(type, props, ...children);
 }
+
+export type { JSXInternal as JSX };

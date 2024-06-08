@@ -1,12 +1,15 @@
 import { computed, effect, ref, render } from "ly";
+import type { Ref } from "./signal.ts";
 
-function John({ count }) {
+function John({ count }: { count: Ref<number> }) {
   const two = computed(() => count.value * 2);
 
   return () => {
-    return count.value % 3 === 0
-      ? <p>count = {count}</p>
-      : <p>count * 2 = {two}</p>;
+    return count.value % 3 === 0 ? (
+      <p>count = {count}</p>
+    ) : (
+      <p>count * 2 = {two}</p>
+    );
   };
 }
 
@@ -28,4 +31,4 @@ function App() {
   );
 }
 
-render(<App />, document.getElementById("app"));
+render(<App />, document.getElementById("app")!);
