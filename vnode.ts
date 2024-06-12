@@ -13,14 +13,19 @@ export class VNode {
   ) {}
 }
 
+export interface LyDOMAttributes {
+  children?: ComponentChildren;
+  _dangerouslySetInnerHTML?: { __html: string };
+}
+
+export interface ClassAttributes<T = any> {
+  key?: Key;
+  ref?: Ref<T>;
+}
+
 export type Permitives = string | number | bigint | boolean | null | undefined;
 export type ComponentChild = Permitives | Computed<Permitives> | VNode;
 export type ComponentChildren = ComponentChild | ComponentChild[];
-
-export type Attributes<T = HTMLElement> = {
-  key?: Key;
-  ref?: Ref<T>;
-};
 
 export type Props = Record<string, any>;
 export type Slots = Record<string, ComponentChild[]>;

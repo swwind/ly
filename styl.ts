@@ -1,3 +1,5 @@
+import type { MaybeComputed } from "./jsx.d.ts";
+
 export type DOMCSSProperties = {
   [key in keyof Omit<
     CSSStyleDeclaration,
@@ -8,10 +10,10 @@ export type DOMCSSProperties = {
     | "getPropertyValue"
     | "getPropertyPriority"
     | number
-  >]?: string | number | null | undefined;
+  >]?: MaybeComputed<string | number | null | undefined>;
 };
 export type AllCSSProperties = {
-  [key: string]: string | number | null | undefined;
+  [key: string]: MaybeComputed<string | number | null | undefined>;
 };
 export interface CSSProperties extends AllCSSProperties, DOMCSSProperties {}
 

@@ -1,25 +1,20 @@
 // Users who only use Preact for SSR might not specify "dom" in their lib in tsconfig.json
 /// <reference lib="dom" />
 
-import type { Computed, Ref } from "./signal.ts";
-import type { ComponentChildren, ComponentType, VNode } from "./vnode.ts";
+import type { Computed } from "./signal.ts";
+import type {
+  ClassAttributes,
+  ComponentType,
+  LyDOMAttributes,
+  VNode,
+} from "./vnode.ts";
 
-export interface LyDOMAttributes {
-  children?: ComponentChildren;
-  _dangerouslySetInnerHTML?: { __html: string };
-}
-
-export interface ClassAttributes<T> {
-  ref?: Ref<T>;
-}
+export type MaybeComputed<T> = T | Computed<T>;
 
 export namespace JSXInternal {
-  export interface IntrinsicAttributes {
-    key?: any;
-  }
-
   export type Booleanish = boolean | "true" | "false";
 
+  // deno-lint-ignore no-explicit-any
   export type ElementType<P = any> =
     | {
         [K in keyof IntrinsicElements]: P extends IntrinsicElements[K]
@@ -29,8 +24,6 @@ export namespace JSXInternal {
     | ComponentType<P>;
   export interface Element extends VNode {}
   export type ElementClass = ComponentType;
-
-  export type MaybeComputed<T> = T | Computed<T>;
 
   export interface SVGAttributes<Target extends EventTarget = SVGElement>
     extends HTMLAttributes<Target> {
@@ -1194,7 +1187,7 @@ export namespace JSXInternal {
     dir?: MaybeComputed<"auto" | "rtl" | "ltr" | undefined>;
     disabled?: MaybeComputed<boolean | undefined>;
     disableRemotePlayback?: MaybeComputed<boolean | undefined>;
-    download?: any | undefined;
+    download?: MaybeComputed<boolean | string | undefined>;
     decoding?: MaybeComputed<"sync" | "async" | "auto" | undefined>;
     draggable?: MaybeComputed<boolean | undefined>;
     encType?: MaybeComputed<string | undefined>;
