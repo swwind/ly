@@ -1,4 +1,4 @@
-import { toArray } from "./utils.ts";
+import { toArray } from "./src/utils.ts";
 import {
   type Key,
   type Props,

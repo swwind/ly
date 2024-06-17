@@ -6,18 +6,20 @@ import {
   type VNode,
   isVNode,
 } from "./vnode.ts";
-import { toArray } from "./utils.ts";
+import { toArray } from "./src/utils.ts";
+import { provideProvides } from "./provide.ts";
 import {
-  type ComputedState,
-  EffectState,
-  collect,
-  isComputed,
   type Computed,
-} from "./signal.ts";
+  EffectState,
+  createStates,
+  globalStates,
+  isComputed,
+  type RemovableState,
+} from "./src/state.ts";
 
 type VDOM = {
   children: VDOM[];
-  states: (ComputedState | EffectState)[];
+  states: RemovableState[];
   doms: ChildNode[];
   contain: boolean;
 };
@@ -26,14 +28,14 @@ function createVDOM(contain: boolean = false): VDOM {
   return { children: [], states: [], doms: [], contain };
 }
 
-function removeVDOM(vdom: VDOM, remove: boolean = true) {
+function removeVDOM(vdom: VDOM, removeDom: boolean = true) {
   for (const child of vdom.children) {
-    removeVDOM(child, remove && !vdom.contain);
+    removeVDOM(child, removeDom && !vdom.contain);
   }
   for (const state of vdom.states) {
     state._remove();
   }
-  if (remove) {
+  if (removeDom) {
     for (const dom of vdom.doms) {
       dom.remove();
     }
@@ -102,10 +104,14 @@ function mountVNode(vnode: VNode, mount: Mount): VDOM {
     return vdom;
   } else if (typeof vnode.type === "function") {
     const { type, slots, props } = vnode;
-    const [vnodes, _refs, computes, effects] = collect(() =>
-      provideSlots(slots, () => type(props))
-    );
+    const states = createStates();
+    const vnodes = globalStates.with(states, () => {
+      return provideProvides(new Map(), () => {
+        return provideSlots(slots, () => type(props));
+      });
+    });
 
+    // dynamic components
     if (typeof vnodes === "function") {
       const vdom = createVDOM();
 
@@ -114,9 +120,9 @@ function mountVNode(vnode: VNode, mount: Mount): VDOM {
 
       vdom.states.push(
         new EffectState(() => {
-          const children = mountChildren(vnodes(), (node) =>
-            anchor.before(node)
-          );
+          const children = mountChildren(vnodes(), (node) => {
+            anchor.before(node);
+          });
           return () => removeVDOM(children);
         })
       );
@@ -124,10 +130,11 @@ function mountVNode(vnode: VNode, mount: Mount): VDOM {
       return vdom;
     }
 
+    // static components
     const vdom = createVDOM();
     vdom.children.push(mountChildren(vnodes, mount));
-    vdom.states.push(...computes);
-    vdom.states.push(...effects);
+    vdom.states.push(...states.computes);
+    vdom.states.push(...states.effects);
 
     return vdom;
   } else {

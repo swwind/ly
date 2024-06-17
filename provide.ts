@@ -1,17 +1,18 @@
 // deno-lint-ignore-file no-explicit-any
 
 export type ProvideKey = symbol | string;
+export type ProvideMap = Map<ProvideKey, any>;
 
-let currentProvides: Map<ProvideKey, any> | null = null;
+let currentProvides: ProvideMap | null = null;
 
-export function startProvide(map: Map<ProvideKey, any>) {
+export function provideProvides<T>(map: ProvideMap, callback: () => T) {
+  const old = currentProvides;
   currentProvides = map;
-}
-
-export function endProvide(): Map<ProvideKey, any> {
-  const provides = currentProvides;
-  currentProvides = null;
-  return provides as Map<ProvideKey, any>;
+  try {
+    return callback();
+  } finally {
+    currentProvides = old;
+  }
 }
 
 export function provide<T>(key: ProvideKey, value: T) {

@@ -1,15 +1,15 @@
 // Users who only use Preact for SSR might not specify "dom" in their lib in tsconfig.json
 /// <reference lib="dom" />
 
-import type { Computed } from "./signal.ts";
+import { ClassNames } from "./src/clsx.ts";
+import type { MaybeComputed } from "./src/state.ts";
+import type { CSSProperties } from "./src/styl.ts";
 import type {
   ClassAttributes,
   ComponentType,
   LyDOMAttributes,
   VNode,
 } from "./vnode.ts";
-
-export type MaybeComputed<T> = T | Computed<T>;
 
 export namespace JSXInternal {
   export type Booleanish = boolean | "true" | "false";
@@ -1158,7 +1158,7 @@ export namespace JSXInternal {
     challenge?: MaybeComputed<string | undefined>;
     checked?: MaybeComputed<boolean | undefined>;
     cite?: MaybeComputed<string | undefined>;
-    class?: MaybeComputed<string | undefined>;
+    class?: ClassNames;
     // className?: MaybeComputed<string | undefined>;
     cols?: MaybeComputed<number | undefined>;
     colSpan?: MaybeComputed<number | undefined>;
@@ -1323,7 +1323,7 @@ export namespace JSXInternal {
     srclang?: MaybeComputed<string | undefined>;
     start?: MaybeComputed<number | undefined>;
     step?: MaybeComputed<number | string | undefined>;
-    style?: MaybeComputed<string | undefined>;
+    style?: CSSProperties;
     summary?: MaybeComputed<string | undefined>;
     tabIndex?: MaybeComputed<number | undefined>;
     tabindex?: MaybeComputed<number | undefined>;

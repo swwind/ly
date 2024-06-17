@@ -1,5 +1,7 @@
 // deno-lint-ignore-file ban-types no-explicit-any
-import { isRef, type Computed, type Ref } from "./signal.ts";
+
+import { type Computed, type Ref, isRef } from "./src/state.ts";
+import { isNumber, isString } from "./src/utils.ts";
 
 export type Key = string | number;
 
@@ -29,9 +31,11 @@ export type ComponentChildren = ComponentChild | ComponentChild[];
 
 export type Props = Record<string, any>;
 export type Slots = Record<string, ComponentChild[]>;
-export type ComponentType<P = {}> = (
+export type StaticComponent<P = {}> = (props: P) => VNode | VNode[] | null;
+export type DynamicComponent<P = {}> = (
   props: P
-) => ComponentChildren | (() => ComponentChildren);
+) => () => VNode | VNode[] | null;
+export type ComponentType<P = {}> = StaticComponent<P> | DynamicComponent<P>;
 
 export function component$<P = {}>(
   component: ComponentType<P>
@@ -40,9 +44,7 @@ export function component$<P = {}>(
 }
 
 export const Fragment = component$(() => createElement(Slot, null));
-export const Slot = component$<{ name?: string }>(() => {
-  throw new Error("Usage of <Slot /> outside of components");
-});
+export const Slot = component$<{ name?: string }>(() => null);
 
 let currentSlots: Slots | null = null;
 const DEFAULT_SLOT_NAME = "default";
@@ -72,16 +74,15 @@ export function createElement(
   const slots: Slots = {};
   const normalizedProps: Props = {};
 
-  let ref: Ref | undefined = undefined;
+  let _key: Key | undefined = undefined;
+  let _ref: Ref | undefined = undefined;
 
   for (const child of children) {
     if (isVNode(child) && child.type === "template") {
       const name = child.props["slot"] || DEFAULT_SLOT_NAME;
-      slots[name] ??= [];
-      slots[name].push(...(child.slots[DEFAULT_SLOT_NAME] ?? []));
+      (slots[name] ??= []).push(...(child.slots[DEFAULT_SLOT_NAME] ?? []));
     } else {
-      slots[DEFAULT_SLOT_NAME] ??= [];
-      slots[DEFAULT_SLOT_NAME].push(child);
+      (slots[DEFAULT_SLOT_NAME] ??= []).push(child);
     }
   }
 
@@ -90,14 +91,18 @@ export function createElement(
 
     if (key === "ref") {
       if (isRef(value)) {
-        ref = value;
+        _ref = value;
+      }
+    } else if (key === "key") {
+      if (isString(value) || isNumber(value)) {
+        _key = value;
       }
     } else {
       normalizedProps[key] = value;
     }
   }
 
-  return new VNode(type, normalizedProps, slots, undefined, ref);
+  return new VNode(type, normalizedProps, slots, _key, _ref);
 }
 
 export function isVNode(vnode: unknown): vnode is VNode {
