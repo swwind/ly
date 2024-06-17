@@ -1,13 +1,12 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { type Capture, createCapture, globalCapture } from "./capture.ts";
-import { type Layer, globalLayer } from "./layer.ts";
 import { enqueueUpdate } from "./update.ts";
 import { createGlobal } from "./utils.ts";
 
-export type Ref<T = any> = { value: T };
+export type Ref<T = any> = { value: T; readonly previous: T };
 export type MaybeRef<T> = T | Ref<T>;
-export type Computed<T = any> = { readonly value: T };
+export type Computed<T = any> = { readonly value: T; readonly previous: T };
 export type MaybeComputed<T> = T | Computed<T>;
 
 export type State = RefState | ComputedState | EffectState;
@@ -26,16 +25,12 @@ export class RefState<T = any> {
   private _old: T;
   private _state: T;
   private _pending: T;
-  private _layer: Layer | null;
   _listeners: Set<ComputedState | EffectState> = new Set();
 
   constructor(init: T) {
     this._old = init;
     this._state = init;
     this._pending = init;
-
-    this._layer = globalLayer.current;
-    this._layer?.states.push(this);
   }
 
   get value(): T {
@@ -51,7 +46,11 @@ export class RefState<T = any> {
     }
   }
 
-  _update(): boolean {
+  get previous(): T {
+    return this._old;
+  }
+
+  update(): boolean {
     if (this._state === this._pending) {
       return false;
     }
@@ -59,6 +58,8 @@ export class RefState<T = any> {
     this._state = this._pending;
     return true;
   }
+
+  remove() {}
 }
 
 export class ComputedState<T = any> {
@@ -66,27 +67,20 @@ export class ComputedState<T = any> {
   private _old: T;
   private _state: T;
   private _capture: Capture;
-  private _layer: Layer | null;
-  _count: number = 0;
-  _dirty: number = 0;
-  _listeners: Set<ComputedState | EffectState> = new Set();
+  _listeners: Set<Computed | EffectState> = new Set();
 
   constructor(fn: () => T) {
     this._fn = fn;
     this._capture = createCapture();
+    const state = this.evaluate();
 
-    const state = globalScope.with("computed", () =>
-      globalCapture.with(this._capture, fn)
-    );
-
+    // create links
     for (const node of this._capture._getters) {
       node._listeners.add(this);
     }
+
     this._old = state;
     this._state = state;
-
-    this._layer = globalLayer.current;
-    this._layer?.states.push(this);
   }
 
   get value(): T {
@@ -94,22 +88,30 @@ export class ComputedState<T = any> {
     return this._state;
   }
 
-  _update(): boolean {
+  get previous(): T {
+    return this._old;
+  }
+
+  evaluate(): T {
+    return globalScope.with("computed", () =>
+      globalCapture.with(this._capture, this._fn)
+    );
+  }
+
+  update(): boolean {
     // remove old links
-    for (const node of this._capture._getters) {
-      node._listeners.delete(this);
-    }
+    this.remove();
 
     // capture new deps
     this._capture = createCapture();
-    const state = globalCapture.with(this._capture, this._fn);
+    const state = this.evaluate();
 
     // link to current getters
     for (const node of this._capture._getters) {
       node._listeners.add(this);
     }
 
-    // skip graph update if nothing changes
+    // skip update if nothing changes
     if (state === this._state) {
       return false;
     }
@@ -121,7 +123,8 @@ export class ComputedState<T = any> {
     return true;
   }
 
-  _remove() {
+  remove() {
+    // remove old links
     for (const node of this._capture._getters) {
       node._listeners.delete(this);
     }
@@ -132,41 +135,35 @@ export class EffectState {
   private _fn: () => void | (() => void);
   private _capture: Capture;
   private _clear: void | (() => void);
-  private _layer: Layer | null;
-  _count: number = 0;
-  _dirty: number = 0;
 
   constructor(fn: () => void | (() => void)) {
     this._fn = fn;
     this._capture = createCapture();
-
-    this._clear = globalCapture.with(this._capture, fn);
+    this._clear = this.evaluate();
 
     for (const node of this._capture._getters) {
       node._listeners.add(this);
     }
-
-    this._layer = globalLayer.current;
-    this._layer?.states.push(this);
   }
 
-  _update(): void {
-    if (typeof this._clear === "function") {
-      this._clear();
-    }
-    for (const node of this._capture._getters) {
-      node._listeners.delete(this);
-    }
+  evaluate() {
+    return globalScope.with("effect", () =>
+      globalCapture.with(this._capture, this._fn)
+    );
+  }
+
+  update(): void {
+    this.remove();
 
     this._capture = createCapture();
-    this._clear = globalCapture.with(this._capture, this._fn);
+    this._clear = this.evaluate();
 
     for (const node of this._capture._getters) {
       node._listeners.add(this);
     }
   }
 
-  _remove() {
+  remove() {
     if (typeof this._clear === "function") {
       this._clear();
     }

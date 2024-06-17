@@ -13,8 +13,9 @@ export class Layer {
   }
 
   remove() {
-    // TODO
-    this.parent?.children.delete(this);
+    for (const child of this.children) child.remove();
+    for (const state of this.states) state.remove();
+    for (const dom of this.doms) dom.remove();
   }
 }
 
