@@ -12,7 +12,9 @@ function App() {
 }
 ```
 
-如果想要加入交互内容，可以使用[信号系统](/signals)来进行。
+框架会在每个组件初始化的时候调用该函数并生成对应 DOM 结构，之后便不会再运行该函数。
+
+如果想要加入一些动态的交互内容，可以使用[信号系统](/signals)来进行，下面是一个简单的例子。
 
 ```jsx
 function App() {
@@ -31,24 +33,29 @@ function App() {
 动态组件是指其 DOM 结构会随信号系统发生变化的组件，需要在定义的时候返回一个函数。
 
 ```jsx
+function Banner(props) {
+  return () =>
+    props.count.value % 2 === 0 ? (
+      <span>count is odd</span>
+    ) : (
+      <span>count is even</span>
+    );
+}
+
 function App() {
   const count = ref(0);
   const increment = () => count.value++;
 
-  return () => [
+  return [
     <button onClick={increment}>click me</button>,
-    count.value % 2 === 0 ? (
-      <span>count is odd</span>
-    ) : (
-      <span>count is even</span>
-    ),
+    <Banner count={count} />,
   ];
 }
 ```
 
 组件在渲染的时候会监听其中用到的所有信号，并在其中某个信号更新的时候移除原来的所有 DOM 结构，并插入新的 DOM 结构。
 
-在某些情况下，如果整个组件中只有一部分有动态 DOM 变换的部分，可以使用 `block` 函数来创建一个简单的动态组件。
+在某些情况下，如果整个组件中只有一部分有动态 DOM 变换的部分，可以使用 `block` 函数来创建一个简单的动态组件。例如，上面的例子可以简化如下。
 
 ```jsx
 function App() {
@@ -65,7 +72,7 @@ function App() {
 
   return [
     <button onClick={increment}>click me</button>,
-    // Banner 可以直接作为组件使用
+    // 直接作为组件使用
     <Banner />,
   ];
 }

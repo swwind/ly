@@ -20,13 +20,13 @@ one.value = 233;
 
 ## computed
 
-computed 是根据前置的信号源来得到新的只读信号的函数，类似于 React 中的 useMemo。
+computed 是根据前置的信号来得到新的只读信号的函数，类似于 React 中的 useMemo。
+
+该函数会自动捕获其中用到的所有信号，并在其中任何信号更新之后自动更新自身的值。
 
 ```ts
 const two = computed(() => one.value * 2);
 ```
-
-computed 会在其使用的信号源更新后自动更新。
 
 ## effect
 
