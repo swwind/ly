@@ -9,7 +9,7 @@ import type {
   ComponentType,
   LyDOMAttributes,
   VNode,
-} from "./vnode.ts";
+} from "./src/vnode.ts";
 
 export namespace JSXInternal {
   export type Booleanish = boolean | "true" | "false";

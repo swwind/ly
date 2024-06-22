@@ -6,7 +6,7 @@ import {
   type Slots,
   type VNode,
   isVNode,
-} from "../vnode.ts";
+} from "./vnode.ts";
 import { Layer, appendChild } from "./layer.ts";
 import { layout, isComputed } from "./state.ts";
 import { toArray } from "./utils.ts";
