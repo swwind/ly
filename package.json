@@ -1,0 +1,26 @@
+{
+  "name": "@swwind/ly",
+  "version": "0.0.1",
+  "type": "module",
+  "types": "./dist/types/mod.d.ts",
+  "module": "./dist/esm/mod.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/types/mod.d.ts",
+      "import": "./dist/esm/index.mjs"
+    },
+    "./jsx-runtime": {
+      "types": "./dist/types/jsx-runtime.d.ts",
+      "import": "./dist/esm/jsx-runtime.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build && shx cp src/jsx.d.ts dist/types && exbuild",
+    "clean": "shx rm -rf dist"
+  },
+  "devDependencies": {
+    "@swwind/exbuild": "^1.0.3",
+    "shx": "^0.3.4",
+    "typescript": "^5.5.2"
+  }
+}

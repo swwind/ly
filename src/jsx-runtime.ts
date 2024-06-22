@@ -1,4 +1,4 @@
-import { toArray } from "./src/utils.ts";
+import { toArray } from "./utils.ts";
 import {
   type Key,
   type Props,
@@ -7,7 +7,7 @@ import {
   type ComponentType,
   type ClassAttributes,
   type ComponentChildren,
-} from "./src/vnode.ts";
+} from "./vnode.ts";
 import type { JSXInternal } from "./jsx.d.ts";
 
 export function jsx(type: string, props: Props | null, key?: Key): VNode;

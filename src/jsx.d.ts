@@ -1,15 +1,15 @@
 // Users who only use Preact for SSR might not specify "dom" in their lib in tsconfig.json
 /// <reference lib="dom" />
 
-import type { ClassNames } from "./src/clsx.ts";
-import type { MaybeComputed } from "./src/state.ts";
-import type { CSSProperties } from "./src/styl.ts";
+import type { ClassNames } from "./clsx.ts";
+import type { MaybeComputed } from "./state.ts";
+import type { CSSProperties } from "./styl.ts";
 import type {
   ClassAttributes,
   ComponentType,
   LyDOMAttributes,
   VNode,
-} from "./src/vnode.ts";
+} from "./vnode.ts";
 
 export namespace JSXInternal {
   export type Booleanish = boolean | "true" | "false";
