@@ -16,11 +16,15 @@
   },
   "scripts": {
     "build": "tsc --build && shx cp src/jsx.d.ts dist/types && exbuild",
-    "clean": "shx rm -rf dist"
+    "clean": "shx rm -rf dist",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
     "@swwind/exbuild": "^1.0.3",
     "shx": "^0.3.4",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.2",
+    "vitepress": "^1.2.3"
   }
 }

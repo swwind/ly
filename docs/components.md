@@ -1,45 +1,72 @@
-# Components
+# 组件
 
-组件只能通过函数的方式定义。
+组件是网站交互逻辑的最小单位，分为静态组件和动态组件两种。
 
-```tsx
-import { ref } from "riakuto";
+## 静态组件
 
+静态组件是指其 DOM 结构不会发生变化的组件，可以在组件中直接返回其 DOM 结构。
+
+```jsx
 function App() {
-  const count = ref(0);
-
-  const increment = () => count.value++;
-
-  return <div onClick={increment}>{count}</div>;
+  return <div>hello world</div>;
 }
 ```
 
-每个组件的函数只会在最初调用的时候创建一次，之后永远不会被调用。
+如果想要加入交互内容，可以使用[信号系统](/signals)来进行。
 
-组件函数内部不可以使用信号系统的 `.value`。
-
-你必须将所有的交互逻辑使用信号系统实现。
-
-## 返回值
-
-所有的动态交互逻辑都完全由信号系统实现。如果你有需要动态更新 DOM 结构的地方，请使用 Computed 函数。
-
-```tsx
-function App1() {
-  return <div>never change</div>;
-}
-function App2() {
+```jsx
+function App() {
   const count = ref(0);
-  return <div>count = {count}</div>;
+  const increment = () => count.value++;
+
+  return [
+    <button onClick={increment}>click me</button>,
+    <div>count = {count}</div>,
+  ];
 }
-function App3() {
-  const show = ref(false);
-  return computed(() =>
-    show.value ? (
-      <div>welcome to my website</div>
+```
+
+## 动态组件
+
+动态组件是指其 DOM 结构会随信号系统发生变化的组件，需要在定义的时候返回一个函数。
+
+```jsx
+function App() {
+  const count = ref(0);
+  const increment = () => count.value++;
+
+  return () => [
+    <button onClick={increment}>click me</button>,
+    count.value % 2 === 0 ? (
+      <span>count is odd</span>
     ) : (
-      <div>there is nothing here</div>
+      <span>count is even</span>
+    ),
+  ];
+}
+```
+
+组件在渲染的时候会监听其中用到的所有信号，并在其中某个信号更新的时候移除原来的所有 DOM 结构，并插入新的 DOM 结构。
+
+在某些情况下，如果整个组件中只有一部分有动态 DOM 变换的部分，可以使用 `block` 函数来创建一个简单的动态组件。
+
+```jsx
+function App() {
+  const count = ref(0);
+  const increment = () => count.value++;
+
+  const Banner = block(() =>
+    count.value % 2 === 0 ? (
+      <span>count is odd</span>
+    ) : (
+      <span>count is even</span>
     )
   );
+
+  return [
+    <button onClick={increment}>click me</button>,
+    // Banner 可以直接作为组件使用
+    <Banner />,
+  ];
 }
 ```
