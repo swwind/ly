@@ -2,12 +2,12 @@ import { toArray } from "./src/utils.ts";
 import {
   type Key,
   type Props,
-  createElement,
+  createVNode,
   type VNode,
   type ComponentType,
   type ClassAttributes,
   type ComponentChildren,
-} from "./vnode.ts";
+} from "./src/vnode.ts";
 import type { JSXInternal } from "./jsx.d.ts";
 
 export function jsx(type: string, props: Props | null, key?: Key): VNode;
@@ -28,7 +28,7 @@ export function jsx(
     delete props.children;
   }
   props["key"] = key;
-  return createElement(type, props, ...children);
+  return createVNode(type, props, ...children);
 }
 
 export { jsx as jsxs };

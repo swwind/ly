@@ -1,7 +1,7 @@
 // Users who only use Preact for SSR might not specify "dom" in their lib in tsconfig.json
 /// <reference lib="dom" />
 
-import { ClassNames } from "./src/clsx.ts";
+import type { ClassNames } from "./src/clsx.ts";
 import type { MaybeComputed } from "./src/state.ts";
 import type { CSSProperties } from "./src/styl.ts";
 import type {

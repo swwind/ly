@@ -1,13 +1,22 @@
-type Compare<T> = (a: T, b: T) => number;
+export const CompareSymbol = Symbol("compare");
 
-export type Heap<T> = {
+export interface Comparable {
+  [CompareSymbol](value: Comparable): number;
+}
+
+export type Heap<T extends Comparable> = {
   push(elem: T): void;
   size(): number;
   pop(): T;
+  has(elem: T): boolean;
 };
 
-export function createHeap<T>(cmp: Compare<T>): Heap<T> {
-  const a = [,] as T[];
+export function createHeap<T extends Comparable>(): Heap<T> {
+  // make index start at 1
+  const a = [,] as unknown as T[];
+  // remember duplicated items
+  const s = new Set<T>();
+  const cmp = (a: T, b: T) => a[CompareSymbol](b);
   const swap = (i: number, j: number) => ([a[i], a[j]] = [a[j], a[i]]);
   const size = () => a.length - 1;
   const up = (x: number) => {
@@ -20,12 +29,19 @@ export function createHeap<T>(cmp: Compare<T>): Heap<T> {
       swap(x, t);
     }
   };
-  const push = (elem: T) => up(a.push(elem) - 1);
+  const has = (elem: T) => s.has(elem);
+  const push = (elem: T) => {
+    if (has(elem)) return;
+    up(a.push(elem) - 1);
+    s.add(elem);
+  };
   const pop = () => {
     const n = size();
     swap(1, n);
     down(1, n - 1);
-    return a.pop() as T;
+    const k = a.pop() as T;
+    s.delete(k);
+    return k;
   };
-  return { push, size, pop };
+  return { push, size, pop, has };
 }

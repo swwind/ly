@@ -1,4 +1,6 @@
-import { ComputedState, type EffectState, type RefState } from "./state.ts";
+import { createHeap } from "./heap.ts";
+import type { Layer } from "./layer.ts";
+import type { RefState } from "./state.ts";
 
 let dirtyStates = new Set<RefState>();
 let currentUpdate = false;
@@ -11,54 +13,31 @@ export function enqueueUpdate(node: RefState) {
   }
 }
 
-function mark(node: RefState | ComputedState) {
-  for (const listener of node._listeners) {
-    if (!listener._dirty++ && listener instanceof ComputedState) {
-      mark(listener);
-    }
-  }
-}
-
-function unmark(node: RefState | ComputedState) {
-  for (const listener of node._listeners) {
-    if (!--listener._dirty && listener instanceof ComputedState) {
-      unmark(listener);
-    }
-  }
-}
-
 function updateStates() {
   currentUpdate = false;
 
   while (dirtyStates.size > 0) {
     const dirty = [...dirtyStates];
     dirtyStates = new Set();
-    const queue: (ComputedState | EffectState)[] = [];
 
-    for (const node of dirty) mark(node);
-    for (const node of dirty) {
-      if (node._update()) {
-        for (const dest of node._listeners) {
-          if (!--dest._dirty) {
-            queue.push(dest);
-          }
-        }
-      } else {
-        unmark(node);
-      }
+    const layers = createHeap<Layer>();
+
+    for (const ref of dirty) {
+      layers.push(ref._layer);
+      ref._layer.heap.push(ref);
     }
 
-    while (queue.length > 0) {
-      const node = queue.pop()!;
+    while (layers.size() > 0) {
+      const layer = layers.pop();
 
-      if (node._update()) {
-        for (const dest of (node as ComputedState)._listeners) {
-          if (!--dest._dirty) {
-            queue.push(dest);
+      while (layer.heap.size() > 0) {
+        const elem = layer.heap.pop();
+        if (elem.update()) {
+          for (const node of elem._listeners) {
+            layers.push(node._layer);
+            node._layer.heap.push(node);
           }
         }
-      } else if (node instanceof ComputedState) {
-        unmark(node);
       }
     }
   }

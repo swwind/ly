@@ -25,8 +25,8 @@ export interface ClassAttributes<T = any> {
   ref?: Ref<T>;
 }
 
-export type Permitives = string | number | bigint | boolean | null | undefined;
-export type ComponentChild = Permitives | Computed<Permitives> | VNode;
+export type Primitives = string | number | bigint | boolean | null | undefined;
+export type ComponentChild = Primitives | Computed<Primitives> | VNode;
 export type ComponentChildren = ComponentChild | ComponentChild[];
 
 export type Props = Record<string, any>;
@@ -43,7 +43,7 @@ export function component$<P = {}>(
   return component;
 }
 
-export const Fragment = component$(() => createElement(Slot, null));
+export const Fragment = component$(() => createVNode(Slot, null));
 export const Slot = component$<{ name?: string }>(() => null);
 
 let currentSlots: Slots | null = null;
@@ -59,7 +59,7 @@ export function provideSlots<T>(slots: Slots, callback: () => T) {
   }
 }
 
-export function createElement(
+export function createVNode(
   type: string | ComponentType | null,
   props: Props | null,
   ...children: ComponentChild[]
@@ -68,7 +68,7 @@ export function createElement(
 
   if (type === Slot) {
     const name = props["name"] || DEFAULT_SLOT_NAME;
-    return createElement(null, null, ...(currentSlots?.[name] ?? children));
+    return createVNode(null, null, ...(currentSlots?.[name] ?? children));
   }
 
   const slots: Slots = {};

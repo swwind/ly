@@ -1,8 +1,10 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { type Capture, createCapture, globalCapture } from "./capture.ts";
+import { isDEV, isSSR } from "./flags.ts";
+import { LayerElement } from "./layer.ts";
 import { enqueueUpdate } from "./update.ts";
-import { createGlobal } from "./utils.ts";
+import { createStack } from "./utils.ts";
 
 export type Ref<T = any> = { value: T; readonly previous: T };
 export type MaybeRef<T> = T | Ref<T>;
@@ -12,7 +14,7 @@ export type MaybeComputed<T> = T | Computed<T>;
 export type State = RefState | ComputedState | EffectState;
 export type RemovableState = ComputedState | EffectState;
 
-const globalScope = createGlobal<"computed" | "effect">();
+const globalScope = createStack<"computed" | "effect">();
 
 function assertRecursive(name: string) {
   const scope = globalScope.current;
@@ -21,13 +23,14 @@ function assertRecursive(name: string) {
   }
 }
 
-export class RefState<T = any> {
+export class RefState<T = any> extends LayerElement {
   private _old: T;
   private _state: T;
   private _pending: T;
-  _listeners: Set<ComputedState | EffectState> = new Set();
 
   constructor(init: T) {
+    super();
+
     this._old = init;
     this._state = init;
     this._pending = init;
@@ -50,26 +53,27 @@ export class RefState<T = any> {
     return this._old;
   }
 
-  update(): boolean {
+  override update(): boolean {
+    // skip if nothing changes
     if (this._state === this._pending) {
       return false;
     }
+
+    // update states
     this._old = this._state;
     this._state = this._pending;
     return true;
   }
-
-  remove() {}
 }
 
-export class ComputedState<T = any> {
+export class ComputedState<T = any> extends LayerElement {
   private _fn: () => T;
   private _old: T;
   private _state: T;
   private _capture: Capture;
-  _listeners: Set<Computed | EffectState> = new Set();
 
   constructor(fn: () => T) {
+    super();
     this._fn = fn;
     this._capture = createCapture();
     const state = this.evaluate();
@@ -93,9 +97,14 @@ export class ComputedState<T = any> {
   }
 
   evaluate(): T {
-    return globalScope.with("computed", () =>
-      globalCapture.with(this._capture, this._fn)
-    );
+    globalScope.pushd("computed");
+    globalCapture.pushd(this._capture);
+    try {
+      return this._fn();
+    } finally {
+      globalScope.popd();
+      globalCapture.popd();
+    }
   }
 
   update(): boolean {
@@ -131,12 +140,13 @@ export class ComputedState<T = any> {
   }
 }
 
-export class EffectState {
+export class EffectState extends LayerElement {
   private _fn: () => void | (() => void);
   private _capture: Capture;
   private _clear: void | (() => void);
 
   constructor(fn: () => void | (() => void)) {
+    super();
     this._fn = fn;
     this._capture = createCapture();
     this._clear = this.evaluate();
@@ -147,12 +157,17 @@ export class EffectState {
   }
 
   evaluate() {
-    return globalScope.with("effect", () =>
-      globalCapture.with(this._capture, this._fn)
-    );
+    globalScope.pushd("effect");
+    globalCapture.pushd(this._capture);
+    try {
+      return this._fn();
+    } finally {
+      globalScope.popd();
+      globalCapture.popd();
+    }
   }
 
-  update(): void {
+  override update(): boolean {
     this.remove();
 
     this._capture = createCapture();
@@ -161,9 +176,11 @@ export class EffectState {
     for (const node of this._capture._getters) {
       node._listeners.add(this);
     }
+
+    return true;
   }
 
-  remove() {
+  override remove() {
     if (typeof this._clear === "function") {
       this._clear();
     }
@@ -173,43 +190,26 @@ export class EffectState {
   }
 }
 
-export type States = {
-  refs: RefState[];
-  computes: ComputedState[];
-  effects: EffectState[];
-};
-
-export const globalStates = createGlobal<States>();
-
-export function createStates(): States {
-  return { refs: [], computes: [], effects: [] };
-}
-
 export function ref<T>(): Ref<T | null>;
 export function ref<T>(init: T): Ref<T>;
 export function ref<T>(init: T = null as T): Ref<T> {
-  assertRecursive("ref");
-  const state = new RefState(init);
-  globalStates.current?.refs.push(state);
-  return state;
+  if (isDEV) assertRecursive("ref");
+  return new RefState(init);
 }
 
 export function computed<T>(fn: () => T): Computed<T> {
-  assertRecursive("computed");
-  const state = globalScope.with("computed", () => new ComputedState(fn));
-  globalStates.current?.computes.push(state);
-  return state;
+  if (isDEV) assertRecursive("computed");
+  return new ComputedState(fn);
 }
 
 export function effect(fn: () => void | (() => void)): void {
-  assertRecursive("effect");
-  const state = globalScope.with("effect", () => new EffectState(fn));
-  globalStates.current?.effects.push(state);
+  if (isSSR) return;
+  if (isDEV) assertRecursive("effect");
+  new EffectState(fn);
 }
 
 export function layout(fn: () => void | (() => void)): void {
-  const capture = createCapture();
-  globalCapture.with(capture, fn);
+  new EffectState(fn);
 }
 
 export function isComputed<T>(v: unknown): v is Computed<T> {

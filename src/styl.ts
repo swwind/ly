@@ -1,4 +1,5 @@
-import { isComputed, type MaybeComputed } from "./state.ts";
+import type { MaybeComputed } from "./state.ts";
+import { valueOf } from "./utils.ts";
 
 export type DOMCSSProperties = {
   [key in keyof Omit<
@@ -20,11 +21,8 @@ export interface CSSProperties extends AllCSSProperties, DOMCSSProperties {}
 export function styl(style: CSSProperties) {
   return Object.entries(style)
     .map(([name, value]) => {
-      name = name.replace(/[A-Z]g/, "-$&").toLowerCase();
-      value = isComputed(value) ? value.value : value;
-      if (!name.startsWith("--") && typeof value === "number") {
-        value = value + "px";
-      }
+      name = name.replace(/[A-Z]/g, "-$&").toLowerCase();
+      value = valueOf(value);
       return `${name}:${value}`;
     })
     .join(";");
