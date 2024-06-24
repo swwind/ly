@@ -10,6 +10,8 @@ import {
 } from "./vnode.ts";
 import type { JSXInternal } from "./jsx.d.ts";
 
+export { Fragment } from "./vnode.ts";
+
 export function jsx(type: string, props: Props | null, key?: Key): VNode;
 export function jsx<P extends Props>(
   type: ComponentType<P>,
