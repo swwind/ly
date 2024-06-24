@@ -2,7 +2,7 @@ import { type Comparable, createHeap, CompareSymbol } from "./heap.ts";
 import { Stack, current, popd, pushd, withd } from "./stack.ts";
 
 const layers: Stack<Layer> = [];
-const nodes: Stack<Node[]> = [];
+const nodes: Stack<ParentNode> = [];
 
 export class LayerElement implements Comparable {
   _layer: Layer = current(layers)!;
@@ -34,15 +34,17 @@ export class Layer implements Comparable {
     }
 
     if (fn) {
+      const fragment = new DocumentFragment();
       pushd(layers, this);
-      pushd(nodes, this.doms);
+      pushd(nodes, fragment);
       try {
         fn();
       } finally {
         popd(layers);
         popd(nodes);
       }
-      appendNodes(...this.doms);
+      this.doms = Array.from(fragment.childNodes);
+      appendNodes(fragment);
     }
   }
 
@@ -61,9 +63,9 @@ const rootLayer = new Layer();
 pushd(layers, rootLayer);
 
 export function appendNodes(...node: Node[]) {
-  current(nodes)?.push(...node);
+  current(nodes)?.append(...node);
 }
 
-export function withNodes(node: Node[], fn: () => void) {
+export function withNodes(node: ParentNode, fn: () => void) {
   withd(nodes, node, fn);
 }

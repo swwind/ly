@@ -44,6 +44,10 @@ export function component$<P = {}>(
   return component;
 }
 
+export function block(fn: () => VNode | VNode[] | null): DynamicComponent {
+  return () => fn;
+}
+
 export const Fragment = component$(() => createVNode(Slot, null));
 export const Slot = component$<{ name?: string }>(() => null);
 

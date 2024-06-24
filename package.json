@@ -7,9 +7,13 @@
   "exports": {
     ".": {
       "types": "./dist/types/mod.d.ts",
-      "import": "./dist/esm/index.mjs"
+      "import": "./dist/esm/mod.mjs"
     },
     "./jsx-runtime": {
+      "types": "./dist/types/jsx-runtime.d.ts",
+      "import": "./dist/esm/jsx-runtime.mjs"
+    },
+    "./jsx-dev-runtime": {
       "types": "./dist/types/jsx-runtime.d.ts",
       "import": "./dist/esm/jsx-runtime.mjs"
     }

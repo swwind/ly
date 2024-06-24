@@ -76,9 +76,7 @@ function realizeVNode(vnode: VNode) {
     }
 
     const children = vnode.slots["default"] ?? [];
-    const doms: Node[] = [];
-    withNodes(doms, () => realizeChildren(children));
-    elem.append(...doms);
+    withNodes(elem, () => realizeChildren(children));
     appendNodes(elem);
   }
   // components
@@ -88,12 +86,19 @@ function realizeVNode(vnode: VNode) {
     if (inside === null) return;
 
     if (typeof inside === "function") {
+      const comment = new Comment("/");
+      appendNodes(comment);
+
       // dynamic component
       layout(() => {
         const layer = new Layer(() => {
           const children = inside();
           realizeChildren(children);
         });
+
+        for (const dom of layer.doms) {
+          comment.before(dom);
+        }
 
         return () => layer.remove();
       });
