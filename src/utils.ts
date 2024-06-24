@@ -8,21 +8,6 @@ export function toArray<T>(arr: T | T[]): T[] {
   return isArray(arr) ? arr : [arr];
 }
 
-export function createStack<T>() {
-  const stack: T[] = [];
-  return {
-    get current() {
-      return stack.at(-1);
-    },
-    pushd(v: T) {
-      stack.push(v);
-    },
-    popd() {
-      stack.pop();
-    },
-  };
-}
-
 export function isString(x: unknown): x is string {
   return typeof x === "string";
 }

@@ -1,5 +1,6 @@
 // deno-lint-ignore-file ban-types no-explicit-any
 
+import { Stack, current, popd, pushd } from "./stack.ts";
 import { type Computed, type Ref, isRef } from "./state.ts";
 import { isNumber, isString } from "./utils.ts";
 
@@ -46,16 +47,15 @@ export function component$<P = {}>(
 export const Fragment = component$(() => createVNode(Slot, null));
 export const Slot = component$<{ name?: string }>(() => null);
 
-let currentSlots: Slots | null = null;
+const slots: Stack<Slots> = [];
 const DEFAULT_SLOT_NAME = "default";
 
-export function provideSlots<T>(slots: Slots, callback: () => T) {
-  const old = currentSlots;
-  currentSlots = slots;
+export function withSlots<T>(slot: Slots, fn: () => T) {
+  pushd(slots, slot);
   try {
-    return callback();
+    return fn();
   } finally {
-    currentSlots = old;
+    popd(slots);
   }
 }
 
@@ -67,12 +67,12 @@ export function createVNode(
   props ??= {};
 
   if (type === Slot) {
-    const name = props["name"] || DEFAULT_SLOT_NAME;
-    return createVNode(null, null, ...(currentSlots?.[name] ?? children));
+    const name = (props["name"] || DEFAULT_SLOT_NAME) as string;
+    return createVNode(null, null, ...(current(slots)?.[name] ?? children));
   }
 
-  const slots: Slots = {};
-  const normalizedProps: Props = {};
+  const _slots: Slots = {};
+  const _props: Props = {};
 
   let _key: Key | undefined = undefined;
   let _ref: Ref | undefined = undefined;
@@ -80,9 +80,9 @@ export function createVNode(
   for (const child of children) {
     if (isVNode(child) && child.type === "template") {
       const name = child.props["slot"] || DEFAULT_SLOT_NAME;
-      (slots[name] ??= []).push(...(child.slots[DEFAULT_SLOT_NAME] ?? []));
+      (_slots[name] ??= []).push(...(child.slots[DEFAULT_SLOT_NAME] ?? []));
     } else {
-      (slots[DEFAULT_SLOT_NAME] ??= []).push(child);
+      (_slots[DEFAULT_SLOT_NAME] ??= []).push(child);
     }
   }
 
@@ -98,11 +98,11 @@ export function createVNode(
         _key = value;
       }
     } else {
-      normalizedProps[key] = value;
+      _props[key] = value;
     }
   }
 
-  return new VNode(type, normalizedProps, slots, _key, _ref);
+  return new VNode(type, _props, _slots, _key, _ref);
 }
 
 export function isVNode(vnode: unknown): vnode is VNode {

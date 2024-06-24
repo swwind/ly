@@ -1,22 +1,21 @@
 import {
   type ComponentChildren,
   type Primitives,
-  provideSlots,
   type ComponentType,
   type Slots,
   type VNode,
   isVNode,
+  withSlots,
 } from "./vnode.ts";
-import { Layer, appendChild } from "./layer.ts";
+import { Layer, appendNodes, withNodes } from "./layer.ts";
 import { layout, isComputed } from "./state.ts";
 import { toArray } from "./utils.ts";
 import { clsx } from "./clsx.ts";
 import { styl } from "./styl.ts";
 import { createElement, createText } from "./dom.ts";
-import { declareNodes } from "./layer.ts";
 
 function execute<P>(type: ComponentType<P>, props: P, slots: Slots) {
-  return provideSlots(slots, () => type(props));
+  return withSlots(slots, () => type(props));
 }
 
 function serializePrimitive(primitive: Primitives) {
@@ -40,13 +39,13 @@ function realizeChildren(children: ComponentChildren) {
       layout(() => {
         text.textContent = serializePrimitive(child.value);
       });
-      appendChild(text);
+      appendNodes(text);
     } else if (isVNode(child)) {
       realizeVNode(child);
     } else {
       const str = serializePrimitive(child);
       const text = createText(str);
-      appendChild(text);
+      appendNodes(text);
     }
   }
 }
@@ -78,9 +77,9 @@ function realizeVNode(vnode: VNode) {
 
     const children = vnode.slots["default"] ?? [];
     const doms: Node[] = [];
-    declareNodes(doms, () => realizeChildren(children));
+    withNodes(doms, () => realizeChildren(children));
     elem.append(...doms);
-    appendChild(elem);
+    appendNodes(elem);
   }
   // components
   else {
@@ -91,8 +90,7 @@ function realizeVNode(vnode: VNode) {
     if (typeof inside === "function") {
       // dynamic component
       layout(() => {
-        const layer = new Layer();
-        layer.with(() => {
+        const layer = new Layer(() => {
           const children = inside();
           realizeChildren(children);
         });
@@ -108,9 +106,10 @@ function realizeVNode(vnode: VNode) {
 }
 
 export function render(vnode: VNode, parent: Element) {
-  const layer = new Layer();
-  layer.with(() => realizeVNode(vnode));
+  const layer = new Layer(() => realizeVNode(vnode));
   parent.replaceChildren(...layer.doms);
 }
 
-export function hydrate(vnode: VNode, parent: Element, replace?: ChildNode) {}
+export function hydrate(vnode: VNode, parent: Element, replace?: ChildNode) {
+  // TODO
+}

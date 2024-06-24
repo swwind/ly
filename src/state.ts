@@ -1,10 +1,9 @@
 // deno-lint-ignore-file no-explicit-any
 
-import { type Capture, createCapture, globalCapture } from "./capture.ts";
 import { isDEV, isSSR } from "./flags.ts";
 import { LayerElement } from "./layer.ts";
+import { Stack, current, popd, pushd } from "./stack.ts";
 import { enqueueUpdate } from "./update.ts";
-import { createStack } from "./utils.ts";
 
 export type Ref<T = any> = { value: T; readonly previous: T };
 export type MaybeRef<T> = T | Ref<T>;
@@ -14,13 +13,24 @@ export type MaybeComputed<T> = T | Computed<T>;
 export type State = RefState | ComputedState | EffectState;
 export type RemovableState = ComputedState | EffectState;
 
-const globalScope = createStack<"computed" | "effect">();
+const scopes: Stack<"computed" | "effect"> = [];
 
 function assertRecursive(name: string) {
-  const scope = globalScope.current;
+  const scope = current(scopes);
   if (scope) {
     throw new TypeError(`Cannot construct ${name} inside ${scope}`);
   }
+}
+
+export type Capture = {
+  _getters: Set<RefState | ComputedState>;
+  _setters: Set<RefState>;
+};
+
+export const captures: Stack<Capture> = [];
+
+export function createCapture(): Capture {
+  return { _getters: new Set(), _setters: new Set() };
 }
 
 export class RefState<T = any> extends LayerElement {
@@ -37,12 +47,12 @@ export class RefState<T = any> extends LayerElement {
   }
 
   get value(): T {
-    globalCapture.current?._getters.add(this);
+    current(captures)?._getters.add(this);
     return this._state;
   }
 
   set value(state: T) {
-    globalCapture.current?._setters.add(this);
+    current(captures)?._setters.add(this);
     if (state !== this._state) {
       this._pending = state;
       enqueueUpdate(this);
@@ -88,7 +98,7 @@ export class ComputedState<T = any> extends LayerElement {
   }
 
   get value(): T {
-    globalCapture.current?._getters.add(this);
+    current(captures)?._getters.add(this);
     return this._state;
   }
 
@@ -97,13 +107,13 @@ export class ComputedState<T = any> extends LayerElement {
   }
 
   evaluate(): T {
-    globalScope.pushd("computed");
-    globalCapture.pushd(this._capture);
+    if (isDEV) pushd(scopes, "computed");
+    pushd(captures, this._capture);
     try {
       return this._fn();
     } finally {
-      globalScope.popd();
-      globalCapture.popd();
+      if (isDEV) popd(scopes);
+      popd(captures);
     }
   }
 
@@ -157,13 +167,13 @@ export class EffectState extends LayerElement {
   }
 
   evaluate() {
-    globalScope.pushd("effect");
-    globalCapture.pushd(this._capture);
+    if (isDEV) pushd(scopes, "effect");
+    pushd(captures, this._capture);
     try {
       return this._fn();
     } finally {
-      globalScope.popd();
-      globalCapture.popd();
+      if (isDEV) popd(scopes);
+      popd(captures);
     }
   }
 

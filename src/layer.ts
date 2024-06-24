@@ -1,13 +1,16 @@
 import { type Comparable, createHeap, CompareSymbol } from "./heap.ts";
-import { createStack } from "./utils.ts";
+import { Stack, current, popd, pushd, withd } from "./stack.ts";
+
+const layers: Stack<Layer> = [];
+const nodes: Stack<Node[]> = [];
 
 export class LayerElement implements Comparable {
-  _layer: Layer = globalLayer.current!;
+  _layer: Layer = current(layers)!;
   _index: number = this._layer.states.push(this) - 1;
   _listeners: Set<LayerElement> = new Set();
 
-  [CompareSymbol](value: LayerElement) {
-    return this._index - value._index;
+  get [CompareSymbol]() {
+    return this._index;
   }
 
   update(): boolean {
@@ -17,22 +20,34 @@ export class LayerElement implements Comparable {
 }
 
 export class Layer implements Comparable {
-  parent: Layer | undefined = globalLayer.current;
+  parent: Layer | null = current(layers);
   children: Set<Layer> = new Set();
   states: LayerElement[] = [];
   doms: Node[] = [];
   depth = 0;
   heap = createHeap<LayerElement>();
 
-  constructor() {
+  constructor(fn?: () => void) {
     if (this.parent) {
       this.parent.children.add(this);
       this.depth = this.parent.depth + 1;
     }
+
+    if (fn) {
+      pushd(layers, this);
+      pushd(nodes, this.doms);
+      try {
+        fn();
+      } finally {
+        popd(layers);
+        popd(nodes);
+      }
+      appendNodes(...this.doms);
+    }
   }
 
-  [CompareSymbol](value: Layer) {
-    return this.depth - value.depth;
+  get [CompareSymbol]() {
+    return this.depth;
   }
 
   remove(doms: boolean = true) {
@@ -40,37 +55,15 @@ export class Layer implements Comparable {
     for (const state of this.states) state.remove();
     if (doms) for (const dom of this.doms) (dom as ChildNode).remove();
   }
-
-  /**
-   * Capture all ref/computed/effect calls inside fn
-   */
-  with(fn: () => void) {
-    globalLayer.pushd(this);
-    globalNodes.pushd(this.doms);
-    try {
-      fn();
-    } finally {
-      globalNodes.popd();
-      globalLayer.popd();
-    }
-    appendChild(...this.doms);
-  }
 }
 
 const rootLayer = new Layer();
-const globalLayer = createStack<Layer>();
-const globalNodes = createStack<Node[]>();
-globalLayer.pushd(rootLayer);
+pushd(layers, rootLayer);
 
-export function declareNodes(nodes: Node[], fn: () => void) {
-  globalNodes.pushd(nodes);
-  try {
-    fn();
-  } finally {
-    globalNodes.popd();
-  }
+export function appendNodes(...node: Node[]) {
+  current(nodes)?.push(...node);
 }
 
-export function appendChild(...node: Node[]) {
-  globalNodes.current?.push(...node);
+export function withNodes(node: Node[], fn: () => void) {
+  withd(nodes, node, fn);
 }
