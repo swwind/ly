@@ -6,14 +6,20 @@ import {
   type VNode,
   isVNode,
   withSlots,
+  type Props,
 } from "./vnode.ts";
 import { Layer, appendNodes, withNodes } from "./layer.ts";
 import { layout, isComputed } from "./state.ts";
 import { toArray } from "./utils.ts";
 import { clsx } from "./clsx.ts";
 import { styl } from "./styl.ts";
+import { isSSR } from "./flags.ts";
 
-function execute<P>(type: ComponentType<P>, props: P, slots: Slots) {
+function execute<P extends Props>(
+  type: ComponentType<P>,
+  props: P,
+  slots: Slots
+) {
   return withSlots(slots, () => type(props));
 }
 
@@ -112,11 +118,23 @@ function realizeVNode(vnode: VNode) {
 }
 
 export function render(vnode: VNode, parent: Element) {
+  if (isSSR) {
+    throw new Error(
+      "Cannot use render() in SSR mode, please use renderToString() instead."
+    );
+  }
+
   const layer = new Layer(() => realizeVNode(vnode));
   parent.replaceChildren(...layer.doms);
 }
 
 export function hydrate(vnode: VNode, parent: Element, replace?: Node) {
+  if (isSSR) {
+    throw new Error(
+      "Cannot use render() in SSR mode, this is only allowed in browser."
+    );
+  }
+
   const layer = new Layer(() => realizeVNode(vnode));
   const fragment = new DocumentFragment();
   fragment.append(...layer.doms);

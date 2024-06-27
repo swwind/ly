@@ -32,27 +32,30 @@ export type ComponentChildren = ComponentChild | ComponentChild[];
 
 export type Props = Record<string, any>;
 export type Slots = Record<string, ComponentChild[]>;
-export type StaticComponent<P = {}> = (props: P) => VNode | VNode[] | null;
+export type StaticComponent<P extends Props = {}> = (
+  props: P
+) => VNode | VNode[] | null;
 export type DynamicComponent<P = {}> = (
   props: P
 ) => () => VNode | VNode[] | null;
-export type ComponentType<P = {}> = StaticComponent<P> | DynamicComponent<P>;
+export type ComponentType<P extends Props = {}> =
+  | StaticComponent<P>
+  | DynamicComponent<P>;
 
-export function component$<P = {}>(
-  component: ComponentType<P>
+export function component<P extends Props = {}>(
+  fn: ComponentType<P>
 ): ComponentType<P> {
-  return component;
+  return fn;
 }
 
 export function block(fn: () => VNode | VNode[] | null): DynamicComponent {
   return () => fn;
 }
 
-export const Fragment = component$(() => createVNode(Slot, null));
-export const Slot = component$<{ name?: string }>(() => null);
+export const Fragment = component(() => createVNode(Slot, null));
+export const Slot = component<{ name?: string }>(() => null);
 
 const slots: Stack<Slots> = [];
-const DEFAULT_SLOT_NAME = "default";
 
 export function withSlots<T>(slot: Slots, fn: () => T) {
   pushd(slots, slot);
@@ -71,7 +74,7 @@ export function createVNode(
   props ??= {};
 
   if (type === Slot) {
-    const name = (props["name"] || DEFAULT_SLOT_NAME) as string;
+    const name = (props["name"] || "default") as string;
     return createVNode(null, null, ...(current(slots)?.[name] ?? children));
   }
 
@@ -83,10 +86,11 @@ export function createVNode(
 
   for (const child of children) {
     if (isVNode(child) && child.type === "template") {
-      const name = child.props["slot"] || DEFAULT_SLOT_NAME;
-      (_slots[name] ??= []).push(...(child.slots[DEFAULT_SLOT_NAME] ?? []));
+      (_slots[child.props["slot"] || "default"] ??= []).push(
+        ...(child.slots["default"] ?? [])
+      );
     } else {
-      (_slots[DEFAULT_SLOT_NAME] ??= []).push(child);
+      (_slots["default"] ??= []).push(child);
     }
   }
 
