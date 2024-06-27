@@ -12,7 +12,6 @@ import { layout, isComputed } from "./state.ts";
 import { toArray } from "./utils.ts";
 import { clsx } from "./clsx.ts";
 import { styl } from "./styl.ts";
-import { createElement, createText } from "./dom.ts";
 
 function execute<P>(type: ComponentType<P>, props: P, slots: Slots) {
   return withSlots(slots, () => type(props));
@@ -35,7 +34,7 @@ function setAttribute(dom: Element, key: string, value: unknown) {
 function realizeChildren(children: ComponentChildren) {
   for (const child of toArray(children)) {
     if (isComputed(child)) {
-      const text = createText();
+      const text = new Text();
       layout(() => {
         text.textContent = serializePrimitive(child.value);
       });
@@ -44,7 +43,7 @@ function realizeChildren(children: ComponentChildren) {
       realizeVNode(child);
     } else {
       const str = serializePrimitive(child);
-      const text = createText(str);
+      const text = new Text(str);
       appendNodes(text);
     }
   }
@@ -58,7 +57,7 @@ function realizeVNode(vnode: VNode) {
   }
   // dom elements
   else if (typeof vnode.type === "string") {
-    const elem = createElement(vnode.type);
+    const elem = document.createElement(vnode.type);
 
     for (const [key, value] of Object.entries(vnode.props)) {
       if (key === "class") {
@@ -76,7 +75,9 @@ function realizeVNode(vnode: VNode) {
     }
 
     const children = vnode.slots["default"] ?? [];
-    withNodes(elem, () => realizeChildren(children));
+    const doms = [] as Node[];
+    withNodes(doms, () => realizeChildren(children));
+    elem.append(...doms);
     appendNodes(elem);
   }
   // components
@@ -115,6 +116,13 @@ export function render(vnode: VNode, parent: Element) {
   parent.replaceChildren(...layer.doms);
 }
 
-export function hydrate(vnode: VNode, parent: Element, replace?: ChildNode) {
-  // TODO
+export function hydrate(vnode: VNode, parent: Element, replace?: Node) {
+  const layer = new Layer(() => realizeVNode(vnode));
+  const fragment = new DocumentFragment();
+  fragment.append(...layer.doms);
+  if (replace) {
+    parent.replaceChild(fragment, replace);
+  } else {
+    parent.replaceChildren(fragment);
+  }
 }

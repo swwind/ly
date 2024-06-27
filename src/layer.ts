@@ -2,7 +2,7 @@ import { type Comparable, createHeap, CompareSymbol } from "./heap.ts";
 import { Stack, current, popd, pushd, withd } from "./stack.ts";
 
 const layers: Stack<Layer> = [];
-const nodes: Stack<ParentNode> = [];
+const nodes: Stack<Node[]> = [];
 
 export class LayerElement implements Comparable {
   _layer: Layer = current(layers)!;
@@ -34,17 +34,15 @@ export class Layer implements Comparable {
     }
 
     if (fn) {
-      const fragment = new DocumentFragment();
       pushd(layers, this);
-      pushd(nodes, fragment);
+      pushd(nodes, this.doms);
       try {
         fn();
       } finally {
         popd(layers);
         popd(nodes);
       }
-      this.doms = Array.from(fragment.childNodes);
-      appendNodes(fragment);
+      appendNodes(...this.doms);
     }
   }
 
@@ -52,10 +50,10 @@ export class Layer implements Comparable {
     return this.depth;
   }
 
-  remove(doms: boolean = true) {
-    for (const child of this.children) child.remove(false);
+  remove(keepDoms: boolean = false) {
+    for (const child of this.children) child.remove(true);
     for (const state of this.states) state.remove();
-    if (doms) for (const dom of this.doms) (dom as ChildNode).remove();
+    if (!keepDoms) for (const dom of this.doms) (dom as ChildNode).remove();
   }
 }
 
@@ -63,9 +61,9 @@ const rootLayer = new Layer();
 pushd(layers, rootLayer);
 
 export function appendNodes(...node: Node[]) {
-  current(nodes)?.append(...node);
+  current(nodes)?.push(...node);
 }
 
-export function withNodes(node: ParentNode, fn: () => void) {
+export function withNodes(node: Node[], fn: () => void) {
   withd(nodes, node, fn);
 }
