@@ -1,7 +1,7 @@
 // deno-lint-ignore-file ban-types no-explicit-any
 
 import { Stack, current, popd, pushd } from "./stack.ts";
-import { type Computed, type Ref, isRef } from "./state.ts";
+import { type Computed, type Ref, isRef, MaybeComputed } from "./state.ts";
 import { isNumber, isString } from "./utils.ts";
 
 export type Key = string | number;
@@ -18,7 +18,7 @@ export class VNode {
 
 export interface LyDOMAttributes {
   children?: ComponentChildren;
-  _dangerouslySetInnerHTML?: { __html: string };
+  _dangerouslySetInnerHTML?: { __html: MaybeComputed<string> };
 }
 
 export interface ClassAttributes<T = any> {

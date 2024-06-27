@@ -1,2 +1,4 @@
-export const isSSR = false;
-export const isDEV = false;
+// @ts-ignore
+export const isSSR = import.meta?.env?.SSR === true;
+// @ts-ignore
+export const isDEV = import.meta?.env?.DEV === true;

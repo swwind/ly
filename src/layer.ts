@@ -5,32 +5,29 @@ const layers: Stack<Layer> = [];
 const nodes: Stack<Node[]> = [];
 
 export class LayerElement implements Comparable {
-  _layer: Layer = current(layers)!;
-  _index: number = this._layer.states.push(this) - 1;
-  _listeners: Set<LayerElement> = new Set();
+  layer = current(layers)!;
+  index = this.layer.states.push(this) - 1;
+  listeners = new Set<LayerElement>();
 
   get [CompareSymbol]() {
-    return this._index;
+    return this.index;
   }
 
-  update(): boolean {
-    return false;
-  }
   remove() {}
 }
 
 export class Layer implements Comparable {
-  parent: Layer | null = current(layers);
-  children: Set<Layer> = new Set();
-  states: LayerElement[] = [];
-  doms: Node[] = [];
+  children = new Set<Layer>();
+  states = [] as LayerElement[];
+  doms = [] as Node[];
   depth = 0;
   heap = createHeap<LayerElement>();
 
   constructor(fn?: () => void) {
-    if (this.parent) {
-      this.parent.children.add(this);
-      this.depth = this.parent.depth + 1;
+    const parent = current(layers);
+    if (parent) {
+      parent.children.add(this);
+      this.depth = parent.depth + 1;
     }
 
     if (fn) {

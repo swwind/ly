@@ -33,7 +33,7 @@ export function createCapture(): Capture {
   return { _getters: new Set(), _setters: new Set() };
 }
 
-export class RefState<T = any> extends LayerElement {
+class RefState<T = any> extends LayerElement {
   private _old: T;
   private _state: T;
   private _pending: T;
@@ -63,7 +63,7 @@ export class RefState<T = any> extends LayerElement {
     return this._old;
   }
 
-  override update(): boolean {
+  update(): boolean {
     // skip if nothing changes
     if (this._state === this._pending) {
       return false;
@@ -76,7 +76,7 @@ export class RefState<T = any> extends LayerElement {
   }
 }
 
-export class ComputedState<T = any> extends LayerElement {
+class ComputedState<T = any> extends LayerElement {
   private _fn: () => T;
   private _old: T;
   private _state: T;
@@ -90,7 +90,7 @@ export class ComputedState<T = any> extends LayerElement {
 
     // create links
     for (const node of this._capture._getters) {
-      node._listeners.add(this);
+      node.listeners.add(this);
     }
 
     this._old = state;
@@ -127,7 +127,7 @@ export class ComputedState<T = any> extends LayerElement {
 
     // link to current getters
     for (const node of this._capture._getters) {
-      node._listeners.add(this);
+      node.listeners.add(this);
     }
 
     // skip update if nothing changes
@@ -145,15 +145,15 @@ export class ComputedState<T = any> extends LayerElement {
   remove() {
     // remove old links
     for (const node of this._capture._getters) {
-      node._listeners.delete(this);
+      node.listeners.delete(this);
     }
   }
 }
 
-export class EffectState extends LayerElement {
+class EffectState extends LayerElement {
   private _fn: () => void | (() => void);
-  private _capture: Capture;
   private _clear: void | (() => void);
+  private _capture: Capture;
 
   constructor(fn: () => void | (() => void)) {
     super();
@@ -162,7 +162,7 @@ export class EffectState extends LayerElement {
     this._clear = this.evaluate();
 
     for (const node of this._capture._getters) {
-      node._listeners.add(this);
+      node.listeners.add(this);
     }
   }
 
@@ -177,14 +177,14 @@ export class EffectState extends LayerElement {
     }
   }
 
-  override update(): boolean {
+  update(): boolean {
     this.remove();
 
     this._capture = createCapture();
     this._clear = this.evaluate();
 
     for (const node of this._capture._getters) {
-      node._listeners.add(this);
+      node.listeners.add(this);
     }
 
     return true;
@@ -195,19 +195,29 @@ export class EffectState extends LayerElement {
       this._clear();
     }
     for (const node of this._capture._getters) {
-      node._listeners.delete(this);
+      node.listeners.delete(this);
     }
   }
+}
+
+class RefStateSSR<T> {
+  constructor(public value: T, public previous = value) {}
+}
+
+class ComputedStateSSR<T> {
+  constructor(fn: () => T, public value = fn(), public previous = value) {}
 }
 
 export function ref<T>(): Ref<T | null>;
 export function ref<T>(init: T): Ref<T>;
 export function ref<T>(init: T = null as T): Ref<T> {
+  if (isSSR) return new RefStateSSR(init);
   if (isDEV) assertRecursive("ref");
   return new RefState(init);
 }
 
 export function computed<T>(fn: () => T): Computed<T> {
+  if (isSSR) return new ComputedStateSSR(fn);
   if (isDEV) assertRecursive("computed");
   return new ComputedState(fn);
 }
@@ -219,13 +229,18 @@ export function effect(fn: () => void | (() => void)): void {
 }
 
 export function layout(fn: () => void | (() => void)): void {
+  if (isSSR) return void fn();
   new EffectState(fn);
 }
 
 export function isComputed<T>(v: unknown): v is Computed<T> {
+  if (isSSR) return v instanceof ComputedStateSSR || v instanceof RefStateSSR;
   return v instanceof ComputedState || v instanceof RefState;
 }
 
 export function isRef<T>(v: unknown): v is Ref<T> {
+  if (isSSR) return v instanceof RefStateSSR;
   return v instanceof RefState;
 }
+
+export type { RefState, ComputedState, EffectState };

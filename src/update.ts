@@ -1,6 +1,6 @@
 import { createHeap } from "./heap.ts";
 import type { Layer } from "./layer.ts";
-import type { RefState } from "./state.ts";
+import type { RefState, State } from "./state.ts";
 
 let dirtyStates = new Set<RefState>();
 let currentUpdate = false;
@@ -23,19 +23,20 @@ function updateStates() {
     const layers = createHeap<Layer>();
 
     for (const ref of dirty) {
-      layers.push(ref._layer);
-      ref._layer.heap.push(ref);
+      layers.push(ref.layer);
+      ref.layer.heap.push(ref);
     }
 
     while (layers.size() > 0) {
       const layer = layers.pop();
 
       while (layer.heap.size() > 0) {
-        const elem = layer.heap.pop();
+        const elem = layer.heap.pop() as State;
+
         if (elem.update()) {
-          for (const node of elem._listeners) {
-            layers.push(node._layer);
-            node._layer.heap.push(node);
+          for (const node of elem.listeners) {
+            layers.push(node.layer);
+            node.layer.heap.push(node);
           }
         }
       }
