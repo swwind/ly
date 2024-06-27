@@ -27,25 +27,10 @@ export namespace JSXInternal {
 
   export interface SVGAttributes<Target extends EventTarget = SVGElement>
     extends HTMLAttributes<Target> {
-    accentHeight?: MaybeComputed<number | string | undefined>;
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/accent-height */
+    "accent-height"?: MaybeComputed<number | string | undefined>;
     accumulate?: MaybeComputed<"none" | "sum" | undefined>;
     additive?: MaybeComputed<"replace" | "sum" | undefined>;
-    alignmentBaseline?: MaybeComputed<
-      | "auto"
-      | "baseline"
-      | "before-edge"
-      | "text-before-edge"
-      | "middle"
-      | "central"
-      | "after-edge"
-      | "text-after-edge"
-      | "ideographic"
-      | "alphabetic"
-      | "hanging"
-      | "mathematical"
-      | "inherit"
-      | undefined
-    >;
     "alignment-baseline"?: MaybeComputed<
       | "auto"
       | "baseline"
@@ -62,185 +47,162 @@ export namespace JSXInternal {
       | "inherit"
       | undefined
     >;
-    allowReorder?: MaybeComputed<"no" | "yes" | undefined>;
-    "allow-reorder"?: MaybeComputed<"no" | "yes" | undefined>;
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/alphabetic */
     alphabetic?: MaybeComputed<number | string | undefined>;
     amplitude?: MaybeComputed<number | string | undefined>;
-    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/arabic-form */
-    arabicForm?: MaybeComputed<
-      "initial" | "medial" | "terminal" | "isolated" | undefined
-    >;
     /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/arabic-form */
     "arabic-form"?: MaybeComputed<
       "initial" | "medial" | "terminal" | "isolated" | undefined
     >;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/ascent */
     ascent?: MaybeComputed<number | string | undefined>;
     attributeName?: MaybeComputed<string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/attributeType */
     attributeType?: MaybeComputed<string | undefined>;
-    autoReverse?: MaybeComputed<number | string | undefined>;
+    // autoReverse?: MaybeComputed<number | string | undefined>;
     azimuth?: MaybeComputed<number | string | undefined>;
     baseFrequency?: MaybeComputed<number | string | undefined>;
-    baselineShift?: MaybeComputed<number | string | undefined>;
     "baseline-shift"?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/baseProfile */
     baseProfile?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/bbox */
     bbox?: MaybeComputed<number | string | undefined>;
     begin?: MaybeComputed<number | string | undefined>;
     bias?: MaybeComputed<number | string | undefined>;
     by?: MaybeComputed<number | string | undefined>;
     calcMode?: MaybeComputed<number | string | undefined>;
-    capHeight?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/cap-height */
     "cap-height"?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/clip */
     clip?: MaybeComputed<number | string | undefined>;
-    clipPath?: MaybeComputed<string | undefined>;
-    "clip-path"?: MaybeComputed<string | undefined>;
     clipPathUnits?: MaybeComputed<number | string | undefined>;
-    clipRule?: MaybeComputed<number | string | undefined>;
+    "clip-path"?: MaybeComputed<string | undefined>;
     "clip-rule"?: MaybeComputed<number | string | undefined>;
-    colorInterpolation?: MaybeComputed<number | string | undefined>;
     "color-interpolation"?: MaybeComputed<number | string | undefined>;
-    colorInterpolationFilters?: MaybeComputed<
-      "auto" | "sRGB" | "linearRGB" | "inherit" | undefined
-    >;
     "color-interpolation-filters"?: MaybeComputed<
       "auto" | "sRGB" | "linearRGB" | "inherit" | undefined
     >;
-    colorProfile?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/color-profile */
     "color-profile"?: MaybeComputed<number | string | undefined>;
-    colorRendering?: MaybeComputed<number | string | undefined>;
     "color-rendering"?: MaybeComputed<number | string | undefined>;
-    contentScriptType?: MaybeComputed<number | string | undefined>;
-    "content-script-type"?: MaybeComputed<number | string | undefined>;
-    contentStyleType?: MaybeComputed<number | string | undefined>;
-    "content-style-type"?: MaybeComputed<number | string | undefined>;
     cursor?: MaybeComputed<number | string | undefined>;
     cx?: MaybeComputed<number | string | undefined>;
     cy?: MaybeComputed<number | string | undefined>;
     d?: MaybeComputed<string | undefined>;
     decelerate?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/descent */
     descent?: MaybeComputed<number | string | undefined>;
     diffuseConstant?: MaybeComputed<number | string | undefined>;
     direction?: MaybeComputed<number | string | undefined>;
     display?: MaybeComputed<number | string | undefined>;
     divisor?: MaybeComputed<number | string | undefined>;
-    dominantBaseline?: MaybeComputed<number | string | undefined>;
     "dominant-baseline"?: MaybeComputed<number | string | undefined>;
     dur?: MaybeComputed<number | string | undefined>;
     dx?: MaybeComputed<number | string | undefined>;
     dy?: MaybeComputed<number | string | undefined>;
     edgeMode?: MaybeComputed<number | string | undefined>;
     elevation?: MaybeComputed<number | string | undefined>;
-    enableBackground?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/enable-background */
     "enable-background"?: MaybeComputed<number | string | undefined>;
     end?: MaybeComputed<number | string | undefined>;
     exponent?: MaybeComputed<number | string | undefined>;
-    externalResourcesRequired?: MaybeComputed<number | string | undefined>;
     fill?: MaybeComputed<string | undefined>;
-    fillOpacity?: MaybeComputed<number | string | undefined>;
     "fill-opacity"?: MaybeComputed<number | string | undefined>;
-    fillRule?: MaybeComputed<"nonzero" | "evenodd" | "inherit" | undefined>;
     "fill-rule"?: MaybeComputed<"nonzero" | "evenodd" | "inherit" | undefined>;
     filter?: MaybeComputed<string | undefined>;
-    filterRes?: MaybeComputed<number | string | undefined>;
     filterUnits?: MaybeComputed<number | string | undefined>;
-    floodColor?: MaybeComputed<number | string | undefined>;
     "flood-color"?: MaybeComputed<number | string | undefined>;
-    floodOpacity?: MaybeComputed<number | string | undefined>;
     "flood-opacity"?: MaybeComputed<number | string | undefined>;
-    focusable?: MaybeComputed<number | string | undefined>;
-    fontFamily?: MaybeComputed<string | undefined>;
     "font-family"?: MaybeComputed<string | undefined>;
-    fontSize?: MaybeComputed<number | string | undefined>;
     "font-size"?: MaybeComputed<number | string | undefined>;
-    fontSizeAdjust?: MaybeComputed<number | string | undefined>;
     "font-size-adjust"?: MaybeComputed<number | string | undefined>;
-    fontStretch?: MaybeComputed<number | string | undefined>;
     "font-stretch"?: MaybeComputed<number | string | undefined>;
-    fontStyle?: MaybeComputed<number | string | undefined>;
     "font-style"?: MaybeComputed<number | string | undefined>;
-    fontVariant?: MaybeComputed<number | string | undefined>;
     "font-variant"?: MaybeComputed<number | string | undefined>;
-    fontWeight?: MaybeComputed<number | string | undefined>;
     "font-weight"?: MaybeComputed<number | string | undefined>;
     format?: MaybeComputed<number | string | undefined>;
     from?: MaybeComputed<number | string | undefined>;
+    fr?: MaybeComputed<number | string | undefined>;
     fx?: MaybeComputed<number | string | undefined>;
     fy?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/g1 */
     g1?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/g2 */
     g2?: MaybeComputed<number | string | undefined>;
-    glyphName?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/glyph-name */
     "glyph-name"?: MaybeComputed<number | string | undefined>;
-    glyphOrientationHorizontal?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/glyph-orientation-horizontal */
     "glyph-orientation-horizontal"?: MaybeComputed<number | string | undefined>;
-    glyphOrientationVertical?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/glyph-orientation-vertical */
     "glyph-orientation-vertical"?: MaybeComputed<number | string | undefined>;
     glyphRef?: MaybeComputed<number | string | undefined>;
     gradientTransform?: MaybeComputed<string | undefined>;
     gradientUnits?: MaybeComputed<string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/hanging */
     hanging?: MaybeComputed<number | string | undefined>;
-    horizAdvX?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/horiz-adv-x */
     "horiz-adv-x"?: MaybeComputed<number | string | undefined>;
-    horizOriginX?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/horiz-origin-x */
     "horiz-origin-x"?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/horiz-origin-y */
+    "horiz-origin-y"?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/ideographic */
     ideographic?: MaybeComputed<number | string | undefined>;
-    imageRendering?: MaybeComputed<number | string | undefined>;
     "image-rendering"?: MaybeComputed<number | string | undefined>;
-    in2?: MaybeComputed<number | string | undefined>;
     in?: MaybeComputed<string | undefined>;
+    in2?: MaybeComputed<number | string | undefined>;
     intercept?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/k */
+    k?: MaybeComputed<number | string | undefined>;
     k1?: MaybeComputed<number | string | undefined>;
     k2?: MaybeComputed<number | string | undefined>;
     k3?: MaybeComputed<number | string | undefined>;
     k4?: MaybeComputed<number | string | undefined>;
-    k?: MaybeComputed<number | string | undefined>;
     kernelMatrix?: MaybeComputed<number | string | undefined>;
     kernelUnitLength?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/kerning */
     kerning?: MaybeComputed<number | string | undefined>;
     keyPoints?: MaybeComputed<number | string | undefined>;
     keySplines?: MaybeComputed<number | string | undefined>;
     keyTimes?: MaybeComputed<number | string | undefined>;
     lengthAdjust?: MaybeComputed<number | string | undefined>;
-    letterSpacing?: MaybeComputed<number | string | undefined>;
     "letter-spacing"?: MaybeComputed<number | string | undefined>;
-    lightingColor?: MaybeComputed<number | string | undefined>;
     "lighting-color"?: MaybeComputed<number | string | undefined>;
     limitingConeAngle?: MaybeComputed<number | string | undefined>;
     local?: MaybeComputed<number | string | undefined>;
-    markerEnd?: MaybeComputed<string | undefined>;
     "marker-end"?: MaybeComputed<string | undefined>;
-    markerHeight?: MaybeComputed<number | string | undefined>;
-    markerMid?: MaybeComputed<string | undefined>;
     "marker-mid"?: MaybeComputed<string | undefined>;
-    markerStart?: MaybeComputed<string | undefined>;
     "marker-start"?: MaybeComputed<string | undefined>;
+    markerHeight?: MaybeComputed<number | string | undefined>;
     markerUnits?: MaybeComputed<number | string | undefined>;
     markerWidth?: MaybeComputed<number | string | undefined>;
     mask?: MaybeComputed<string | undefined>;
     maskContentUnits?: MaybeComputed<number | string | undefined>;
     maskUnits?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/mathematical */
     mathematical?: MaybeComputed<number | string | undefined>;
     mode?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/name */
+    name?: MaybeComputed<string | undefined>;
     numOctaves?: MaybeComputed<number | string | undefined>;
     offset?: MaybeComputed<number | string | undefined>;
     opacity?: MaybeComputed<number | string | undefined>;
     operator?: MaybeComputed<number | string | undefined>;
     order?: MaybeComputed<number | string | undefined>;
     orient?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/orientation */
     orientation?: MaybeComputed<number | string | undefined>;
     origin?: MaybeComputed<number | string | undefined>;
     overflow?: MaybeComputed<number | string | undefined>;
-    overlinePosition?: MaybeComputed<number | string | undefined>;
     "overline-position"?: MaybeComputed<number | string | undefined>;
-    overlineThickness?: MaybeComputed<number | string | undefined>;
     "overline-thickness"?: MaybeComputed<number | string | undefined>;
-    paintOrder?: MaybeComputed<number | string | undefined>;
     "paint-order"?: MaybeComputed<number | string | undefined>;
-    panose1?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/panose-1 */
     "panose-1"?: MaybeComputed<number | string | undefined>;
     pathLength?: MaybeComputed<number | string | undefined>;
     patternContentUnits?: MaybeComputed<string | undefined>;
     patternTransform?: MaybeComputed<number | string | undefined>;
     patternUnits?: MaybeComputed<string | undefined>;
-    pointerEvents?: MaybeComputed<number | string | undefined>;
     "pointer-events"?: MaybeComputed<number | string | undefined>;
     points?: MaybeComputed<string | undefined>;
     pointsAtX?: MaybeComputed<number | string | undefined>;
@@ -253,12 +215,9 @@ export namespace JSXInternal {
     radius?: MaybeComputed<number | string | undefined>;
     refX?: MaybeComputed<number | string | undefined>;
     refY?: MaybeComputed<number | string | undefined>;
-    renderingIntent?: MaybeComputed<number | string | undefined>;
     "rendering-intent"?: MaybeComputed<number | string | undefined>;
     repeatCount?: MaybeComputed<number | string | undefined>;
-    "repeat-count"?: MaybeComputed<number | string | undefined>;
     repeatDur?: MaybeComputed<number | string | undefined>;
-    "repeat-dur"?: MaybeComputed<number | string | undefined>;
     requiredExtensions?: MaybeComputed<number | string | undefined>;
     requiredFeatures?: MaybeComputed<number | string | undefined>;
     restart?: MaybeComputed<number | string | undefined>;
@@ -268,8 +227,8 @@ export namespace JSXInternal {
     ry?: MaybeComputed<number | string | undefined>;
     scale?: MaybeComputed<number | string | undefined>;
     seed?: MaybeComputed<number | string | undefined>;
-    shapeRendering?: MaybeComputed<number | string | undefined>;
     "shape-rendering"?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/slope */
     slope?: MaybeComputed<number | string | undefined>;
     spacing?: MaybeComputed<number | string | undefined>;
     specularConstant?: MaybeComputed<number | string | undefined>;
@@ -278,126 +237,107 @@ export namespace JSXInternal {
     spreadMethod?: MaybeComputed<string | undefined>;
     startOffset?: MaybeComputed<number | string | undefined>;
     stdDeviation?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stemh */
     stemh?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stemv */
     stemv?: MaybeComputed<number | string | undefined>;
     stitchTiles?: MaybeComputed<number | string | undefined>;
-    stopColor?: MaybeComputed<string | undefined>;
     "stop-color"?: MaybeComputed<string | undefined>;
-    stopOpacity?: MaybeComputed<number | string | undefined>;
     "stop-opacity"?: MaybeComputed<number | string | undefined>;
-    strikethroughPosition?: MaybeComputed<number | string | undefined>;
     "strikethrough-position"?: MaybeComputed<number | string | undefined>;
-    strikethroughThickness?: MaybeComputed<number | string | undefined>;
     "strikethrough-thickness"?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/string */
     string?: MaybeComputed<number | string | undefined>;
     stroke?: MaybeComputed<string | undefined>;
-    strokeDasharray?: MaybeComputed<number | string | undefined>;
     "stroke-dasharray"?: MaybeComputed<number | string | undefined>;
-    strokeDashoffset?: MaybeComputed<number | string | undefined>;
     "stroke-dashoffset"?: MaybeComputed<number | string | undefined>;
-    strokeLinecap?: MaybeComputed<
-      "butt" | "round" | "square" | "inherit" | undefined
-    >;
     "stroke-linecap"?: MaybeComputed<
       "butt" | "round" | "square" | "inherit" | undefined
-    >;
-    strokeLinejoin?: MaybeComputed<
-      "miter" | "round" | "bevel" | "inherit" | undefined
     >;
     "stroke-linejoin"?: MaybeComputed<
       "miter" | "round" | "bevel" | "inherit" | undefined
     >;
-    strokeMiterlimit?: MaybeComputed<number | string | undefined>;
     "stroke-miterlimit"?: MaybeComputed<number | string | undefined>;
-    strokeOpacity?: MaybeComputed<number | string | undefined>;
     "stroke-opacity"?: MaybeComputed<number | string | undefined>;
-    strokeWidth?: MaybeComputed<number | string | undefined>;
     "stroke-width"?: MaybeComputed<number | string | undefined>;
     surfaceScale?: MaybeComputed<number | string | undefined>;
     systemLanguage?: MaybeComputed<number | string | undefined>;
     tableValues?: MaybeComputed<number | string | undefined>;
     targetX?: MaybeComputed<number | string | undefined>;
     targetY?: MaybeComputed<number | string | undefined>;
-    textAnchor?: MaybeComputed<string | undefined>;
     "text-anchor"?: MaybeComputed<string | undefined>;
-    textDecoration?: MaybeComputed<number | string | undefined>;
     "text-decoration"?: MaybeComputed<number | string | undefined>;
+    "text-rendering"?: MaybeComputed<number | string | undefined>;
     textLength?: MaybeComputed<number | string | undefined>;
-    textRendering?: MaybeComputed<number | string | undefined>;
     to?: MaybeComputed<number | string | undefined>;
     transform?: MaybeComputed<string | undefined>;
+    "transform-origin"?: MaybeComputed<string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/u1 */
     u1?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/u2 */
     u2?: MaybeComputed<number | string | undefined>;
-    underlinePosition?: MaybeComputed<number | string | undefined>;
     "underline-position"?: MaybeComputed<number | string | undefined>;
-    underlineThickness?: MaybeComputed<number | string | undefined>;
     "underline-thickness"?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/unicode */
     unicode?: MaybeComputed<number | string | undefined>;
-    unicodeBidi?: MaybeComputed<number | string | undefined>;
     "unicode-bidi"?: MaybeComputed<number | string | undefined>;
-    unicodeRange?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/unicode-range */
     "unicode-range"?: MaybeComputed<number | string | undefined>;
-    unitsPerEm?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/units-per-em */
     "units-per-em"?: MaybeComputed<number | string | undefined>;
-    vAlphabetic?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/v-alphabetic */
     "v-alphabetic"?: MaybeComputed<number | string | undefined>;
-    values?: MaybeComputed<string | undefined>;
-    vectorEffect?: MaybeComputed<number | string | undefined>;
-    "vector-effect"?: MaybeComputed<number | string | undefined>;
-    version?: MaybeComputed<string | undefined>;
-    vertAdvY?: MaybeComputed<number | string | undefined>;
-    "vert-adv-y"?: MaybeComputed<number | string | undefined>;
-    vertOriginX?: MaybeComputed<number | string | undefined>;
-    "vert-origin-x"?: MaybeComputed<number | string | undefined>;
-    vertOriginY?: MaybeComputed<number | string | undefined>;
-    "vert-origin-y"?: MaybeComputed<number | string | undefined>;
-    vHanging?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/v-hanging */
     "v-hanging"?: MaybeComputed<number | string | undefined>;
-    vIdeographic?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/v-ideographic */
     "v-ideographic"?: MaybeComputed<number | string | undefined>;
-    viewBox?: MaybeComputed<string | undefined>;
-    viewTarget?: MaybeComputed<number | string | undefined>;
-    visibility?: MaybeComputed<number | string | undefined>;
-    vMathematical?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/v-mathematical */
     "v-mathematical"?: MaybeComputed<number | string | undefined>;
+    values?: MaybeComputed<string | undefined>;
+    "vector-effect"?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/version */
+    version?: MaybeComputed<string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/vert-adv-y */
+    "vert-adv-y"?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/vert-origin-x */
+    "vert-origin-x"?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/vert-origin-y */
+    "vert-origin-y"?: MaybeComputed<number | string | undefined>;
+    viewBox?: MaybeComputed<string | undefined>;
+    // viewTarget?: MaybeComputed<number | string | undefined>;
+    visibility?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/widths */
     widths?: MaybeComputed<number | string | undefined>;
-    wordSpacing?: MaybeComputed<number | string | undefined>;
     "word-spacing"?: MaybeComputed<number | string | undefined>;
-    writingMode?: MaybeComputed<number | string | undefined>;
     "writing-mode"?: MaybeComputed<number | string | undefined>;
+    x?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/x-height */
+    "x-height"?: MaybeComputed<number | string | undefined>;
     x1?: MaybeComputed<number | string | undefined>;
     x2?: MaybeComputed<number | string | undefined>;
-    x?: MaybeComputed<number | string | undefined>;
     xChannelSelector?: MaybeComputed<string | undefined>;
-    xHeight?: MaybeComputed<number | string | undefined>;
-    "x-height"?: MaybeComputed<number | string | undefined>;
-    xlinkActuate?: MaybeComputed<string | undefined>;
-    "xlink:actuate"?: SVGAttributes["xlinkActuate"];
-    xlinkArcrole?: MaybeComputed<string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:arcrole */
     "xlink:arcrole"?: MaybeComputed<string | undefined>;
-    xlinkHref?: MaybeComputed<string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href */
     "xlink:href"?: MaybeComputed<string | undefined>;
-    xlinkRole?: MaybeComputed<string | undefined>;
-    "xlink:role"?: MaybeComputed<string | undefined>;
-    xlinkShow?: MaybeComputed<string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:show */
     "xlink:show"?: MaybeComputed<string | undefined>;
-    xlinkTitle?: MaybeComputed<string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:title */
     "xlink:title"?: MaybeComputed<string | undefined>;
-    xlinkType?: MaybeComputed<string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:type */
     "xlink:type"?: MaybeComputed<string | undefined>;
-    xmlBase?: MaybeComputed<string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xml:base */
     "xml:base"?: MaybeComputed<string | undefined>;
-    xmlLang?: MaybeComputed<string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xml:lang */
     "xml:lang"?: MaybeComputed<string | undefined>;
-    xmlns?: MaybeComputed<string | undefined>;
-    xmlnsXlink?: MaybeComputed<string | undefined>;
-    xmlSpace?: MaybeComputed<string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xml:space */
     "xml:space"?: MaybeComputed<string | undefined>;
+    y?: MaybeComputed<number | string | undefined>;
     y1?: MaybeComputed<number | string | undefined>;
     y2?: MaybeComputed<number | string | undefined>;
-    y?: MaybeComputed<number | string | undefined>;
     yChannelSelector?: MaybeComputed<string | undefined>;
     z?: MaybeComputed<number | string | undefined>;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/zoomAndPan */
     zoomAndPan?: MaybeComputed<string | undefined>;
   }
 
@@ -518,25 +458,17 @@ export namespace JSXInternal {
     extends LyDOMAttributes {
     // Image Events
     onLoad?: GenericEventHandler<Target> | undefined;
-    onLoadCapture?: GenericEventHandler<Target> | undefined;
     onError?: GenericEventHandler<Target> | undefined;
-    onErrorCapture?: GenericEventHandler<Target> | undefined;
 
     // Clipboard Events
     onCopy?: ClipboardEventHandler<Target> | undefined;
-    onCopyCapture?: ClipboardEventHandler<Target> | undefined;
     onCut?: ClipboardEventHandler<Target> | undefined;
-    onCutCapture?: ClipboardEventHandler<Target> | undefined;
     onPaste?: ClipboardEventHandler<Target> | undefined;
-    onPasteCapture?: ClipboardEventHandler<Target> | undefined;
 
     // Composition Events
     onCompositionEnd?: CompositionEventHandler<Target> | undefined;
-    onCompositionEndCapture?: CompositionEventHandler<Target> | undefined;
     onCompositionStart?: CompositionEventHandler<Target> | undefined;
-    onCompositionStartCapture?: CompositionEventHandler<Target> | undefined;
     onCompositionUpdate?: CompositionEventHandler<Target> | undefined;
-    onCompositionUpdateCapture?: CompositionEventHandler<Target> | undefined;
 
     // Details Events
     onToggle?: GenericEventHandler<Target> | undefined;
@@ -547,194 +479,110 @@ export namespace JSXInternal {
 
     // Focus Events
     onFocus?: FocusEventHandler<Target> | undefined;
-    onFocusCapture?: FocusEventHandler<Target> | undefined;
     onFocusIn?: FocusEventHandler<Target> | undefined;
-    onFocusInCapture?: FocusEventHandler<Target> | undefined;
     onFocusOut?: FocusEventHandler<Target> | undefined;
-    onFocusOutCapture?: FocusEventHandler<Target> | undefined;
     onBlur?: FocusEventHandler<Target> | undefined;
-    onBlurCapture?: FocusEventHandler<Target> | undefined;
 
     // Form Events
     onChange?: GenericEventHandler<Target> | undefined;
-    onChangeCapture?: GenericEventHandler<Target> | undefined;
     onInput?: InputEventHandler<Target> | undefined;
-    onInputCapture?: InputEventHandler<Target> | undefined;
     onBeforeInput?: InputEventHandler<Target> | undefined;
-    onBeforeInputCapture?: InputEventHandler<Target> | undefined;
     onSearch?: GenericEventHandler<Target> | undefined;
-    onSearchCapture?: GenericEventHandler<Target> | undefined;
     onSubmit?: SubmitEventHandler<Target> | undefined;
-    onSubmitCapture?: SubmitEventHandler<Target> | undefined;
     onInvalid?: GenericEventHandler<Target> | undefined;
-    onInvalidCapture?: GenericEventHandler<Target> | undefined;
     onReset?: GenericEventHandler<Target> | undefined;
-    onResetCapture?: GenericEventHandler<Target> | undefined;
     onFormData?: GenericEventHandler<Target> | undefined;
-    onFormDataCapture?: GenericEventHandler<Target> | undefined;
 
     // Keyboard Events
     onKeyDown?: KeyboardEventHandler<Target> | undefined;
-    onKeyDownCapture?: KeyboardEventHandler<Target> | undefined;
     onKeyPress?: KeyboardEventHandler<Target> | undefined;
-    onKeyPressCapture?: KeyboardEventHandler<Target> | undefined;
     onKeyUp?: KeyboardEventHandler<Target> | undefined;
-    onKeyUpCapture?: KeyboardEventHandler<Target> | undefined;
 
     // Media Events
     onAbort?: GenericEventHandler<Target> | undefined;
-    onAbortCapture?: GenericEventHandler<Target> | undefined;
     onCanPlay?: GenericEventHandler<Target> | undefined;
-    onCanPlayCapture?: GenericEventHandler<Target> | undefined;
     onCanPlayThrough?: GenericEventHandler<Target> | undefined;
-    onCanPlayThroughCapture?: GenericEventHandler<Target> | undefined;
     onDurationChange?: GenericEventHandler<Target> | undefined;
-    onDurationChangeCapture?: GenericEventHandler<Target> | undefined;
     onEmptied?: GenericEventHandler<Target> | undefined;
-    onEmptiedCapture?: GenericEventHandler<Target> | undefined;
     onEncrypted?: GenericEventHandler<Target> | undefined;
-    onEncryptedCapture?: GenericEventHandler<Target> | undefined;
     onEnded?: GenericEventHandler<Target> | undefined;
-    onEndedCapture?: GenericEventHandler<Target> | undefined;
     onLoadedData?: GenericEventHandler<Target> | undefined;
-    onLoadedDataCapture?: GenericEventHandler<Target> | undefined;
     onLoadedMetadata?: GenericEventHandler<Target> | undefined;
-    onLoadedMetadataCapture?: GenericEventHandler<Target> | undefined;
     onLoadStart?: GenericEventHandler<Target> | undefined;
-    onLoadStartCapture?: GenericEventHandler<Target> | undefined;
     onPause?: GenericEventHandler<Target> | undefined;
-    onPauseCapture?: GenericEventHandler<Target> | undefined;
     onPlay?: GenericEventHandler<Target> | undefined;
-    onPlayCapture?: GenericEventHandler<Target> | undefined;
     onPlaying?: GenericEventHandler<Target> | undefined;
-    onPlayingCapture?: GenericEventHandler<Target> | undefined;
     onProgress?: GenericEventHandler<Target> | undefined;
-    onProgressCapture?: GenericEventHandler<Target> | undefined;
     onRateChange?: GenericEventHandler<Target> | undefined;
-    onRateChangeCapture?: GenericEventHandler<Target> | undefined;
     onSeeked?: GenericEventHandler<Target> | undefined;
-    onSeekedCapture?: GenericEventHandler<Target> | undefined;
     onSeeking?: GenericEventHandler<Target> | undefined;
-    onSeekingCapture?: GenericEventHandler<Target> | undefined;
     onStalled?: GenericEventHandler<Target> | undefined;
-    onStalledCapture?: GenericEventHandler<Target> | undefined;
     onSuspend?: GenericEventHandler<Target> | undefined;
-    onSuspendCapture?: GenericEventHandler<Target> | undefined;
     onTimeUpdate?: GenericEventHandler<Target> | undefined;
-    onTimeUpdateCapture?: GenericEventHandler<Target> | undefined;
     onVolumeChange?: GenericEventHandler<Target> | undefined;
-    onVolumeChangeCapture?: GenericEventHandler<Target> | undefined;
     onWaiting?: GenericEventHandler<Target> | undefined;
-    onWaitingCapture?: GenericEventHandler<Target> | undefined;
 
     // MouseEvents
     onClick?: MouseEventHandler<Target> | undefined;
-    onClickCapture?: MouseEventHandler<Target> | undefined;
     onContextMenu?: MouseEventHandler<Target> | undefined;
-    onContextMenuCapture?: MouseEventHandler<Target> | undefined;
     onDblClick?: MouseEventHandler<Target> | undefined;
-    onDblClickCapture?: MouseEventHandler<Target> | undefined;
     onDrag?: DragEventHandler<Target> | undefined;
-    onDragCapture?: DragEventHandler<Target> | undefined;
     onDragEnd?: DragEventHandler<Target> | undefined;
-    onDragEndCapture?: DragEventHandler<Target> | undefined;
     onDragEnter?: DragEventHandler<Target> | undefined;
-    onDragEnterCapture?: DragEventHandler<Target> | undefined;
     onDragExit?: DragEventHandler<Target> | undefined;
-    onDragExitCapture?: DragEventHandler<Target> | undefined;
     onDragLeave?: DragEventHandler<Target> | undefined;
-    onDragLeaveCapture?: DragEventHandler<Target> | undefined;
     onDragOver?: DragEventHandler<Target> | undefined;
-    onDragOverCapture?: DragEventHandler<Target> | undefined;
     onDragStart?: DragEventHandler<Target> | undefined;
-    onDragStartCapture?: DragEventHandler<Target> | undefined;
     onDrop?: DragEventHandler<Target> | undefined;
-    onDropCapture?: DragEventHandler<Target> | undefined;
     onMouseDown?: MouseEventHandler<Target> | undefined;
-    onMouseDownCapture?: MouseEventHandler<Target> | undefined;
     onMouseEnter?: MouseEventHandler<Target> | undefined;
-    onMouseEnterCapture?: MouseEventHandler<Target> | undefined;
     onMouseLeave?: MouseEventHandler<Target> | undefined;
-    onMouseLeaveCapture?: MouseEventHandler<Target> | undefined;
     onMouseMove?: MouseEventHandler<Target> | undefined;
-    onMouseMoveCapture?: MouseEventHandler<Target> | undefined;
     onMouseOut?: MouseEventHandler<Target> | undefined;
-    onMouseOutCapture?: MouseEventHandler<Target> | undefined;
     onMouseOver?: MouseEventHandler<Target> | undefined;
-    onMouseOverCapture?: MouseEventHandler<Target> | undefined;
     onMouseUp?: MouseEventHandler<Target> | undefined;
-    onMouseUpCapture?: MouseEventHandler<Target> | undefined;
 
     // Selection Events
     onSelect?: GenericEventHandler<Target> | undefined;
-    onSelectCapture?: GenericEventHandler<Target> | undefined;
 
     // Touch Events
     onTouchCancel?: TouchEventHandler<Target> | undefined;
-    onTouchCancelCapture?: TouchEventHandler<Target> | undefined;
     onTouchEnd?: TouchEventHandler<Target> | undefined;
-    onTouchEndCapture?: TouchEventHandler<Target> | undefined;
     onTouchMove?: TouchEventHandler<Target> | undefined;
-    onTouchMoveCapture?: TouchEventHandler<Target> | undefined;
     onTouchStart?: TouchEventHandler<Target> | undefined;
-    onTouchStartCapture?: TouchEventHandler<Target> | undefined;
 
     // Pointer Events
     onPointerOver?: PointerEventHandler<Target> | undefined;
-    onPointerOverCapture?: PointerEventHandler<Target> | undefined;
     onPointerEnter?: PointerEventHandler<Target> | undefined;
-    onPointerEnterCapture?: PointerEventHandler<Target> | undefined;
     onPointerDown?: PointerEventHandler<Target> | undefined;
-    onPointerDownCapture?: PointerEventHandler<Target> | undefined;
     onPointerMove?: PointerEventHandler<Target> | undefined;
-    onPointerMoveCapture?: PointerEventHandler<Target> | undefined;
     onPointerUp?: PointerEventHandler<Target> | undefined;
-    onPointerUpCapture?: PointerEventHandler<Target> | undefined;
     onPointerCancel?: PointerEventHandler<Target> | undefined;
-    onPointerCancelCapture?: PointerEventHandler<Target> | undefined;
     onPointerOut?: PointerEventHandler<Target> | undefined;
-    onPointerOutCapture?: PointerEventHandler<Target> | undefined;
     onPointerLeave?: PointerEventHandler<Target> | undefined;
-    onPointerLeaveCapture?: PointerEventHandler<Target> | undefined;
-    onGotPointerCapture?: PointerEventHandler<Target> | undefined;
-    onGotPointerCaptureCapture?: PointerEventHandler<Target> | undefined;
-    onLostPointerCapture?: PointerEventHandler<Target> | undefined;
-    onLostPointerCaptureCapture?: PointerEventHandler<Target> | undefined;
 
     // UI Events
     onScroll?: UIEventHandler<Target> | undefined;
     onScrollEnd?: UIEventHandler<Target> | undefined;
-    onScrollCapture?: UIEventHandler<Target> | undefined;
 
     // Wheel Events
     onWheel?: WheelEventHandler<Target> | undefined;
-    onWheelCapture?: WheelEventHandler<Target> | undefined;
 
     // Animation Events
     onAnimationStart?: AnimationEventHandler<Target> | undefined;
-    onAnimationStartCapture?: AnimationEventHandler<Target> | undefined;
     onAnimationEnd?: AnimationEventHandler<Target> | undefined;
-    onAnimationEndCapture?: AnimationEventHandler<Target> | undefined;
     onAnimationIteration?: AnimationEventHandler<Target> | undefined;
-    onAnimationIterationCapture?: AnimationEventHandler<Target> | undefined;
 
     // Transition Events
     onTransitionCancel?: TransitionEventHandler<Target>;
-    onTransitionCancelCapture?: TransitionEventHandler<Target>;
     onTransitionEnd?: TransitionEventHandler<Target>;
-    onTransitionEndCapture?: TransitionEventHandler<Target>;
     onTransitionRun?: TransitionEventHandler<Target>;
-    onTransitionRunCapture?: TransitionEventHandler<Target>;
     onTransitionStart?: TransitionEventHandler<Target>;
-    onTransitionStartCapture?: TransitionEventHandler<Target>;
 
     // PictureInPicture Events
     onEnterPictureInPicture?: PictureInPictureEventHandler<Target>;
-    onEnterPictureInPictureCapture?: PictureInPictureEventHandler<Target>;
     onLeavePictureInPicture?: PictureInPictureEventHandler<Target>;
-    onLeavePictureInPictureCapture?: PictureInPictureEventHandler<Target>;
     onResize?: PictureInPictureEventHandler<Target>;
-    onResizeCapture?: PictureInPictureEventHandler<Target>;
   }
 
   // All the WAI-ARIA 1.1 attributes from https://www.w3.org/TR/wai-aria-1.1/
@@ -1131,9 +979,7 @@ export namespace JSXInternal {
       AriaAttributes {
     // Standard HTML Attributes
     accept?: MaybeComputed<string | undefined>;
-    acceptCharset?: MaybeComputed<string | undefined>;
     "accept-charset"?: HTMLAttributes["acceptCharset"];
-    accessKey?: MaybeComputed<string | undefined>;
     accesskey?: HTMLAttributes["accessKey"];
     action?: MaybeComputed<string | undefined>;
     allow?: MaybeComputed<string | undefined>;
