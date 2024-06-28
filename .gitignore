@@ -1,4 +1,2 @@
-*.js
-/.vite
 node_modules
 dist

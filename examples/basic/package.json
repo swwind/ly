@@ -1,0 +1,14 @@
+{
+  "name": "@example/basic",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "vite": "^5.3.2"
+  },
+  "dependencies": {
+    "@swwind/ly": "workspace:^"
+  }
+}

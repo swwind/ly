@@ -1,42 +1,15 @@
 {
-  "name": "@swwind/ly",
-  "version": "0.0.1",
+  "name": "workspace",
+  "private": true,
   "type": "module",
-  "types": "./dist/types/mod.d.ts",
-  "module": "./dist/esm/mod.mjs",
-  "exports": {
-    ".": {
-      "types": "./dist/types/mod.d.ts",
-      "import": "./dist/esm/mod.mjs"
-    },
-    "./jsx-runtime": {
-      "types": "./dist/types/jsx-runtime.d.ts",
-      "import": "./dist/esm/jsx-runtime.mjs"
-    },
-    "./jsx-dev-runtime": {
-      "types": "./dist/types/jsx-runtime.d.ts",
-      "import": "./dist/esm/jsx-runtime.mjs"
-    },
-    "./server": {
-      "types": "./dist/types/server.d.ts",
-      "import": "./dist/esm/server.mjs"
-    },
-    "./browser": {
-      "types": "./dist/types/render.d.ts",
-      "import": "./dist/esm/render.mjs"
-    }
-  },
   "scripts": {
-    "build": "tsc --build && shx cp src/jsx.d.ts dist/types && exbuild",
-    "clean": "shx rm -rf dist",
+    "build": "cd packages/ly && pnpm clean && pnpm build",
+    "example:basic": "cd examples/basic && pnpm dev",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
-    "@swwind/exbuild": "^1.0.3",
-    "shx": "^0.3.4",
-    "typescript": "^5.5.2",
     "vitepress": "^1.2.3"
   }
 }
