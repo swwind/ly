@@ -1,5 +1,3 @@
-import { JSX } from "./jsx-runtime.ts";
-
 export type Stack<T> = Array<T>;
 
 export function pushd<T>(stack: Stack<T>, item: T) {

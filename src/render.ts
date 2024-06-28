@@ -85,6 +85,9 @@ function realizeVNode(vnode: VNode) {
     withNodes(doms, () => realizeChildren(children));
     elem.append(...doms);
     appendNodes(elem);
+    if (vnode.ref) {
+      vnode.ref.value = elem;
+    }
   }
   // components
   else {
@@ -131,7 +134,7 @@ export function render(vnode: VNode, parent: Element) {
 export function hydrate(vnode: VNode, parent: Element, replace?: Node) {
   if (isSSR) {
     throw new Error(
-      "Cannot use render() in SSR mode, this is only allowed in browser."
+      "Cannot use hydrate() in SSR mode, this is only allowed in browser."
     );
   }
 
