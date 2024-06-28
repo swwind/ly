@@ -16,6 +16,10 @@
     "./jsx-dev-runtime": {
       "types": "./dist/types/jsx-runtime.d.ts",
       "import": "./dist/esm/jsx-runtime.mjs"
+    },
+    "./server": {
+      "types": "./dist/types/server.d.ts",
+      "import": "./dist/esm/server.mjs"
     }
   },
   "scripts": {

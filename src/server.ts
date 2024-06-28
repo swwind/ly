@@ -1,0 +1,103 @@
+import { clsx } from "./clsx.ts";
+import { isSSR } from "./flags.ts";
+import { styl } from "./styl.ts";
+import { isArray, toArray, valueOf } from "./utils.ts";
+import {
+  ComponentChildren,
+  ComponentType,
+  Primitives,
+  Props,
+  Slots,
+  VNode,
+  isVNode,
+  withSlots,
+} from "./vnode.ts";
+
+function sanitizeHTML(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function execute<P extends Props>(
+  type: ComponentType<P>,
+  props: P,
+  slots: Slots
+) {
+  return withSlots(slots, () => type(props));
+}
+
+function serializePrimitive(primitive: Primitives) {
+  return primitive == null || primitive === false ? "" : String(primitive);
+}
+
+function serializeChildren(children: ComponentChildren) {
+  return toArray(children)
+    .map((child) =>
+      isVNode(child)
+        ? serializeVNode(child)
+        : serializePrimitive(valueOf(child))
+    )
+    .join("");
+}
+
+function serializeVNode(vnode: VNode): string {
+  // fragment
+  if (vnode.type === null) {
+    const children = vnode.slots["default"] ?? [];
+    return serializeChildren(children);
+  }
+  // dom elements
+  else if (typeof vnode.type === "string") {
+    const attributes: [string, string][] = [];
+
+    for (const [key, value] of Object.entries(vnode.props)) {
+      if (key === "class") {
+        attributes.push([key, clsx(value)]);
+      } else if (key === "style") {
+        attributes.push([key, styl(value)]);
+      } else if (key.startsWith("on")) {
+        // do nothing
+      } else {
+        const content = valueOf(value);
+        if (content == null || content === false) {
+          // do nothing
+        } else if (content === true) {
+          attributes.push([key, ""]);
+        } else {
+          attributes.push([key, String(content)]);
+        }
+      }
+    }
+
+    const children = serializeChildren(vnode.slots["default"] ?? []);
+    return `<${[
+      vnode.type,
+      ...attributes.map(([k, v]) => `${k}="${sanitizeHTML(v)}"`),
+    ].join(" ")}>${children}</${vnode.type}>`;
+  }
+  // components
+  else {
+    const inside = execute(vnode.type, vnode.props, vnode.slots);
+
+    if (inside === null) return "";
+
+    if (typeof inside === "function") {
+      return serializeChildren(inside()) + "<!--/-->";
+    } else if (isArray(inside)) {
+      return inside.map((vnode) => serializeVNode(vnode)).join("");
+    } else {
+      return serializeVNode(inside);
+    }
+  }
+}
+
+export function renderToString(vnode: VNode) {
+  if (!isSSR) {
+    throw new Error("Cannot use renderToString() without SSR flag.");
+  }
+
+  return serializeVNode(vnode);
+}
