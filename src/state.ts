@@ -62,7 +62,7 @@ function createRef<T>(init: T): Ref<T> {
     set value(v: T) {
       current(captures)?._setters.add(elem);
       if (v !== pending) {
-        pending = state;
+        pending = v;
         enqueueUpdate(elem);
       }
     }
@@ -77,7 +77,7 @@ function createSSRRef<T>(init: T): Ref<T> {
     get value() {
       return init;
     }
-    set value(_v: T) {
+    set value(_: T) {
       throw new Error("Cannot set ref in SSR mode");
     }
     get previous() {
@@ -165,17 +165,17 @@ function createSSRComputed<T>(fn: () => T): Computed<T> {
 
 export type EffectClear = () => void;
 
-function createEffect(fn: () => void | EffectClear) {
+function createEffect(fn: () => void | EffectClear, layout = false) {
   let capture: Capture;
   let clear: void | EffectClear;
 
   const evaluate = () => {
-    if (isDEV) pushd(scopes, "effect");
+    if (isDEV && !layout) pushd(scopes, "effect");
     pushd(captures, capture);
     try {
       return fn();
     } finally {
-      if (isDEV) popd(scopes);
+      if (isDEV && !layout) popd(scopes);
       popd(captures);
     }
   };
@@ -225,15 +225,15 @@ export function computed<T>(fn: () => T): Computed<T> {
   return createComputed(fn);
 }
 
-export function effect(fn: () => void | (() => void)): void {
+export function effect(fn: () => void | EffectClear): void {
   if (isSSR) return;
   if (isDEV) assertRecursive("effect");
   createEffect(fn);
 }
 
-export function layout(fn: () => void | (() => void)): void {
+export function layout(fn: () => void | EffectClear): void {
   if (isSSR) return createSSREffect(fn);
-  createEffect(fn);
+  createEffect(fn, true);
 }
 
 export function isComputed<T>(v: unknown): v is Computed<T> {
