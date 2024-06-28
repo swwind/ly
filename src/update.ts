@@ -1,11 +1,11 @@
 import { createHeap } from "./heap.ts";
-import type { Layer } from "./layer.ts";
-import type { RefState, State } from "./state.ts";
+import type { Layer, LayerElement } from "./layer.ts";
+import type { State } from "./state.ts";
 
-let dirtyStates = new Set<RefState>();
+let dirtyStates = new Set<LayerElement>();
 let currentUpdate = false;
 
-export function enqueueUpdate(node: RefState) {
+export function enqueueUpdate(node: LayerElement) {
   dirtyStates.add(node);
   if (!currentUpdate) {
     currentUpdate = true;

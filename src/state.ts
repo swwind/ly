@@ -10,8 +10,7 @@ export type MaybeRef<T> = T | Ref<T>;
 export type Computed<T = any> = { readonly value: T; readonly previous: T };
 export type MaybeComputed<T> = T | Computed<T>;
 
-export type State = RefState | ComputedState | EffectState;
-export type RemovableState = ComputedState | EffectState;
+export type State = LayerElement;
 
 const scopes: Stack<"computed" | "effect"> = [];
 
@@ -23,8 +22,8 @@ function assertRecursive(name: string) {
 }
 
 export type Capture = {
-  _getters: Set<RefState | ComputedState>;
-  _setters: Set<RefState>;
+  _getters: Set<LayerElement>;
+  _setters: Set<LayerElement>;
 };
 
 export const captures: Stack<Capture> = [];
@@ -33,214 +32,211 @@ export function createCapture(): Capture {
   return { _getters: new Set(), _setters: new Set() };
 }
 
-class RefState<T = any> extends LayerElement {
-  private _old: T;
-  private _state: T;
-  private _pending: T;
+class ComputedElement extends LayerElement {}
+class RefElement extends ComputedElement {}
 
-  constructor(init: T) {
-    super();
+function createRef<T>(init: T): Ref<T> {
+  let state = init;
+  let pending = init;
+  let previous = init;
 
-    this._old = init;
-    this._state = init;
-    this._pending = init;
-  }
-
-  get value(): T {
-    current(captures)?._getters.add(this);
-    return this._state;
-  }
-
-  set value(state: T) {
-    current(captures)?._setters.add(this);
-    if (state !== this._state) {
-      this._pending = state;
-      enqueueUpdate(this);
+  return new (class extends RefElement {
+    get value() {
+      current(captures)?._getters.add(this);
+      return pending;
     }
-  }
-
-  get previous(): T {
-    return this._old;
-  }
-
-  update(): boolean {
-    // skip if nothing changes
-    if (this._state === this._pending) {
-      return false;
+    set value(v: T) {
+      current(captures)?._setters.add(this);
+      if (v !== pending) {
+        pending = state;
+        enqueueUpdate(this);
+      }
     }
+    get previous() {
+      return previous;
+    }
+    override update() {
+      // skip if nothing changes
+      if (state === pending) {
+        return false;
+      }
 
-    // update states
-    this._old = this._state;
-    this._state = this._pending;
-    return true;
-  }
+      // update states
+      previous = state;
+      state = pending;
+      return true;
+    }
+  })();
 }
 
-class ComputedState<T = any> extends LayerElement {
-  private _fn: () => T;
-  private _old: T;
-  private _state: T;
-  private _capture: Capture;
-
-  constructor(fn: () => T) {
-    super();
-    this._fn = fn;
-    this._capture = createCapture();
-    const state = this.evaluate();
-
-    // create links
-    for (const node of this._capture._getters) {
-      node.listeners.add(this);
+function createSSRRef<T>(init: T): Ref<T> {
+  return new (class extends RefElement {
+    get value() {
+      return init;
     }
+    set value(_v: T) {
+      throw new Error("Cannot set ref in SSR mode");
+    }
+    get previous() {
+      return init;
+    }
+  })();
+}
 
-    this._old = state;
-    this._state = state;
-  }
+function createComputed<T>(fn: () => T): Computed<T> {
+  let capture: Capture;
+  let state: T;
+  let pending: T;
+  let previous: T;
 
-  get value(): T {
-    current(captures)?._getters.add(this);
-    return this._state;
-  }
-
-  get previous(): T {
-    return this._old;
-  }
-
-  evaluate(): T {
+  const evaluate = () => {
     if (isDEV) pushd(scopes, "computed");
-    pushd(captures, this._capture);
+    pushd(captures, capture);
     try {
-      return this._fn();
+      return fn();
     } finally {
       if (isDEV) popd(scopes);
       popd(captures);
     }
-  }
-
-  update(): boolean {
-    // remove old links
-    this.remove();
-
-    // capture new deps
-    this._capture = createCapture();
-    const state = this.evaluate();
-
-    // link to current getters
-    for (const node of this._capture._getters) {
-      node.listeners.add(this);
+  };
+  const setup = (self: LayerElement) => {
+    capture = createCapture();
+    pending = evaluate();
+    for (const node of capture._getters) {
+      node.listeners.add(self);
     }
-
-    // skip update if nothing changes
-    if (state === this._state) {
-      return false;
+  };
+  const clean = (self: LayerElement) => {
+    for (const node of capture._getters) {
+      node.listeners.delete(self);
     }
+  };
 
-    // update current states
-    this._old = this._state;
-    this._state = state;
-
-    return true;
-  }
-
-  remove() {
-    // remove old links
-    for (const node of this._capture._getters) {
-      node.listeners.delete(this);
+  return new (class extends ComputedElement {
+    constructor() {
+      super();
+      setup(this);
+      previous = state = pending;
     }
-  }
+    get value() {
+      current(captures)?._getters.add(this);
+      return state;
+    }
+    get previous() {
+      return previous;
+    }
+    override update() {
+      clean(this);
+      setup(this);
+
+      // skip update if nothing changes
+      if (pending === state) {
+        return false;
+      }
+
+      // update current states
+      previous = state;
+      state = pending;
+
+      return true;
+    }
+    override remove() {
+      clean(this);
+    }
+  })();
 }
 
-class EffectState extends LayerElement {
-  private _fn: () => void | (() => void);
-  private _clear: void | (() => void);
-  private _capture: Capture;
-
-  constructor(fn: () => void | (() => void)) {
-    super();
-    this._fn = fn;
-    this._capture = createCapture();
-    this._clear = this.evaluate();
-
-    for (const node of this._capture._getters) {
-      node.listeners.add(this);
+function createSSRComputed<T>(fn: () => T): Computed<T> {
+  const state = fn();
+  return new (class extends ComputedElement {
+    get value() {
+      return state;
     }
-  }
+    get previous() {
+      return state;
+    }
+  })();
+}
 
-  evaluate() {
+export type EffectClear = () => void;
+
+function createEffect(fn: () => void | EffectClear) {
+  let capture: Capture;
+  let clear: void | EffectClear;
+
+  const evaluate = () => {
     if (isDEV) pushd(scopes, "effect");
-    pushd(captures, this._capture);
+    pushd(captures, capture);
     try {
-      return this._fn();
+      return fn();
     } finally {
       if (isDEV) popd(scopes);
       popd(captures);
     }
-  }
-
-  update(): boolean {
-    this.remove();
-
-    this._capture = createCapture();
-    this._clear = this.evaluate();
-
-    for (const node of this._capture._getters) {
-      node.listeners.add(this);
+  };
+  const setup = (self: LayerElement) => {
+    capture = createCapture();
+    clear = evaluate();
+    for (const node of capture._getters) {
+      node.listeners.add(self);
     }
-
-    return true;
-  }
-
-  override remove() {
-    if (typeof this._clear === "function") {
-      this._clear();
+  };
+  const clean = (self: LayerElement) => {
+    if (typeof clear === "function") clear();
+    for (const node of capture._getters) {
+      node.listeners.delete(self);
     }
-    for (const node of this._capture._getters) {
-      node.listeners.delete(this);
+  };
+
+  new (class extends LayerElement {
+    constructor() {
+      super();
+      setup(this);
     }
-  }
+    override update() {
+      clean(this);
+      setup(this);
+      return true;
+    }
+    override remove() {
+      clean(this);
+    }
+  })();
 }
 
-class RefStateSSR<T> {
-  constructor(public value: T, public previous = value) {}
-}
-
-class ComputedStateSSR<T> {
-  constructor(fn: () => T, public value = fn(), public previous = value) {}
+function createSSREffect(fn: () => void | EffectClear) {
+  fn();
 }
 
 export function ref<T>(): Ref<T | null>;
 export function ref<T>(init: T): Ref<T>;
 export function ref<T>(init: T = null as T): Ref<T> {
-  if (isSSR) return new RefStateSSR(init);
+  if (isSSR) return createSSRRef(init);
   if (isDEV) assertRecursive("ref");
-  return new RefState(init);
+  return createRef(init);
 }
 
 export function computed<T>(fn: () => T): Computed<T> {
-  if (isSSR) return new ComputedStateSSR(fn);
+  if (isSSR) return createSSRComputed(fn);
   if (isDEV) assertRecursive("computed");
-  return new ComputedState(fn);
+  return createComputed(fn);
 }
 
 export function effect(fn: () => void | (() => void)): void {
   if (isSSR) return;
   if (isDEV) assertRecursive("effect");
-  new EffectState(fn);
+  createEffect(fn);
 }
 
 export function layout(fn: () => void | (() => void)): void {
-  if (isSSR) return void fn();
-  new EffectState(fn);
+  if (isSSR) return createSSREffect(fn);
+  createEffect(fn);
 }
 
 export function isComputed<T>(v: unknown): v is Computed<T> {
-  if (isSSR) return v instanceof ComputedStateSSR || v instanceof RefStateSSR;
-  return v instanceof ComputedState || v instanceof RefState;
+  return v instanceof ComputedElement;
 }
 
 export function isRef<T>(v: unknown): v is Ref<T> {
-  if (isSSR) return v instanceof RefStateSSR;
-  return v instanceof RefState;
+  return v instanceof RefElement;
 }
-
-export type { RefState, ComputedState, EffectState };

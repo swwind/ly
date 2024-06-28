@@ -13,6 +13,9 @@ export class LayerElement implements Comparable {
     return this.index;
   }
 
+  update() {
+    return true;
+  }
   remove() {}
 }
 

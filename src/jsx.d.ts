@@ -574,15 +574,15 @@ export namespace JSXInternal {
     onAnimationIteration?: AnimationEventHandler<Target> | undefined;
 
     // Transition Events
-    onTransitionCancel?: TransitionEventHandler<Target>;
-    onTransitionEnd?: TransitionEventHandler<Target>;
-    onTransitionRun?: TransitionEventHandler<Target>;
-    onTransitionStart?: TransitionEventHandler<Target>;
+    onTransitionCancel?: TransitionEventHandler<Target> | undefined;
+    onTransitionEnd?: TransitionEventHandler<Target> | undefined;
+    onTransitionRun?: TransitionEventHandler<Target> | undefined;
+    onTransitionStart?: TransitionEventHandler<Target> | undefined;
 
     // PictureInPicture Events
-    onEnterPictureInPicture?: PictureInPictureEventHandler<Target>;
-    onLeavePictureInPicture?: PictureInPictureEventHandler<Target>;
-    onResize?: PictureInPictureEventHandler<Target>;
+    onEnterPictureInPicture?: PictureInPictureEventHandler<Target> | undefined;
+    onLeavePictureInPicture?: PictureInPictureEventHandler<Target> | undefined;
+    onResize?: PictureInPictureEventHandler<Target> | undefined;
   }
 
   // All the WAI-ARIA 1.1 attributes from https://www.w3.org/TR/wai-aria-1.1/
