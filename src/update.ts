@@ -33,7 +33,7 @@ function updateStates() {
       while (layer.heap.size() > 0) {
         const elem = layer.heap.pop() as State;
 
-        if (elem.update()) {
+        if (elem.hooks.update?.()) {
           for (const node of elem.listeners) {
             layers.push(node.layer);
             node.layer.heap.push(node);

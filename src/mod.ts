@@ -2,4 +2,6 @@ export { createVNode as h, Fragment, Slot, component, block } from "./vnode.ts";
 export { ref, computed, effect, layout } from "./state.ts";
 export { render } from "./render.ts";
 
-export type { Ref, Computed } from "./state.ts";
+export type { Ref, Computed, MaybeRef, MaybeComputed } from "./state.ts";
+export type { VNode } from "./vnode.ts";
+export type { JSX } from "./jsx-runtime.ts";

@@ -9,14 +9,11 @@ export class LayerElement implements Comparable {
   index = this.layer.states.push(this) - 1;
   listeners = new Set<LayerElement>();
 
+  constructor(public hooks: { remove?: () => void; update?: () => boolean }) {}
+
   get [CompareSymbol]() {
     return this.index;
   }
-
-  update() {
-    return true;
-  }
-  remove() {}
 }
 
 export class Layer implements Comparable {
@@ -52,7 +49,7 @@ export class Layer implements Comparable {
 
   remove(keepDoms: boolean = false) {
     for (const child of this.children) child.remove(true);
-    for (const state of this.states) state.remove();
+    for (const state of this.states) state.hooks.remove?.();
     if (!keepDoms) for (const dom of this.doms) (dom as ChildNode).remove();
   }
 }

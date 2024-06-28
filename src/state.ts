@@ -32,30 +32,16 @@ export function createCapture(): Capture {
   return { _getters: new Set(), _setters: new Set() };
 }
 
-class ComputedElement extends LayerElement {}
-class RefElement extends ComputedElement {}
+class ComputedClass {}
+class RefClass extends ComputedClass {}
 
 function createRef<T>(init: T): Ref<T> {
   let state = init;
   let pending = init;
   let previous = init;
 
-  return new (class extends RefElement {
-    get value() {
-      current(captures)?._getters.add(this);
-      return pending;
-    }
-    set value(v: T) {
-      current(captures)?._setters.add(this);
-      if (v !== pending) {
-        pending = state;
-        enqueueUpdate(this);
-      }
-    }
-    get previous() {
-      return previous;
-    }
-    override update() {
+  const elem = new LayerElement({
+    update() {
       // skip if nothing changes
       if (state === pending) {
         return false;
@@ -65,12 +51,29 @@ function createRef<T>(init: T): Ref<T> {
       previous = state;
       state = pending;
       return true;
+    },
+  });
+
+  return new (class extends RefClass {
+    get value() {
+      current(captures)?._getters.add(elem);
+      return pending;
+    }
+    set value(v: T) {
+      current(captures)?._setters.add(elem);
+      if (v !== pending) {
+        pending = state;
+        enqueueUpdate(elem);
+      }
+    }
+    get previous() {
+      return previous;
     }
   })();
 }
 
 function createSSRRef<T>(init: T): Ref<T> {
-  return new (class extends RefElement {
+  return new (class extends RefClass {
     get value() {
       return init;
     }
@@ -112,22 +115,10 @@ function createComputed<T>(fn: () => T): Computed<T> {
     }
   };
 
-  return new (class extends ComputedElement {
-    constructor() {
-      super();
-      setup(this);
-      previous = state = pending;
-    }
-    get value() {
-      current(captures)?._getters.add(this);
-      return state;
-    }
-    get previous() {
-      return previous;
-    }
-    override update() {
-      clean(this);
-      setup(this);
+  const elem = new LayerElement({
+    update() {
+      clean(elem);
+      setup(elem);
 
       // skip update if nothing changes
       if (pending === state) {
@@ -139,16 +130,30 @@ function createComputed<T>(fn: () => T): Computed<T> {
       state = pending;
 
       return true;
+    },
+    remove() {
+      clean(elem);
+    },
+  });
+
+  setup(elem);
+  previous = state = pending!;
+
+  return new (class extends ComputedClass {
+    get value() {
+      current(captures)?._getters.add(elem);
+      return state;
     }
-    override remove() {
-      clean(this);
+    get previous() {
+      return previous;
     }
   })();
 }
 
 function createSSRComputed<T>(fn: () => T): Computed<T> {
   const state = fn();
-  return new (class extends ComputedElement {
+
+  return new (class extends ComputedClass {
     get value() {
       return state;
     }
@@ -188,20 +193,18 @@ function createEffect(fn: () => void | EffectClear) {
     }
   };
 
-  new (class extends LayerElement {
-    constructor() {
-      super();
-      setup(this);
-    }
-    override update() {
-      clean(this);
-      setup(this);
+  const elem = new LayerElement({
+    update() {
+      clean(elem);
+      setup(elem);
       return true;
-    }
-    override remove() {
-      clean(this);
-    }
-  })();
+    },
+    remove() {
+      clean(elem);
+    },
+  });
+
+  setup(elem);
 }
 
 function createSSREffect(fn: () => void | EffectClear) {
@@ -234,9 +237,9 @@ export function layout(fn: () => void | (() => void)): void {
 }
 
 export function isComputed<T>(v: unknown): v is Computed<T> {
-  return v instanceof ComputedElement;
+  return v instanceof ComputedClass;
 }
 
 export function isRef<T>(v: unknown): v is Ref<T> {
-  return v instanceof RefElement;
+  return v instanceof RefClass;
 }
