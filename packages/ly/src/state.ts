@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { isDEV, isSSR } from "./flags.ts";
-import { LayerElement } from "./layer.ts";
+import { LayerElement, createLayerElement } from "./layer.ts";
 import { Stack, current, popd, pushd } from "./stack.ts";
 import { enqueueUpdate } from "./update.ts";
 
@@ -40,7 +40,7 @@ function createRef<T>(init: T): Ref<T> {
   let pending = init;
   let previous = init;
 
-  const elem = new LayerElement({
+  const elem = createLayerElement({
     update() {
       // skip if nothing changes
       if (state === pending) {
@@ -115,7 +115,7 @@ function createComputed<T>(fn: () => T): Computed<T> {
     }
   };
 
-  const elem = new LayerElement({
+  const elem = createLayerElement({
     update() {
       clean(elem);
       setup(elem);
@@ -193,7 +193,7 @@ function createEffect(fn: () => void | EffectClear, layout = false) {
     }
   };
 
-  const elem = new LayerElement({
+  const elem = createLayerElement({
     update() {
       clean(elem);
       setup(elem);

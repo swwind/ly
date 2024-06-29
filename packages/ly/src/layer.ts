@@ -1,60 +1,74 @@
-import { type Comparable, createHeap, CompareSymbol } from "./heap.ts";
+import { type Comparable, createHeap, Heap } from "./heap.ts";
 import { Stack, current, popd, pushd, withd } from "./stack.ts";
 
 const layers: Stack<Layer> = [];
 const nodes: Stack<Node[]> = [];
 
-export class LayerElement implements Comparable {
-  layer = current(layers)!;
-  index = this.layer.states.push(this) - 1;
-  listeners = new Set<LayerElement>();
-
-  constructor(public hooks: { remove?: () => void; update?: () => boolean }) {}
-
-  get [CompareSymbol]() {
-    return this.index;
-  }
+export interface LayerElement extends Comparable {
+  layer: Layer;
+  hooks: {
+    remove?: () => void;
+    update?: () => boolean;
+  };
+  listeners: Set<LayerElement>;
 }
 
-export class Layer implements Comparable {
-  children = new Set<Layer>();
-  states = [] as LayerElement[];
-  doms = [] as Node[];
-  depth = 0;
-  heap = createHeap<LayerElement>();
-
-  constructor(fn?: () => void) {
-    const parent = current(layers);
-    if (parent) {
-      parent.children.add(this);
-      this.depth = parent.depth + 1;
-    }
-
-    if (fn) {
-      pushd(layers, this);
-      pushd(nodes, this.doms);
-      try {
-        fn();
-      } finally {
-        popd(layers);
-        popd(nodes);
-      }
-      appendNodes(...this.doms);
-    }
-  }
-
-  get [CompareSymbol]() {
-    return this.depth;
-  }
-
-  remove(keepDoms: boolean = false) {
-    for (const child of this.children) child.remove(true);
-    for (const state of this.states) state.hooks.remove?.();
-    if (!keepDoms) for (const dom of this.doms) (dom as ChildNode).remove();
-  }
+export function createLayerElement(hooks: LayerElement["hooks"]) {
+  const layer = current(layers)!;
+  const elem: LayerElement = {
+    layer,
+    hooks,
+    index: layer.states.length,
+    listeners: new Set(),
+  };
+  layer.states.push(elem);
+  return elem;
 }
 
-const rootLayer = new Layer();
+export interface Layer extends Comparable {
+  children: Set<Layer>;
+  states: LayerElement[];
+  doms: Node[];
+  heap: Heap<LayerElement>;
+  remove(keepDoms?: boolean): void;
+}
+
+export function createLayer(callback?: () => void) {
+  const parent = current(layers);
+
+  const children = new Set<Layer>();
+  const states = [] as LayerElement[];
+  const doms = [] as Node[];
+  const index = parent ? parent.index + 1 : 0;
+  const remove = (keepDoms = false) => {
+    for (const child of children) child.remove(true);
+    for (const state of states) state.hooks.remove?.();
+    if (!keepDoms) for (const dom of doms) (dom as ChildNode).remove();
+  };
+  const heap = createHeap<LayerElement>();
+
+  const layer: Layer = { children, states, index, doms, heap, remove };
+
+  if (parent) {
+    parent.children.add(layer);
+  }
+
+  if (callback) {
+    pushd(layers, layer);
+    pushd(nodes, doms);
+    try {
+      callback();
+    } finally {
+      popd(layers);
+      popd(nodes);
+    }
+    appendNodes(...doms);
+  }
+
+  return layer;
+}
+
+const rootLayer = createLayer();
 pushd(layers, rootLayer);
 
 export function appendNodes(...node: Node[]) {

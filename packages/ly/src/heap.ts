@@ -1,7 +1,5 @@
-export const CompareSymbol = Symbol();
-
 export interface Comparable {
-  get [CompareSymbol](): number;
+  index: number;
 }
 
 export interface Heap<T extends Comparable> {
@@ -16,7 +14,7 @@ export function createHeap<T extends Comparable>(): Heap<T> {
   const a = [,] as unknown as T[];
   // remember duplicated items
   const s = new Set<T>();
-  const cmp = (a: T, b: T) => a[CompareSymbol] < b[CompareSymbol];
+  const cmp = (a: T, b: T) => a.index < b.index;
   const swap = (i: number, j: number) => ([a[i], a[j]] = [a[j], a[i]]);
   const size = () => a.length - 1;
   const up = (x: number) => {

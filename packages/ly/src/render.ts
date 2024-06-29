@@ -8,7 +8,7 @@ import {
   withSlots,
   type Props,
 } from "./vnode.ts";
-import { Layer, appendNodes, withNodes } from "./layer.ts";
+import { Layer, appendNodes, createLayer, withNodes } from "./layer.ts";
 import { layout, isComputed } from "./state.ts";
 import { toArray } from "./utils.ts";
 import { clsx } from "./clsx.ts";
@@ -101,7 +101,7 @@ function realizeVNode(vnode: VNode) {
 
       // dynamic component
       layout(() => {
-        const layer = new Layer(() => {
+        const layer = createLayer(() => {
           const children = inside();
           realizeChildren(children);
         });
@@ -127,7 +127,7 @@ export function render(vnode: VNode, parent: Element) {
     );
   }
 
-  const layer = new Layer(() => realizeVNode(vnode));
+  const layer = createLayer(() => realizeVNode(vnode));
   parent.replaceChildren(...layer.doms);
 }
 
@@ -138,7 +138,7 @@ export function hydrate(vnode: VNode, parent: Element, replace?: Node) {
     );
   }
 
-  const layer = new Layer(() => realizeVNode(vnode));
+  const layer = createLayer(() => realizeVNode(vnode));
   const fragment = new DocumentFragment();
   fragment.append(...layer.doms);
   if (replace) {

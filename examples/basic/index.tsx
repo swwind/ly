@@ -1,4 +1,4 @@
-import { block, component, computed, effect, ref } from "@swwind/ly";
+import { block, component, computed, effect, h, ref } from "@swwind/ly";
 import { render } from "@swwind/ly/browser";
 
 const app = document.getElementById("app");
@@ -34,7 +34,7 @@ const Counter = component(() => {
 const Tabs = component(() => {
   const currentTab = ref<"home" | "about" | "info">("home");
 
-  const Home = component(() => <div>Welcome to 🏠Home</div>);
+  const Home = component(() => <p>Welcome to 🏠Home</p>);
   const About = component(() => (
     <div>
       <p>
@@ -45,9 +45,7 @@ const Tabs = component(() => {
       </p>
     </div>
   ));
-  const Info = component(() => (
-    <div>Ly is the best framework I've ever seen!</div>
-  ));
+  const Info = component(() => <p>Ly is the best framework I've ever seen!</p>);
 
   const TabContent = block(() => {
     switch (currentTab.value) {
@@ -73,6 +71,34 @@ const Tabs = component(() => {
   );
 });
 
+const SyncInput = component(() => {
+  const text = ref("hello world");
+  effect(() => console.log(`text = ${text.value}`));
+
+  return (
+    <div class="example">
+      <h2>Sync Inputs</h2>
+      <p>
+        Enter your password:{" "}
+        <input
+          type="text"
+          value={text}
+          onInput={(e) => (text.value = e.currentTarget.value)}
+        />
+      </p>
+      <p>
+        Repeat your password:{" "}
+        <input
+          type="text"
+          value={text}
+          onInput={(e) => (text.value = e.currentTarget.value)}
+        />
+      </p>
+      <p>Your password is {text}</p>
+    </div>
+  );
+});
+
 const App = component(() => {
   return (
     <>
@@ -80,6 +106,7 @@ const App = component(() => {
 
       <Counter />
       <Tabs />
+      <SyncInput />
     </>
   );
 });
