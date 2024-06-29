@@ -12,7 +12,7 @@ import type {
 } from "./vnode.ts";
 
 export namespace JSXInternal {
-  export type Booleanish = boolean | "true" | "false";
+  export type Booleanish<Name extends string> = boolean | "" | Name;
 
   // deno-lint-ignore no-explicit-any
   export type ElementType<P = any> =
@@ -590,7 +590,7 @@ export namespace JSXInternal {
     /** Identifies the currently active element when DOM focus is on a composite widget, textbox, group, or application. */
     "aria-activedescendant"?: MaybeComputed<string | undefined>;
     /** Indicates whether assistive technologies will present all, or only parts of, the changed region based on the change notifications defined by the aria-relevant attribute. */
-    "aria-atomic"?: MaybeComputed<Booleanish | undefined>;
+    "aria-atomic"?: MaybeComputed<Booleanish<"aria-atomic"> | undefined>;
     /**
      * Indicates whether inputting text could trigger display of one or more predictions of the user's intended value for an input and specifies how predictions would be
      * presented if they are made.
@@ -609,13 +609,15 @@ export namespace JSXInternal {
      */
     "aria-brailleroledescription"?: MaybeComputed<string | undefined>;
     /** Indicates an element is being modified and that assistive technologies MAY want to wait until the modifications are complete before exposing them to the user. */
-    "aria-busy"?: MaybeComputed<Booleanish | undefined>;
+    "aria-busy"?: MaybeComputed<Booleanish<"aria-busy"> | undefined>;
     /**
      * Indicates the current "checked" state of checkboxes, radio buttons, and other widgets.
      * @see aria-pressed
      * @see aria-selected.
      */
-    "aria-checked"?: MaybeComputed<Booleanish | "mixed" | undefined>;
+    "aria-checked"?: MaybeComputed<
+      Booleanish<"aria-checked"> | "mixed" | undefined
+    >;
     /**
      * Defines the total number of columns in a table, grid, or treegrid.
      * @see aria-colindex.
@@ -667,7 +669,7 @@ export namespace JSXInternal {
      * @see aria-hidden
      * @see aria-readonly.
      */
-    "aria-disabled"?: MaybeComputed<Booleanish | undefined>;
+    "aria-disabled"?: MaybeComputed<Booleanish<"aria-disabled"> | undefined>;
     /**
      * Indicates what functions can be performed when a dragged object is released on the drop target.
      * @deprecated in ARIA 1.1
@@ -682,7 +684,7 @@ export namespace JSXInternal {
      */
     "aria-errormessage"?: MaybeComputed<string | undefined>;
     /** Indicates whether the element, or another grouping element it controls, is currently expanded or collapsed. */
-    "aria-expanded"?: MaybeComputed<Booleanish | undefined>;
+    "aria-expanded"?: MaybeComputed<Booleanish<"aria-expanded"> | undefined>;
     /**
      * Identifies the next element (or elements) in an alternate reading order of content which, at the user's discretion,
      * allows assistive technology to override the general default of reading in document source order.
@@ -692,7 +694,7 @@ export namespace JSXInternal {
      * Indicates an element's "grabbed" state in a drag-and-drop operation.
      * @deprecated in ARIA 1.1
      */
-    "aria-grabbed"?: MaybeComputed<Booleanish | undefined>;
+    "aria-grabbed"?: MaybeComputed<Booleanish<"aria-grabbed"> | undefined>;
     /** Indicates the availability and type of interactive popup element, such as menu or dialog, that can be triggered by an element. */
     "aria-haspopup"?: MaybeComputed<
       Booleanish | "menu" | "listbox" | "tree" | "grid" | "dialog" | undefined
@@ -701,7 +703,7 @@ export namespace JSXInternal {
      * Indicates whether the element is exposed to an accessibility API.
      * @see aria-disabled.
      */
-    "aria-hidden"?: MaybeComputed<Booleanish | undefined>;
+    "aria-hidden"?: MaybeComputed<Booleanish<"aria-hidden"> | undefined>;
     /**
      * Indicates the entered value does not conform to the format expected by the application.
      * @see aria-errormessage.
@@ -726,11 +728,13 @@ export namespace JSXInternal {
     /** Indicates that an element will be updated, and describes the types of updates the user agents, assistive technologies, and user can expect from the live region. */
     "aria-live"?: MaybeComputed<"off" | "assertive" | "polite" | undefined>;
     /** Indicates whether an element is modal when displayed. */
-    "aria-modal"?: MaybeComputed<Booleanish | undefined>;
+    "aria-modal"?: MaybeComputed<Booleanish<"aria-modal"> | undefined>;
     /** Indicates whether a text box accepts multiple lines of input or only a single line. */
-    "aria-multiline"?: MaybeComputed<Booleanish | undefined>;
+    "aria-multiline"?: MaybeComputed<Booleanish<"aria-multiline"> | undefined>;
     /** Indicates that the user may select more than one item from the current selectable descendants. */
-    "aria-multiselectable"?: MaybeComputed<Booleanish | undefined>;
+    "aria-multiselectable"?: MaybeComputed<
+      Booleanish<"aria-multiselectable"> | undefined
+    >;
     /** Indicates whether the element's orientation is horizontal, vertical, or unknown/ambiguous. */
     "aria-orientation"?: MaybeComputed<"horizontal" | "vertical" | undefined>;
     /**
@@ -754,12 +758,14 @@ export namespace JSXInternal {
      * @see aria-checked
      * @see aria-selected.
      */
-    "aria-pressed"?: MaybeComputed<Booleanish | "mixed" | undefined>;
+    "aria-pressed"?: MaybeComputed<
+      Booleanish<"aria-pressed"> | "mixed" | undefined
+    >;
     /**
      * Indicates that the element is not editable, but is otherwise operable.
      * @see aria-disabled.
      */
-    "aria-readonly"?: MaybeComputed<Booleanish | undefined>;
+    "aria-readonly"?: MaybeComputed<Booleanish<"aria-readonly"> | undefined>;
     /**
      * Indicates what notifications the user agent will trigger when the accessibility tree within a live region is modified.
      * @see aria-atomic.
@@ -778,7 +784,7 @@ export namespace JSXInternal {
       | undefined
     >;
     /** Indicates that user input is required on the element before a form may be submitted. */
-    "aria-required"?: MaybeComputed<Booleanish | undefined>;
+    "aria-required"?: MaybeComputed<Booleanish<"aria-required"> | undefined>;
     /** Defines a human-readable, author-localized description for the role of an element. */
     "aria-roledescription"?: MaybeComputed<string | undefined>;
     /**
@@ -808,7 +814,7 @@ export namespace JSXInternal {
      * @see aria-checked
      * @see aria-pressed.
      */
-    "aria-selected"?: MaybeComputed<Booleanish | undefined>;
+    "aria-selected"?: MaybeComputed<Booleanish<"aria-selected"> | undefined>;
     /**
      * Defines the number of items in the current set of listitems or treeitems. Not required if all elements in the set are present in the DOM.
      * @see aria-posinset.
@@ -1027,8 +1033,8 @@ export namespace JSXInternal {
     dateTime?: MaybeComputed<string | undefined>;
     datetime?: MaybeComputed<string | undefined>;
     default?: MaybeComputed<boolean | undefined>;
-    defaultChecked?: MaybeComputed<boolean | undefined>;
-    defaultValue?: MaybeComputed<string | undefined>;
+    // defaultChecked?: MaybeComputed<boolean | undefined>;
+    // defaultValue?: MaybeComputed<string | undefined>;
     defer?: MaybeComputed<boolean | undefined>;
     dir?: MaybeComputed<"auto" | "rtl" | "ltr" | undefined>;
     disabled?: MaybeComputed<boolean | undefined>;
@@ -1178,7 +1184,7 @@ export namespace JSXInternal {
     type?: MaybeComputed<string | undefined>;
     useMap?: MaybeComputed<string | undefined>;
     usemap?: MaybeComputed<string | undefined>;
-    value?: MaybeComputed<string | string[] | number | undefined>;
+    value?: MaybeComputed<string | number | Date | undefined>;
     volume?: MaybeComputed<string | number | undefined>;
     width?: MaybeComputed<number | string | undefined>;
     wmode?: MaybeComputed<string | undefined>;

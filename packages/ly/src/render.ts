@@ -10,7 +10,7 @@ import {
 } from "./vnode.ts";
 import { Layer, appendNodes, createLayer, withNodes } from "./layer.ts";
 import { layout, isComputed } from "./state.ts";
-import { toArray } from "./utils.ts";
+import { isNumber, isString, toArray } from "./utils.ts";
 import { clsx } from "./clsx.ts";
 import { styl } from "./styl.ts";
 import { isSSR } from "./flags.ts";
@@ -28,7 +28,17 @@ function serializePrimitive(primitive: Primitives) {
 }
 
 function setAttribute(dom: Element, key: string, value: unknown) {
-  if (value == null || value === false) {
+  if (key === "value") {
+    if (isNumber(value)) {
+      (dom as HTMLInputElement).valueAsNumber = value;
+    } else if (value instanceof Date) {
+      (dom as HTMLInputElement).valueAsDate = value;
+    } else {
+      (dom as HTMLInputElement).value = String(value);
+    }
+  } else if (key === "checked") {
+    (dom as HTMLInputElement).checked = Boolean(value);
+  } else if (value == null || value === false) {
     dom.removeAttribute(key);
   } else if (value === true) {
     dom.setAttribute(key, "");

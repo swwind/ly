@@ -94,7 +94,34 @@ const SyncInput = component(() => {
           onInput={(e) => (text.value = e.currentTarget.value)}
         />
       </p>
-      <p>Your password is {text}</p>
+      <p>
+        Your password is <span style={{ color: "red" }}>{text}</span>
+      </p>
+    </div>
+  );
+});
+
+const SyncCheckbox = component(() => {
+  const checked = ref(true);
+  const inverse = () => (checked.value = !checked.value);
+
+  return (
+    <div class="example">
+      <h2>Sync Checkbox</h2>
+      <p>
+        <button onClick={inverse}>inverse</button>
+        <input
+          type="checkbox"
+          checked={checked}
+          onInput={(e) => (checked.value = e.currentTarget.checked)}
+        />
+        <input
+          type="checkbox"
+          checked={checked}
+          onInput={(e) => (checked.value = e.currentTarget.checked)}
+        />
+        {computed(() => (checked.value ? "Checked" : "Unchecked"))}
+      </p>
     </div>
   );
 });
@@ -107,6 +134,7 @@ const App = component(() => {
       <Counter />
       <Tabs />
       <SyncInput />
+      <SyncCheckbox />
     </>
   );
 });
