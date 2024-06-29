@@ -19,3 +19,27 @@ export function isNumber(x: unknown): x is number {
 export function valueOf<T>(x: MaybeComputed<T>): T {
   return isComputed(x) ? x.value : x;
 }
+
+/**
+ * @see https://www.scaler.com/topics/self-closing-tags-in-html/
+ */
+const VOID_TAGS = [
+  "area",
+  "base",
+  "br",
+  "col",
+  "embed",
+  "hr",
+  "img",
+  "input",
+  "link",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr",
+];
+
+export function isVoidTag(tag: string) {
+  return VOID_TAGS.includes(tag);
+}

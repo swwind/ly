@@ -7,10 +7,11 @@ import {
   isVNode,
   withSlots,
   type Props,
+  LyDOMAttributes,
 } from "./vnode.ts";
 import { Layer, appendNodes, createLayer, withNodes } from "./layer.ts";
 import { layout, isComputed } from "./state.ts";
-import { isNumber, isString, toArray } from "./utils.ts";
+import { isNumber, isString, isVoidTag, toArray, valueOf } from "./utils.ts";
 import { clsx } from "./clsx.ts";
 import { styl } from "./styl.ts";
 import { isSSR } from "./flags.ts";
@@ -76,7 +77,9 @@ function realizeVNode(vnode: VNode) {
     const elem = document.createElement(vnode.type);
 
     for (const [key, value] of Object.entries(vnode.props)) {
-      if (key === "class") {
+      if (key === "_dangerouslySetInnerHTML") {
+        continue;
+      } else if (key === "class") {
         layout(() => setAttribute(elem, "class", clsx(value)));
       } else if (key === "style") {
         layout(() => setAttribute(elem, "style", styl(value)));
@@ -90,10 +93,26 @@ function realizeVNode(vnode: VNode) {
       }
     }
 
-    const children = vnode.slots["default"] ?? [];
-    const doms = [] as Node[];
-    withNodes(doms, () => realizeChildren(children));
-    elem.append(...doms);
+    if (!isVoidTag(vnode.type)) {
+      const dangerous = (vnode.props as LyDOMAttributes)
+        ._dangerouslySetInnerHTML;
+      if (dangerous) {
+        const html = dangerous.__html;
+        if (isComputed(html)) {
+          layout(() => {
+            elem.innerHTML = html.value;
+          });
+        } else {
+          elem.innerHTML = html;
+        }
+      } else {
+        const children = vnode.slots["default"] ?? [];
+        const doms = [] as Node[];
+        withNodes(doms, () => realizeChildren(children));
+        elem.append(...doms);
+      }
+    }
+
     appendNodes(elem);
     if (vnode.ref) {
       vnode.ref.value = elem;

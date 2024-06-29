@@ -1,7 +1,4 @@
-import { block, component, computed, effect, h, ref } from "@swwind/ly";
-import { render } from "@swwind/ly/browser";
-
-const app = document.getElementById("app");
+import { block, component, computed, effect, ref } from "@swwind/ly";
 
 const Counter = component(() => {
   const a = ref(0);
@@ -105,6 +102,8 @@ const SyncCheckbox = component(() => {
   const checked = ref(true);
   const inverse = () => (checked.value = !checked.value);
 
+  effect(() => console.log(`checked = ${checked.value}`));
+
   return (
     <div class="example">
       <h2>Sync Checkbox</h2>
@@ -126,6 +125,20 @@ const SyncCheckbox = component(() => {
   );
 });
 
+const InnerHTML = component(() => {
+  return (
+    <div class="example">
+      <h2>DangerouslySetInnerHTML</h2>
+      <p>This is dangerous but still should be supported.</p>
+      <p
+        _dangerouslySetInnerHTML={{
+          __html: '<code style="color:red">This is a red code</code>',
+        }}
+      />
+    </div>
+  );
+});
+
 const App = component(() => {
   return (
     <>
@@ -135,8 +148,9 @@ const App = component(() => {
       <Tabs />
       <SyncInput />
       <SyncCheckbox />
+      <InnerHTML />
     </>
   );
 });
 
-render(<App />, app);
+export { App };
