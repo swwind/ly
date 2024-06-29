@@ -5,7 +5,6 @@
     "moduleResolution": "NodeNext",
     "jsx": "react-jsx",
     "jsxImportSource": "@swwind/ly",
-    "lib": ["DOM"]
+    "lib": ["DOM", "ESNext"]
   },
 }
-
