@@ -6,6 +6,7 @@ import type { MaybeComputed } from "./state.ts";
 import type { CSSProperties } from "./styl.ts";
 import type {
   ClassAttributes,
+  ComponentChildren,
   ComponentType,
   LyDOMAttributes,
   VNode,
@@ -1574,7 +1575,7 @@ export namespace JSXInternal {
     search: HTMLAttributes<HTMLElement>;
     section: HTMLAttributes<HTMLElement>;
     select: HTMLAttributes<HTMLSelectElement>;
-    slot: HTMLAttributes<HTMLSlotElement>;
+    // slot: HTMLAttributes<HTMLSlotElement>;
     small: HTMLAttributes<HTMLElement>;
     source: HTMLAttributes<HTMLSourceElement>;
     span: HTMLAttributes<HTMLSpanElement>;
@@ -1586,7 +1587,7 @@ export namespace JSXInternal {
     table: HTMLAttributes<HTMLTableElement>;
     tbody: HTMLAttributes<HTMLTableSectionElement>;
     td: HTMLAttributes<HTMLTableCellElement>;
-    template: HTMLAttributes<HTMLTemplateElement>;
+    // template: HTMLAttributes<HTMLTemplateElement>;
     textarea: HTMLAttributes<HTMLTextAreaElement>;
     tfoot: HTMLAttributes<HTMLTableSectionElement>;
     th: HTMLAttributes<HTMLTableCellElement>;
@@ -1600,6 +1601,10 @@ export namespace JSXInternal {
     var: HTMLAttributes<HTMLElement>;
     video: HTMLAttributes<HTMLVideoElement>;
     wbr: HTMLAttributes<HTMLElement>;
+
+    // Ly taken
+    slot: { name?: string; children?: ComponentChildren };
+    template: { slot?: string; children?: ComponentChildren };
 
     //SVG
     svg: SVGAttributes<SVGSVGElement>;

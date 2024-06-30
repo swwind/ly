@@ -1,4 +1,4 @@
-export { createVNode as h, Fragment, Slot, component, block } from "./vnode.ts";
+export { createVNode as h, Fragment, component, block } from "./vnode.ts";
 export { ref, computed, effect, layout } from "./state.ts";
 
 export type { Ref, Computed, MaybeRef, MaybeComputed } from "./state.ts";

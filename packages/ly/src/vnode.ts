@@ -54,8 +54,7 @@ export function block<P extends Props = {}>(
   return (p) => () => fn(p);
 }
 
-export const Fragment = component(() => createVNode(Slot, null));
-export const Slot = component<{ name?: string }>(() => null);
+export const Fragment = component(() => createVNode("slot", null));
 
 const slots: Stack<Slots> = [];
 
@@ -75,7 +74,7 @@ export function createVNode(
 ): VNode {
   props ??= {};
 
-  if (type === Slot) {
+  if (type === "slot") {
     const name = (props["name"] || "default") as string;
     return createVNode(null, null, ...(current(slots)?.[name] ?? children));
   }

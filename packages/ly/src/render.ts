@@ -9,9 +9,9 @@ import {
   type Props,
   LyDOMAttributes,
 } from "./vnode.ts";
-import { Layer, appendNodes, createLayer, withNodes } from "./layer.ts";
+import { appendNodes, createLayer, withNodes } from "./layer.ts";
 import { layout, isComputed } from "./state.ts";
-import { isNumber, isString, isVoidTag, toArray, valueOf } from "./utils.ts";
+import { isNumber, isVoidTag, toArray } from "./utils.ts";
 import { clsx } from "./clsx.ts";
 import { styl } from "./styl.ts";
 import { isSSR } from "./flags.ts";

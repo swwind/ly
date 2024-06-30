@@ -1,3 +1,4 @@
+import { isSSR } from "./flags.ts";
 import { type Comparable, createHeap, Heap } from "./heap.ts";
 import { Stack, current, popd, pushd, withd } from "./stack.ts";
 
@@ -68,8 +69,10 @@ export function createLayer(callback?: () => void) {
   return layer;
 }
 
-const rootLayer = createLayer();
-pushd(layers, rootLayer);
+if (!isSSR) {
+  const rootLayer = createLayer();
+  pushd(layers, rootLayer);
+}
 
 export function appendNodes(...node: Node[]) {
   current(nodes)?.push(...node);
