@@ -198,7 +198,13 @@ const ArrayList = component(() => {
     array.value = [...array.value];
   };
 
-  const List = dynamic(() => array.value.map((x) => <li key={x}>{x}</li>));
+  const List = dynamic(() =>
+    array.value.map((x) => (
+      <li key={x} class="fade-in-animation">
+        {x}
+      </li>
+    ))
+  );
 
   return (
     <div class="example">

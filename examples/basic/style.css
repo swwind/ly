@@ -16,3 +16,18 @@
   border: 2px solid lime;
   padding: 0 2rem;
 }
+
+.fade-in-animation {
+  animation: fade-in 0.5s;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
