@@ -48,7 +48,7 @@ export function component<P extends Props = {}>(
   return fn;
 }
 
-export function block<P extends Props = {}>(
+export function dynamic<P extends Props = {}>(
   fn: (props: P) => VNode | VNode[] | null
 ): DynamicComponent<P> {
   return (p) => () => fn(p);

@@ -1,4 +1,4 @@
-import { block, component, computed, effect, ref } from "@swwind/ly";
+import { dynamic, component, computed, effect, ref } from "@swwind/ly";
 
 const Counter = component(() => {
   const a = ref(0);
@@ -44,7 +44,7 @@ const Tabs = component(() => {
   ));
   const Info = component(() => <p>Ly is the best framework I've ever seen!</p>);
 
-  const TabContent = block(() => {
+  const TabContent = dynamic(() => {
     switch (currentTab.value) {
       case "home":
         return <Home />;
