@@ -1205,7 +1205,7 @@ export namespace JSXInternal {
     // RDFa Attributes
     about?: MaybeComputed<string | undefined>;
     datatype?: MaybeComputed<string | undefined>;
-    inlist?: any;
+    inlist?: MaybeComputed<string | undefined>;
     prefix?: MaybeComputed<string | undefined>;
     property?: MaybeComputed<string | undefined>;
     resource?: MaybeComputed<string | undefined>;
@@ -1606,7 +1606,7 @@ export namespace JSXInternal {
     slot: { name?: string; children?: ComponentChildren };
     template: { slot?: string; children?: ComponentChildren };
 
-    //SVG
+    // SVG
     svg: SVGAttributes<SVGSVGElement>;
     animate: SVGAttributes<SVGAnimateElement>;
     circle: SVGAttributes<SVGCircleElement>;

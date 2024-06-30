@@ -39,7 +39,7 @@ function serializeChildren(children: ComponentChildren) {
     .map((child) =>
       isVNode(child)
         ? serializeVNode(child)
-        : serializePrimitive(valueOf(child))
+        : sanitizeHTML(serializePrimitive(valueOf(child)))
     )
     .join("");
 }
