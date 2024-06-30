@@ -9,10 +9,10 @@ hero:
   actions:
     - theme: brand
       text: 遗器选择
-      link: /components
+      link: /introduction
     - theme: alt
       text: 配队推荐
-      link: /signals
+      link: /introduction
 
 features:
   - title: 终结技
