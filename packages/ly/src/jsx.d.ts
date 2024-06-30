@@ -1245,6 +1245,7 @@ export namespace JSXInternal {
   export interface MathMLAttributes<Target extends EventTarget = MathMLElement>
     extends HTMLAttributes<Target> {
     dir?: MaybeComputed<"ltr" | "rtl" | undefined>;
+    display?: MaybeComputed<"block" | "inline" | undefined>;
     displaystyle?: MaybeComputed<boolean | undefined>;
     /** @deprecated This feature is non-standard. See https://developer.mozilla.org/en-US/docs/Web/MathML/Global_attributes/href  */
     href?: MaybeComputed<string | undefined>;

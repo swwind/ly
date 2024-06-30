@@ -1,4 +1,6 @@
 import { dynamic, component, computed, effect, ref } from "@swwind/ly";
+import { HITLogo } from "./src/HIT.tsx";
+import { MathML } from "./src/MathML.tsx";
 
 const Counter = component(() => {
   const a = ref(0);
@@ -215,6 +217,22 @@ const ArrayList = component(() => {
   );
 });
 
+const SVGMath = component(() => {
+  return (
+    <div class="example">
+      <h2>SVG & MathML</h2>
+      <p style={{ display: "flex", gap: "2rem" }}>
+        <div style={{ flex: "1", height: "200px" }}>
+          <HITLogo />
+        </div>
+        <div style={{ flex: "1" }}>
+          <MathML />
+        </div>
+      </p>
+    </div>
+  );
+});
+
 const App = component(() => {
   return (
     <>
@@ -227,6 +245,7 @@ const App = component(() => {
       <InnerHTML />
       <TemplateSlots />
       <ArrayList />
+      <SVGMath />
     </>
   );
 });

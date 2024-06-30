@@ -48,7 +48,7 @@ function setAttribute(dom: Element, key: string, value: unknown) {
   }
 }
 
-function realizeChildren(children: ComponentChildren) {
+function realizeChildren(children: ComponentChildren, ns?: string) {
   for (const child of toArray(children)) {
     if (isComputed(child)) {
       const text = new Text();
@@ -57,7 +57,7 @@ function realizeChildren(children: ComponentChildren) {
       });
       appendNodes(text);
     } else if (isVNode(child)) {
-      realizeVNode(child);
+      realizeVNode(child, ns);
     } else {
       const str = serializePrimitive(child);
       const text = new Text(str);
@@ -66,15 +66,27 @@ function realizeChildren(children: ComponentChildren) {
   }
 }
 
-function realizeVNode(vnode: VNode) {
+function getNS(type: string, props: Props, ns?: string) {
+  if (type === "svg") {
+    return props["xmlns"] || "http://www.w3.org/2000/svg";
+  } else if (type === "math") {
+    return props["xmlns"] || "http://www.w3.org/1998/Math/MathML";
+  } else {
+    return ns;
+  }
+}
+
+function realizeVNode(vnode: VNode, ns?: string) {
   // fragment
   if (vnode.type === null) {
     const children = vnode.slots["default"] ?? [];
-    realizeChildren(children);
+    realizeChildren(children, ns);
   }
   // dom elements
   else if (typeof vnode.type === "string") {
-    const elem = document.createElement(vnode.type);
+    const elem = (ns = getNS(vnode.type, vnode.props, ns))
+      ? document.createElementNS(ns, vnode.type)
+      : document.createElement(vnode.type);
 
     for (const [key, value] of Object.entries(vnode.props)) {
       if (key === "_dangerouslySetInnerHTML") {
@@ -108,7 +120,7 @@ function realizeVNode(vnode: VNode) {
       } else {
         const children = vnode.slots["default"] ?? [];
         const doms = [] as Node[];
-        withNodes(doms, () => realizeChildren(children));
+        withNodes(doms, () => realizeChildren(children, ns));
         elem.append(...doms);
       }
     }
@@ -132,7 +144,7 @@ function realizeVNode(vnode: VNode) {
       layout(() => {
         const layer = createLayer(() => {
           const children = inside();
-          realizeChildren(children);
+          realizeChildren(children, ns);
         });
 
         for (const dom of layer.doms) {
@@ -143,7 +155,7 @@ function realizeVNode(vnode: VNode) {
       });
     } else {
       for (const node of toArray(inside)) {
-        realizeVNode(node);
+        realizeVNode(node, ns);
       }
     }
   }
