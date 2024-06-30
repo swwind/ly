@@ -317,6 +317,8 @@ export namespace JSXInternal {
     x1?: MaybeComputed<number | string | undefined>;
     x2?: MaybeComputed<number | string | undefined>;
     xChannelSelector?: MaybeComputed<string | undefined>;
+    xmlns?: MaybeComputed<string | undefined>;
+    "xmlns:xlink"?: MaybeComputed<string | undefined>;
     /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:arcrole */
     "xlink:arcrole"?: MaybeComputed<string | undefined>;
     /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href */
@@ -340,10 +342,6 @@ export namespace JSXInternal {
     z?: MaybeComputed<number | string | undefined>;
     /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/zoomAndPan */
     zoomAndPan?: MaybeComputed<string | undefined>;
-  }
-
-  export interface PathAttributes {
-    d: string;
   }
 
   export type TargetedEvent<
