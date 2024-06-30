@@ -30,12 +30,12 @@ console.log(one.value, one.previous); // => 233, 0
 one.value = 514;
 console.log(one.value, one.previous); // => 514, 0
 
-// after signal updates...
+await nextTick();
 console.log(one.value, one.previous); // => 514, 0
 one.value = 114;
 console.log(one.value, one.previous); // => 114, 0
 
-// after signal updates...
+await nextTick();
 console.log(one.value, one.previous); // => 114, 514
 ```
 
@@ -54,7 +54,7 @@ console.log(two.value, two.previous); // => 4, 4
 one.value = 114;
 console.log(two.value, two.previous); // => 4, 4
 
-// after signal updates...
+await nextTick();
 console.log(two.value, two.previous); // => 228, 4
 ```
 
@@ -70,12 +70,12 @@ console.log(c.value, c.previous); // => 0, 0
 
 a.value = 2;
 b.value = 3;
-// after signal updates...
+await nextTick();
 console.log(c.value, c.previous); // => 6, 0
 
 a.value = 1;
 b.value = 6;
-// after signal updates...
+await nextTick();
 console.log(c.value, c.previous); // => 6, 0
 ```
 

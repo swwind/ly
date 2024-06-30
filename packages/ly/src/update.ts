@@ -13,6 +13,13 @@ export function enqueueUpdate(node: LayerElement) {
   }
 }
 
+let nextTickPromises: (() => void)[] = [];
+export function nextTick(): Promise<void> {
+  return new Promise((resolve) => {
+    nextTickPromises.push(resolve);
+  });
+}
+
 function updateStates() {
   currentUpdate = false;
 
@@ -41,5 +48,12 @@ function updateStates() {
         }
       }
     }
+  }
+
+  // trigger nextTick() callbacks
+  const resolves = nextTickPromises;
+  nextTickPromises = [];
+  for (const resolve of resolves) {
+    resolve();
   }
 }
