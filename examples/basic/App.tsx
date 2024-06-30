@@ -156,7 +156,7 @@ const TemplateSlots = component(() => {
   return (
     <div class="example">
       <h2>Template & Slot</h2>
-      <div style={{ display: "flex" }}>
+      <p style={{ display: "flex" }}>
         <Card>Custom Body 1</Card>
         <Card>
           <template>Custom Body 2</template>
@@ -165,7 +165,52 @@ const TemplateSlots = component(() => {
           <template slot="title">Custom Title 3</template>
           <template>Custom Body 3</template>
         </Card>
-      </div>
+      </p>
+    </div>
+  );
+});
+
+const ArrayList = component(() => {
+  let count = 8;
+  const array = ref([1, 2, 3, 4, 5, 6, 7, 8]);
+  const insert = () => {
+    const k = Math.floor(Math.random() * array.value.length);
+    array.value = [
+      ...array.value.slice(0, k),
+      ++count,
+      ...array.value.slice(k),
+    ];
+  };
+  const remove = () => {
+    if (array.value.length > 0) {
+      const k = Math.floor(Math.random() * array.value.length);
+      array.value = [...array.value.slice(0, k), ...array.value.slice(k + 1)];
+    }
+  };
+  const shuffle = () => {
+    const a = array.value;
+    for (let i = 1; i < array.value.length; ++i) {
+      const j = Math.floor(Math.random() * i);
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    array.value = [...array.value];
+  };
+
+  const List = dynamic(() => array.value.map((x) => <li key={x}>{x}</li>));
+
+  return (
+    <div class="example">
+      <h2>Array & List</h2>
+      <p>
+        <button onClick={insert}>insert</button>
+        <button onClick={remove}>remove</button>
+        <button onClick={shuffle}>shuffle</button>
+      </p>
+      <p>
+        <ul>
+          <List />
+        </ul>
+      </p>
     </div>
   );
 });
@@ -181,6 +226,7 @@ const App = component(() => {
       <SyncCheckbox />
       <InnerHTML />
       <TemplateSlots />
+      <ArrayList />
     </>
   );
 });
