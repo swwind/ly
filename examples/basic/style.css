@@ -2,3 +2,17 @@
   border: 2px solid #66ccff;
   padding: 0 2rem;
 }
+
+.card {
+  border: 2px solid #39c5bb;
+  padding: 0 2rem;
+}
+
+.card-title {
+  border: 2px solid yellow;
+  padding: 0 2rem;
+}
+.card-content {
+  border: 2px solid lime;
+  padding: 0 2rem;
+}

@@ -139,6 +139,37 @@ const InnerHTML = component(() => {
   );
 });
 
+const TemplateSlots = component(() => {
+  const Card = component(() => {
+    return (
+      <div class="card">
+        <div class="card-title">
+          <slot name="title">Default Title</slot>
+        </div>
+        <div class="card-content">
+          <slot>Default Body</slot>
+        </div>
+      </div>
+    );
+  });
+
+  return (
+    <div class="example">
+      <h2>Template & Slot</h2>
+      <div style={{ display: "flex" }}>
+        <Card>Custom Body 1</Card>
+        <Card>
+          <template>Custom Body 2</template>
+        </Card>
+        <Card>
+          <template slot="title">Custom Title 3</template>
+          <template>Custom Body 3</template>
+        </Card>
+      </div>
+    </div>
+  );
+});
+
 const App = component(() => {
   return (
     <>
@@ -149,6 +180,7 @@ const App = component(() => {
       <SyncInput />
       <SyncCheckbox />
       <InnerHTML />
+      <TemplateSlots />
     </>
   );
 });
