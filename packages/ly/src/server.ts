@@ -63,7 +63,16 @@ function serializeVNode(vnode: VNode): string {
         attributes.push([key, styl(value)]);
       } else if (key.startsWith("on")) {
         // do nothing
+      } else if (key.startsWith("aria-")) {
+        // ARIA attributes takes boolean into "true" or "false"
+        const content = valueOf(value);
+        if (content == null) {
+          // do nothing
+        } else {
+          attributes.push([key, String(content)]);
+        }
       } else {
+        // other attributes takes boolean as "" or remove
         const content = valueOf(value);
         if (content == null || content === false) {
           // do nothing

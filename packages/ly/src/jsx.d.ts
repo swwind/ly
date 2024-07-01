@@ -13,7 +13,7 @@ import type {
 } from "./vnode.ts";
 
 export namespace JSXInternal {
-  export type Booleanish<Name extends string> = boolean | "" | Name;
+  export type Booleanish = boolean | "true" | "false";
 
   // deno-lint-ignore no-explicit-any
   export type ElementType<P = any> =
@@ -55,26 +55,26 @@ export namespace JSXInternal {
     "arabic-form"?: MaybeComputed<
       "initial" | "medial" | "terminal" | "isolated" | undefined
     >;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/ascent */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/ascent */
     ascent?: MaybeComputed<number | string | undefined>;
     attributeName?: MaybeComputed<string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/attributeType */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/attributeType */
     attributeType?: MaybeComputed<string | undefined>;
     // autoReverse?: MaybeComputed<number | string | undefined>;
     azimuth?: MaybeComputed<number | string | undefined>;
     baseFrequency?: MaybeComputed<number | string | undefined>;
     "baseline-shift"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/baseProfile */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/baseProfile */
     baseProfile?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/bbox */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/bbox */
     bbox?: MaybeComputed<number | string | undefined>;
     begin?: MaybeComputed<number | string | undefined>;
     bias?: MaybeComputed<number | string | undefined>;
     by?: MaybeComputed<number | string | undefined>;
     calcMode?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/cap-height */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/cap-height */
     "cap-height"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/clip */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/clip */
     clip?: MaybeComputed<number | string | undefined>;
     clipPathUnits?: MaybeComputed<number | string | undefined>;
     "clip-path"?: MaybeComputed<string | undefined>;
@@ -83,7 +83,7 @@ export namespace JSXInternal {
     "color-interpolation-filters"?: MaybeComputed<
       "auto" | "sRGB" | "linearRGB" | "inherit" | undefined
     >;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/color-profile */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/color-profile */
     "color-profile"?: MaybeComputed<number | string | undefined>;
     "color-rendering"?: MaybeComputed<number | string | undefined>;
     cursor?: MaybeComputed<number | string | undefined>;
@@ -91,7 +91,7 @@ export namespace JSXInternal {
     cy?: MaybeComputed<number | string | undefined>;
     d?: MaybeComputed<string | undefined>;
     decelerate?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/descent */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/descent */
     descent?: MaybeComputed<number | string | undefined>;
     diffuseConstant?: MaybeComputed<number | string | undefined>;
     direction?: MaybeComputed<number | string | undefined>;
@@ -103,7 +103,7 @@ export namespace JSXInternal {
     dy?: MaybeComputed<number | string | undefined>;
     edgeMode?: MaybeComputed<number | string | undefined>;
     elevation?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/enable-background */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/enable-background */
     "enable-background"?: MaybeComputed<number | string | undefined>;
     end?: MaybeComputed<number | string | undefined>;
     exponent?: MaybeComputed<number | string | undefined>;
@@ -126,34 +126,34 @@ export namespace JSXInternal {
     fr?: MaybeComputed<number | string | undefined>;
     fx?: MaybeComputed<number | string | undefined>;
     fy?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/g1 */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/g1 */
     g1?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/g2 */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/g2 */
     g2?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/glyph-name */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/glyph-name */
     "glyph-name"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/glyph-orientation-horizontal */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/glyph-orientation-horizontal */
     "glyph-orientation-horizontal"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/glyph-orientation-vertical */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/glyph-orientation-vertical */
     "glyph-orientation-vertical"?: MaybeComputed<number | string | undefined>;
     glyphRef?: MaybeComputed<number | string | undefined>;
     gradientTransform?: MaybeComputed<string | undefined>;
     gradientUnits?: MaybeComputed<string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/hanging */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/hanging */
     hanging?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/horiz-adv-x */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/horiz-adv-x */
     "horiz-adv-x"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/horiz-origin-x */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/horiz-origin-x */
     "horiz-origin-x"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/horiz-origin-y */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/horiz-origin-y */
     "horiz-origin-y"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/ideographic */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/ideographic */
     ideographic?: MaybeComputed<number | string | undefined>;
     "image-rendering"?: MaybeComputed<number | string | undefined>;
     in?: MaybeComputed<string | undefined>;
     in2?: MaybeComputed<number | string | undefined>;
     intercept?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/k */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/k */
     k?: MaybeComputed<number | string | undefined>;
     k1?: MaybeComputed<number | string | undefined>;
     k2?: MaybeComputed<number | string | undefined>;
@@ -161,7 +161,7 @@ export namespace JSXInternal {
     k4?: MaybeComputed<number | string | undefined>;
     kernelMatrix?: MaybeComputed<number | string | undefined>;
     kernelUnitLength?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/kerning */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/kerning */
     kerning?: MaybeComputed<number | string | undefined>;
     keyPoints?: MaybeComputed<number | string | undefined>;
     keySplines?: MaybeComputed<number | string | undefined>;
@@ -180,10 +180,10 @@ export namespace JSXInternal {
     mask?: MaybeComputed<string | undefined>;
     maskContentUnits?: MaybeComputed<number | string | undefined>;
     maskUnits?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/mathematical */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/mathematical */
     mathematical?: MaybeComputed<number | string | undefined>;
     mode?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/name */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/name */
     name?: MaybeComputed<string | undefined>;
     numOctaves?: MaybeComputed<number | string | undefined>;
     offset?: MaybeComputed<number | string | undefined>;
@@ -191,14 +191,14 @@ export namespace JSXInternal {
     operator?: MaybeComputed<number | string | undefined>;
     order?: MaybeComputed<number | string | undefined>;
     orient?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/orientation */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/orientation */
     orientation?: MaybeComputed<number | string | undefined>;
     origin?: MaybeComputed<number | string | undefined>;
     overflow?: MaybeComputed<number | string | undefined>;
     "overline-position"?: MaybeComputed<number | string | undefined>;
     "overline-thickness"?: MaybeComputed<number | string | undefined>;
     "paint-order"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/panose-1 */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/panose-1 */
     "panose-1"?: MaybeComputed<number | string | undefined>;
     pathLength?: MaybeComputed<number | string | undefined>;
     patternContentUnits?: MaybeComputed<string | undefined>;
@@ -229,7 +229,7 @@ export namespace JSXInternal {
     scale?: MaybeComputed<number | string | undefined>;
     seed?: MaybeComputed<number | string | undefined>;
     "shape-rendering"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/slope */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/slope */
     slope?: MaybeComputed<number | string | undefined>;
     spacing?: MaybeComputed<number | string | undefined>;
     specularConstant?: MaybeComputed<number | string | undefined>;
@@ -238,16 +238,16 @@ export namespace JSXInternal {
     spreadMethod?: MaybeComputed<string | undefined>;
     startOffset?: MaybeComputed<number | string | undefined>;
     stdDeviation?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stemh */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stemh */
     stemh?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stemv */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stemv */
     stemv?: MaybeComputed<number | string | undefined>;
     stitchTiles?: MaybeComputed<number | string | undefined>;
     "stop-color"?: MaybeComputed<string | undefined>;
     "stop-opacity"?: MaybeComputed<number | string | undefined>;
     "strikethrough-position"?: MaybeComputed<number | string | undefined>;
     "strikethrough-thickness"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/string */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/string */
     string?: MaybeComputed<number | string | undefined>;
     stroke?: MaybeComputed<string | undefined>;
     "stroke-dasharray"?: MaybeComputed<number | string | undefined>;
@@ -273,74 +273,74 @@ export namespace JSXInternal {
     to?: MaybeComputed<number | string | undefined>;
     transform?: MaybeComputed<string | undefined>;
     "transform-origin"?: MaybeComputed<string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/u1 */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/u1 */
     u1?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/u2 */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/u2 */
     u2?: MaybeComputed<number | string | undefined>;
     "underline-position"?: MaybeComputed<number | string | undefined>;
     "underline-thickness"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/unicode */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/unicode */
     unicode?: MaybeComputed<number | string | undefined>;
     "unicode-bidi"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/unicode-range */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/unicode-range */
     "unicode-range"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/units-per-em */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/units-per-em */
     "units-per-em"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/v-alphabetic */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/v-alphabetic */
     "v-alphabetic"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/v-hanging */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/v-hanging */
     "v-hanging"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/v-ideographic */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/v-ideographic */
     "v-ideographic"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/v-mathematical */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/v-mathematical */
     "v-mathematical"?: MaybeComputed<number | string | undefined>;
     values?: MaybeComputed<string | undefined>;
     "vector-effect"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/version */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/version */
     version?: MaybeComputed<string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/vert-adv-y */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/vert-adv-y */
     "vert-adv-y"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/vert-origin-x */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/vert-origin-x */
     "vert-origin-x"?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/vert-origin-y */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/vert-origin-y */
     "vert-origin-y"?: MaybeComputed<number | string | undefined>;
     viewBox?: MaybeComputed<string | undefined>;
     // viewTarget?: MaybeComputed<number | string | undefined>;
     visibility?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/widths */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/widths */
     widths?: MaybeComputed<number | string | undefined>;
     "word-spacing"?: MaybeComputed<number | string | undefined>;
     "writing-mode"?: MaybeComputed<number | string | undefined>;
     x?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/x-height */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/x-height */
     "x-height"?: MaybeComputed<number | string | undefined>;
     x1?: MaybeComputed<number | string | undefined>;
     x2?: MaybeComputed<number | string | undefined>;
     xChannelSelector?: MaybeComputed<string | undefined>;
     xmlns?: MaybeComputed<string | undefined>;
     "xmlns:xlink"?: MaybeComputed<string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:arcrole */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:arcrole */
     "xlink:arcrole"?: MaybeComputed<string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href */
     "xlink:href"?: MaybeComputed<string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:show */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:show */
     "xlink:show"?: MaybeComputed<string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:title */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:title */
     "xlink:title"?: MaybeComputed<string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:type */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:type */
     "xlink:type"?: MaybeComputed<string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xml:base */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xml:base */
     "xml:base"?: MaybeComputed<string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xml:lang */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xml:lang */
     "xml:lang"?: MaybeComputed<string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xml:space */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xml:space */
     "xml:space"?: MaybeComputed<string | undefined>;
     y?: MaybeComputed<number | string | undefined>;
     y1?: MaybeComputed<number | string | undefined>;
     y2?: MaybeComputed<number | string | undefined>;
     yChannelSelector?: MaybeComputed<string | undefined>;
     z?: MaybeComputed<number | string | undefined>;
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/zoomAndPan */
+    /** @deprecated See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/zoomAndPan */
     zoomAndPan?: MaybeComputed<string | undefined>;
   }
 
@@ -589,7 +589,7 @@ export namespace JSXInternal {
     /** Identifies the currently active element when DOM focus is on a composite widget, textbox, group, or application. */
     "aria-activedescendant"?: MaybeComputed<string | undefined>;
     /** Indicates whether assistive technologies will present all, or only parts of, the changed region based on the change notifications defined by the aria-relevant attribute. */
-    "aria-atomic"?: MaybeComputed<Booleanish<"aria-atomic"> | undefined>;
+    "aria-atomic"?: MaybeComputed<Booleanish | undefined>;
     /**
      * Indicates whether inputting text could trigger display of one or more predictions of the user's intended value for an input and specifies how predictions would be
      * presented if they are made.
@@ -608,15 +608,13 @@ export namespace JSXInternal {
      */
     "aria-brailleroledescription"?: MaybeComputed<string | undefined>;
     /** Indicates an element is being modified and that assistive technologies MAY want to wait until the modifications are complete before exposing them to the user. */
-    "aria-busy"?: MaybeComputed<Booleanish<"aria-busy"> | undefined>;
+    "aria-busy"?: MaybeComputed<Booleanish | undefined>;
     /**
      * Indicates the current "checked" state of checkboxes, radio buttons, and other widgets.
      * @see aria-pressed
      * @see aria-selected.
      */
-    "aria-checked"?: MaybeComputed<
-      Booleanish<"aria-checked"> | "mixed" | undefined
-    >;
+    "aria-checked"?: MaybeComputed<Booleanish | "mixed" | undefined>;
     /**
      * Defines the total number of columns in a table, grid, or treegrid.
      * @see aria-colindex.
@@ -668,7 +666,7 @@ export namespace JSXInternal {
      * @see aria-hidden
      * @see aria-readonly.
      */
-    "aria-disabled"?: MaybeComputed<Booleanish<"aria-disabled"> | undefined>;
+    "aria-disabled"?: MaybeComputed<Booleanish | undefined>;
     /**
      * Indicates what functions can be performed when a dragged object is released on the drop target.
      * @deprecated in ARIA 1.1
@@ -683,7 +681,7 @@ export namespace JSXInternal {
      */
     "aria-errormessage"?: MaybeComputed<string | undefined>;
     /** Indicates whether the element, or another grouping element it controls, is currently expanded or collapsed. */
-    "aria-expanded"?: MaybeComputed<Booleanish<"aria-expanded"> | undefined>;
+    "aria-expanded"?: MaybeComputed<Booleanish | undefined>;
     /**
      * Identifies the next element (or elements) in an alternate reading order of content which, at the user's discretion,
      * allows assistive technology to override the general default of reading in document source order.
@@ -693,7 +691,7 @@ export namespace JSXInternal {
      * Indicates an element's "grabbed" state in a drag-and-drop operation.
      * @deprecated in ARIA 1.1
      */
-    "aria-grabbed"?: MaybeComputed<Booleanish<"aria-grabbed"> | undefined>;
+    "aria-grabbed"?: MaybeComputed<Booleanish | undefined>;
     /** Indicates the availability and type of interactive popup element, such as menu or dialog, that can be triggered by an element. */
     "aria-haspopup"?: MaybeComputed<
       Booleanish | "menu" | "listbox" | "tree" | "grid" | "dialog" | undefined
@@ -702,7 +700,7 @@ export namespace JSXInternal {
      * Indicates whether the element is exposed to an accessibility API.
      * @see aria-disabled.
      */
-    "aria-hidden"?: MaybeComputed<Booleanish<"aria-hidden"> | undefined>;
+    "aria-hidden"?: MaybeComputed<Booleanish | undefined>;
     /**
      * Indicates the entered value does not conform to the format expected by the application.
      * @see aria-errormessage.
@@ -727,13 +725,11 @@ export namespace JSXInternal {
     /** Indicates that an element will be updated, and describes the types of updates the user agents, assistive technologies, and user can expect from the live region. */
     "aria-live"?: MaybeComputed<"off" | "assertive" | "polite" | undefined>;
     /** Indicates whether an element is modal when displayed. */
-    "aria-modal"?: MaybeComputed<Booleanish<"aria-modal"> | undefined>;
+    "aria-modal"?: MaybeComputed<Booleanish | undefined>;
     /** Indicates whether a text box accepts multiple lines of input or only a single line. */
-    "aria-multiline"?: MaybeComputed<Booleanish<"aria-multiline"> | undefined>;
+    "aria-multiline"?: MaybeComputed<Booleanish | undefined>;
     /** Indicates that the user may select more than one item from the current selectable descendants. */
-    "aria-multiselectable"?: MaybeComputed<
-      Booleanish<"aria-multiselectable"> | undefined
-    >;
+    "aria-multiselectable"?: MaybeComputed<Booleanish | undefined>;
     /** Indicates whether the element's orientation is horizontal, vertical, or unknown/ambiguous. */
     "aria-orientation"?: MaybeComputed<"horizontal" | "vertical" | undefined>;
     /**
@@ -757,14 +753,12 @@ export namespace JSXInternal {
      * @see aria-checked
      * @see aria-selected.
      */
-    "aria-pressed"?: MaybeComputed<
-      Booleanish<"aria-pressed"> | "mixed" | undefined
-    >;
+    "aria-pressed"?: MaybeComputed<Booleanish | "mixed" | undefined>;
     /**
      * Indicates that the element is not editable, but is otherwise operable.
      * @see aria-disabled.
      */
-    "aria-readonly"?: MaybeComputed<Booleanish<"aria-readonly"> | undefined>;
+    "aria-readonly"?: MaybeComputed<Booleanish | undefined>;
     /**
      * Indicates what notifications the user agent will trigger when the accessibility tree within a live region is modified.
      * @see aria-atomic.
@@ -783,7 +777,7 @@ export namespace JSXInternal {
       | undefined
     >;
     /** Indicates that user input is required on the element before a form may be submitted. */
-    "aria-required"?: MaybeComputed<Booleanish<"aria-required"> | undefined>;
+    "aria-required"?: MaybeComputed<Booleanish | undefined>;
     /** Defines a human-readable, author-localized description for the role of an element. */
     "aria-roledescription"?: MaybeComputed<string | undefined>;
     /**
@@ -813,7 +807,7 @@ export namespace JSXInternal {
      * @see aria-checked
      * @see aria-pressed.
      */
-    "aria-selected"?: MaybeComputed<Booleanish<"aria-selected"> | undefined>;
+    "aria-selected"?: MaybeComputed<Booleanish | undefined>;
     /**
      * Defines the number of items in the current set of listitems or treeitems. Not required if all elements in the set are present in the DOM.
      * @see aria-posinset.

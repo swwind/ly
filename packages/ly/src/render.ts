@@ -39,12 +39,22 @@ function setAttribute(dom: Element, key: string, value: unknown) {
     }
   } else if (key === "checked") {
     (dom as HTMLInputElement).checked = Boolean(value);
-  } else if (value == null || value === false) {
-    dom.removeAttribute(key);
-  } else if (value === true) {
-    dom.setAttribute(key, "");
+  } else if (key.startsWith("aria-")) {
+    // ARIA attributes takes boolean into "true" or "false"
+    if (value == null) {
+      dom.removeAttribute(key);
+    } else {
+      dom.setAttribute(key, String(value));
+    }
   } else {
-    dom.setAttribute(key, String(value));
+    // other attributes takes boolean as "" or remove
+    if (value == null || value === false) {
+      dom.removeAttribute(key);
+    } else if (value === true) {
+      dom.setAttribute(key, "");
+    } else {
+      dom.setAttribute(key, String(value));
+    }
   }
 }
 
