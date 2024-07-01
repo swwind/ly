@@ -39,19 +39,18 @@ function setAttribute(dom: Element, key: string, value: unknown) {
     }
   } else if (key === "checked") {
     (dom as HTMLInputElement).checked = Boolean(value);
-  } else if (key.startsWith("aria-")) {
-    // ARIA attributes takes boolean into "true" or "false"
+  } else {
+    if (typeof value === "boolean") {
+      if (key.startsWith("aria-")) {
+        // ARIA attributes takes boolean into "true" / "false"
+        value = String(value);
+      } else {
+        // other attributes takes boolean as "" / remove
+        value = value ? "" : null;
+      }
+    }
     if (value == null) {
       dom.removeAttribute(key);
-    } else {
-      dom.setAttribute(key, String(value));
-    }
-  } else {
-    // other attributes takes boolean as "" or remove
-    if (value == null || value === false) {
-      dom.removeAttribute(key);
-    } else if (value === true) {
-      dom.setAttribute(key, "");
     } else {
       dom.setAttribute(key, String(value));
     }

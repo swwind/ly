@@ -63,21 +63,19 @@ function serializeVNode(vnode: VNode): string {
         attributes.push([key, styl(value)]);
       } else if (key.startsWith("on")) {
         // do nothing
-      } else if (key.startsWith("aria-")) {
-        // ARIA attributes takes boolean into "true" or "false"
-        const content = valueOf(value);
+      } else {
+        let content = valueOf(value);
+        if (typeof content === "boolean") {
+          if (key.startsWith("aria-")) {
+            // ARIA attributes takes boolean into "true" / "false"
+            content = String(key);
+          } else {
+            // other attributes takes boolean as "" / remove
+            content = content ? "" : null;
+          }
+        }
         if (content == null) {
           // do nothing
-        } else {
-          attributes.push([key, String(content)]);
-        }
-      } else {
-        // other attributes takes boolean as "" or remove
-        const content = valueOf(value);
-        if (content == null || content === false) {
-          // do nothing
-        } else if (content === true) {
-          attributes.push([key, ""]);
         } else {
           attributes.push([key, String(content)]);
         }
