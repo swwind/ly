@@ -7,6 +7,12 @@ export type ClassName =
   | Computed<string | false | null | undefined>;
 export type ClassNames = MaybeArray<ClassName>;
 
+export function hasComputedClass(cns: ClassNames): boolean {
+  return toArray(cns).some((x) => {
+    return typeof x !== "string";
+  });
+}
+
 export function clsx(cns: ClassNames): string {
   const cls = toArray(cns)
     .map((x) => {

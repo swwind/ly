@@ -1,4 +1,4 @@
-import { dynamic, component, computed, effect, ref } from "@swwind/ly";
+import { dynamic, component, computed, effect, ref, list } from "@swwind/ly";
 import { HITLogo } from "./src/HIT.tsx";
 import { MathML } from "./src/MathML.tsx";
 
@@ -198,13 +198,23 @@ const ArrayList = component(() => {
     array.value = [...array.value];
   };
 
-  const List = dynamic(() =>
-    array.value.map((x) => (
-      <li key={x} class="fade-in-animation">
-        {x}
-      </li>
-    ))
-  );
+  const Counter = component(() => {
+    const count = ref(0);
+    const increment = () => count.value++;
+    return (
+      <>
+        <button onClick={increment}>+1</button>
+        <span>value={count}</span>
+      </>
+    );
+  });
+
+  const List = list(array, (x) => (
+    <li key={x} class="fade-in-animation">
+      <span>{x}: </span>
+      <Counter />
+    </li>
+  ));
 
   return (
     <div class="example">

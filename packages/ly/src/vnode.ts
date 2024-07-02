@@ -67,6 +67,22 @@ export function withSlots<T>(slot: Slots, fn: () => T) {
   }
 }
 
+export class ComponentList<T> extends Array<VNode> {
+  constructor(
+    public _array: Computed<T[]>,
+    public _map: (item: T, index: number) => VNode
+  ) {
+    super();
+  }
+}
+
+export function list<T>(
+  array: Computed<T[]>,
+  map: (item: T) => VNode
+): StaticComponent<{}> {
+  return () => new ComponentList(array, map);
+}
+
 export function createVNode(
   type: string | ComponentType | null,
   props: Props | null,

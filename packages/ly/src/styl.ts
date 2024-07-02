@@ -1,4 +1,4 @@
-import type { MaybeComputed } from "./state.ts";
+import { isComputed, type MaybeComputed } from "./state.ts";
 import { valueOf } from "./utils.ts";
 
 export type DOMCSSProperties = {
@@ -17,6 +17,10 @@ export type AllCSSProperties = {
   [key: string]: MaybeComputed<string | number | null | undefined>;
 };
 export interface CSSProperties extends AllCSSProperties, DOMCSSProperties {}
+
+export function hasComputedStyle(style: CSSProperties) {
+  return Object.values(style).some((x) => isComputed(x));
+}
 
 export function styl(style: CSSProperties) {
   return Object.entries(style)

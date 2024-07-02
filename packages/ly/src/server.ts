@@ -3,6 +3,7 @@ import { isSSR } from "./flags.ts";
 import { styl } from "./styl.ts";
 import { isArray, isVoidTag, toArray, valueOf } from "./utils.ts";
 import {
+  ComponentList,
   ComponentChildren,
   ComponentType,
   LyDOMAttributes,
@@ -106,6 +107,13 @@ function serializeVNode(vnode: VNode): string {
 
     if (typeof inside === "function") {
       return serializeChildren(inside()) + "<!--/-->";
+    } else if (inside instanceof ComponentList) {
+      return (
+        inside._array.value
+          .map((x, i) => inside._map(x, i))
+          .map((vnode) => serializeVNode(vnode))
+          .join("") + "<!--%-->"
+      );
     } else if (isArray(inside)) {
       return inside.map((vnode) => serializeVNode(vnode)).join("");
     } else {

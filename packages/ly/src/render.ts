@@ -3,18 +3,20 @@ import {
   type Primitives,
   type ComponentType,
   type Slots,
-  type VNode,
+  VNode,
   isVNode,
   withSlots,
   type Props,
   LyDOMAttributes,
+  ComponentList,
+  Key,
 } from "./vnode.ts";
-import { appendNodes, createLayer, withNodes } from "./layer.ts";
+import { Layer, appendNodes, createLayer, withNodes } from "./layer.ts";
 import { layout, isComputed } from "./state.ts";
 import { isNumber, isVoidTag, toArray } from "./utils.ts";
-import { clsx } from "./clsx.ts";
-import { styl } from "./styl.ts";
-import { isSSR } from "./flags.ts";
+import { ClassName, ClassNames, clsx, hasComputedClass } from "./clsx.ts";
+import { CSSProperties, hasComputedStyle, styl } from "./styl.ts";
+import { isDEV, isSSR } from "./flags.ts";
 
 function execute<P extends Props>(
   type: ComponentType<P>,
@@ -57,7 +59,7 @@ function setAttribute(dom: Element, key: string, value: unknown) {
   }
 }
 
-function realizeChildren(children: ComponentChildren, ns?: string) {
+function realizeChildren(children: ComponentChildren, ns: string | null) {
   for (const child of toArray(children)) {
     if (isComputed(child)) {
       const text = new Text();
@@ -75,7 +77,7 @@ function realizeChildren(children: ComponentChildren, ns?: string) {
   }
 }
 
-function getNS(type: string, props: Props, ns?: string) {
+function getNS(type: string, props: Props, ns: string | null) {
   if (type === "svg") {
     return props["xmlns"] || "http://www.w3.org/2000/svg";
   } else if (type === "math") {
@@ -85,7 +87,7 @@ function getNS(type: string, props: Props, ns?: string) {
   }
 }
 
-function realizeVNode(vnode: VNode, ns?: string) {
+function realizeVNode(vnode: VNode, ns: string | null) {
   // fragment
   if (vnode.type === null) {
     const children = vnode.slots["default"] ?? [];
@@ -101,9 +103,17 @@ function realizeVNode(vnode: VNode, ns?: string) {
       if (key === "_dangerouslySetInnerHTML") {
         continue;
       } else if (key === "class") {
-        layout(() => setAttribute(elem, "class", clsx(value)));
+        if (hasComputedClass(value as ClassNames)) {
+          layout(() => setAttribute(elem, key, clsx(value as ClassNames)));
+        } else {
+          setAttribute(elem, key, clsx(value as ClassNames));
+        }
       } else if (key === "style") {
-        layout(() => setAttribute(elem, "style", styl(value)));
+        if (hasComputedStyle(value as CSSProperties)) {
+          layout(() => setAttribute(elem, key, styl(value as CSSProperties)));
+        } else {
+          setAttribute(elem, key, styl(value as CSSProperties));
+        }
       } else if (key.startsWith("on")) {
         const name = key.slice(2).toLowerCase();
         elem.addEventListener(name, value);
@@ -162,6 +172,80 @@ function realizeVNode(vnode: VNode, ns?: string) {
 
         return () => layer.remove();
       });
+    } else if (inside instanceof ComponentList) {
+      const comment = new Comment("%");
+      appendNodes(comment);
+
+      const map = new Map<Key, Layer>();
+      const nokey = [] as Layer[];
+
+      // do initialize and updates
+      layout(() => {
+        const array = inside._array.value;
+        const vnodes = [] as VNode[];
+        const layers = [] as Layer[];
+        const keys = new Set<Key>();
+
+        // run map function to get VNode arrays
+        for (let i = 0; i < array.length; ++i) {
+          const vnode = inside._map(array[i], i);
+          if (!(vnode instanceof VNode)) {
+            throw new Error("vnode must be instanceof VNode");
+          }
+          vnodes.push(vnode);
+          const key = vnode.key;
+          if (key == null) {
+            if (isDEV) {
+              console.warn("vnode should have a key property");
+            }
+          } else {
+            keys.add(key);
+          }
+        }
+
+        // remove old layers
+        for (const [key, layer] of Array.from(map.entries())) {
+          if (!keys.has(key)) {
+            map.delete(key);
+            layer.remove();
+          }
+        }
+        while (nokey.length > 0) {
+          nokey.pop()!.remove();
+        }
+
+        // create new layers
+        for (const vnode of vnodes) {
+          const key = vnode.key;
+          if (key == null) {
+            const layer = createLayer(() => realizeVNode(vnode, ns));
+            nokey.push(layer);
+            layers.push(layer);
+          } else {
+            const cacheLayer = map.get(key);
+            if (cacheLayer) {
+              layers.push(cacheLayer);
+            } else {
+              const layer = createLayer(() => realizeVNode(vnode, ns));
+              map.set(key, layer);
+              layers.push(layer);
+            }
+          }
+        }
+
+        // adjust DOM orders
+        for (const layer of layers) {
+          comment.before(...layer.doms);
+        }
+      });
+
+      // do final clean
+      layout(() => {
+        return () => {
+          for (const layer of map.values()) layer.remove();
+          for (const layer of nokey) layer.remove();
+        };
+      });
     } else {
       for (const node of toArray(inside)) {
         realizeVNode(node, ns);
@@ -177,7 +261,7 @@ export function render(vnode: VNode, parent: Element) {
     );
   }
 
-  const layer = createLayer(() => realizeVNode(vnode));
+  const layer = createLayer(() => realizeVNode(vnode, null));
   parent.replaceChildren(...layer.doms);
 }
 
@@ -188,7 +272,7 @@ export function hydrate(vnode: VNode, parent: Element, replace?: Node) {
     );
   }
 
-  const layer = createLayer(() => realizeVNode(vnode));
+  const layer = createLayer(() => realizeVNode(vnode, null));
   const fragment = new DocumentFragment();
   fragment.append(...layer.doms);
   if (replace) {
