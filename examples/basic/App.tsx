@@ -1,8 +1,8 @@
-import { dynamic, component, computed, effect, ref, list } from "@swwind/ly";
+import { dynamic$, component$, computed, effect, ref, list$ } from "@swwind/ly";
 import { HITLogo } from "./src/HIT.tsx";
 import { MathML } from "./src/MathML.tsx";
 
-const Counter = component(() => {
+const Counter = component$(() => {
   const a = ref(0);
   const b = ref(0);
 
@@ -30,11 +30,11 @@ const Counter = component(() => {
   );
 });
 
-const Tabs = component(() => {
+const Tabs = component$(() => {
   const currentTab = ref<"home" | "about" | "info">("home");
 
-  const Home = component(() => <p>Welcome to 🏠Home</p>);
-  const About = component(() => (
+  const Home = component$(() => <p>Welcome to 🏠Home</p>);
+  const About = component$(() => (
     <div>
       <p>
         Get in touch: <code>joebiden@whitehouse.gov</code>
@@ -44,9 +44,11 @@ const Tabs = component(() => {
       </p>
     </div>
   ));
-  const Info = component(() => <p>Ly is the best framework I've ever seen!</p>);
+  const Info = component$(() => (
+    <p>Ly is the best framework I've ever seen!</p>
+  ));
 
-  const TabContent = dynamic(() => {
+  const TabContent = dynamic$(() => {
     switch (currentTab.value) {
       case "home":
         return <Home />;
@@ -70,7 +72,7 @@ const Tabs = component(() => {
   );
 });
 
-const SyncInput = component(() => {
+const SyncInput = component$(() => {
   const text = ref("hello world");
   effect(() => console.log(`text = ${text.value}`));
 
@@ -100,7 +102,7 @@ const SyncInput = component(() => {
   );
 });
 
-const SyncCheckbox = component(() => {
+const SyncCheckbox = component$(() => {
   const checked = ref(true);
   const inverse = () => (checked.value = !checked.value);
 
@@ -127,7 +129,7 @@ const SyncCheckbox = component(() => {
   );
 });
 
-const InnerHTML = component(() => {
+const InnerHTML = component$(() => {
   return (
     <div class="example">
       <h2>DangerouslySetInnerHTML</h2>
@@ -141,8 +143,8 @@ const InnerHTML = component(() => {
   );
 });
 
-const TemplateSlots = component(() => {
-  const Card = component(() => {
+const TemplateSlots = component$(() => {
+  const Card = component$(() => {
     return (
       <div class="card">
         <div class="card-title">
@@ -172,7 +174,7 @@ const TemplateSlots = component(() => {
   );
 });
 
-const ArrayList = component(() => {
+const ArrayList = component$(() => {
   let count = 8;
   const array = ref([1, 2, 3, 4, 5, 6, 7, 8]);
   const insert = () => {
@@ -198,7 +200,7 @@ const ArrayList = component(() => {
     array.value = [...array.value];
   };
 
-  const Counter = component(() => {
+  const Counter = component$(() => {
     const count = ref(0);
     const increment = () => count.value++;
     return (
@@ -209,7 +211,7 @@ const ArrayList = component(() => {
     );
   });
 
-  const List = list(array, (x) => (
+  const List = list$(array, (x) => (
     <li key={x} class="fade-in-animation">
       <span>{x}: </span>
       <Counter />
@@ -233,7 +235,7 @@ const ArrayList = component(() => {
   );
 });
 
-const SVGMath = component(() => {
+const SVGMath = component$(() => {
   return (
     <div class="example">
       <h2>SVG & MathML</h2>
@@ -249,7 +251,7 @@ const SVGMath = component(() => {
   );
 });
 
-const InputVModel = component(() => {
+const InputVModel = component$(() => {
   const text = ref("default");
 
   return (
@@ -274,7 +276,7 @@ const InputVModel = component(() => {
   );
 });
 
-const App = component(() => {
+const App = component$(() => {
   return (
     <>
       <h1>Example: Basic</h1>

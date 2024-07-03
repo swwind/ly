@@ -1,6 +1,6 @@
-import { component } from "@swwind/ly";
+import { component$ } from "@swwind/ly";
 
-export const HITLogo = component(() => {
+export const HITLogo = component$(() => {
   return (
     <svg
       id="logo"

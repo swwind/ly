@@ -1,11 +1,12 @@
 export {
   createVNode as h,
   Fragment,
-  component,
-  dynamic,
-  list,
+  component$,
+  dynamic$,
+  list$,
 } from "./vnode.ts";
 export { ref, computed, effect, layout } from "./state.ts";
+export { provide, inject } from "./provide.ts";
 export { nextTick } from "./update.ts";
 
 export type { Ref, Computed, MaybeRef, MaybeComputed } from "./state.ts";

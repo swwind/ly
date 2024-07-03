@@ -1,5 +1,6 @@
 import { clsx } from "./clsx.ts";
 import { isSSR } from "./flags.ts";
+import type { Ref } from "./state.ts";
 import { styl } from "./styl.ts";
 import { isArray, isVoidTag, toArray, valueOf } from "./utils.ts";
 import {
@@ -54,16 +55,21 @@ function serializeVNode(vnode: VNode): string {
   // dom elements
   else if (typeof vnode.type === "string") {
     const attributes: [string, string][] = [];
+    let children: string | null = null;
 
     for (const [key, value] of Object.entries(vnode.props)) {
       if (key === "_dangerouslySetInnerHTML") {
-        continue;
+        children = String(valueOf(value._html));
       } else if (key === "class") {
         attributes.push([key, clsx(value)]);
       } else if (key === "style") {
         attributes.push([key, styl(value)]);
-      } else if (key === "v-model") {
-        attributes.push(["value", String(value)]);
+      } else if (key === "v-model" || key === "value") {
+        if (vnode.type === "textarea") {
+          children = String(valueOf(value));
+        } else {
+          attributes.push(["value", String(valueOf(value))]);
+        }
       } else if (key.startsWith("on")) {
         // do nothing
       } else {
@@ -94,11 +100,9 @@ function serializeVNode(vnode: VNode): string {
       return `<${nameAttrs}/>`;
     }
 
-    const children = (vnode.props as LyDOMAttributes)._dangerouslySetInnerHTML
-      ? valueOf(
-          (vnode.props as LyDOMAttributes)._dangerouslySetInnerHTML!.__html
-        )
-      : serializeChildren(vnode.slots["default"] ?? []);
+    if (children == null) {
+      children = serializeChildren(vnode.slots["default"] ?? []);
+    }
     return `<${nameAttrs}>${children}</${vnode.type}>`;
   }
   // components

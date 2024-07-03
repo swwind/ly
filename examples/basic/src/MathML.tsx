@@ -1,6 +1,6 @@
-import { component } from "@swwind/ly";
+import { component$ } from "@swwind/ly";
 
-export const MathML = component(() => {
+export const MathML = component$(() => {
   return (
     <>
       The infinite sum

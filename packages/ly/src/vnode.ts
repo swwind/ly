@@ -42,19 +42,19 @@ export type ComponentType<P extends Props = {}> =
   | StaticComponent<P>
   | DynamicComponent<P>;
 
-export function component<P extends Props = {}>(
+export function component$<P extends Props = {}>(
   fn: ComponentType<P>
 ): ComponentType<P> {
   return fn;
 }
 
-export function dynamic<P extends Props = {}>(
+export function dynamic$<P extends Props = {}>(
   fn: (props: P) => VNode | VNode[] | null
 ): DynamicComponent<P> {
   return (p) => () => fn(p);
 }
 
-export const Fragment = component(() => createVNode("slot", null));
+export const Fragment = component$(() => createVNode("slot", null));
 
 const slots: Stack<Slots> = [];
 
@@ -76,7 +76,7 @@ export class ComponentList<T> extends Array<VNode> {
   }
 }
 
-export function list<T>(
+export function list$<T>(
   array: Computed<T[]>,
   map: (item: T) => VNode
 ): StaticComponent<{}> {
