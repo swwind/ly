@@ -2,7 +2,7 @@
 /// <reference lib="dom" />
 
 import type { ClassNames } from "./clsx.ts";
-import type { MaybeComputed } from "./state.ts";
+import type { MaybeComputed, Ref } from "./state.ts";
 import type { CSSProperties } from "./styl.ts";
 import type {
   ClassAttributes,
@@ -1182,6 +1182,9 @@ export namespace JSXInternal {
     width?: MaybeComputed<number | string | undefined>;
     wmode?: MaybeComputed<string | undefined>;
     wrap?: MaybeComputed<string | undefined>;
+
+    // Ly helpers attributes
+    "v-model"?: Ref<string> | undefined;
 
     // Non-standard Attributes
     autocapitalize?: MaybeComputed<

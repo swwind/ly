@@ -249,6 +249,31 @@ const SVGMath = component(() => {
   );
 });
 
+const InputVModel = component(() => {
+  const text = ref("default");
+
+  return (
+    <div class="example">
+      <h2>
+        Input <code>v-model</code> Property
+      </h2>
+      <p>
+        <input type="text" v-model={text} />
+      </p>
+      <p>
+        <textarea v-model={text} />
+      </p>
+      <p>
+        <select v-model={text}>
+          <option value="default">Default</option>
+          <option value="another">Another</option>
+        </select>
+      </p>
+      <p>Your input is: {text}</p>
+    </div>
+  );
+});
+
 const App = component(() => {
   return (
     <>
@@ -262,6 +287,7 @@ const App = component(() => {
       <TemplateSlots />
       <ArrayList />
       <SVGMath />
+      <InputVModel />
     </>
   );
 });

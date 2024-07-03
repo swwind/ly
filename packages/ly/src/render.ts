@@ -12,7 +12,7 @@ import {
   type Key,
 } from "./vnode.ts";
 import { type Layer, appendNodes, createLayer, withNodes } from "./layer.ts";
-import { layout, isComputed } from "./state.ts";
+import { layout, isComputed, type Ref } from "./state.ts";
 import { isNumber, isVoidTag, toArray } from "./utils.ts";
 import { type ClassNames, clsx, hasComputedClass } from "./clsx.ts";
 import { type CSSProperties, hasComputedStyle, styl } from "./styl.ts";
@@ -114,6 +114,13 @@ function realizeVNode(vnode: VNode, ns: string | null) {
         } else {
           setAttribute(elem, key, styl(value as CSSProperties));
         }
+      } else if (key === "v-model") {
+        layout(() => setAttribute(elem, "value", (value as Ref<string>).value));
+        (elem as HTMLInputElement).addEventListener(
+          "input",
+          () =>
+            ((value as Ref<string>).value = (elem as HTMLInputElement).value)
+        );
       } else if (key.startsWith("on")) {
         const name = key.slice(2).toLowerCase();
         elem.addEventListener(name, value);

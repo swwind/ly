@@ -62,6 +62,8 @@ function serializeVNode(vnode: VNode): string {
         attributes.push([key, clsx(value)]);
       } else if (key === "style") {
         attributes.push([key, styl(value)]);
+      } else if (key === "v-model") {
+        attributes.push(["value", String(value)]);
       } else if (key.startsWith("on")) {
         // do nothing
       } else {
