@@ -267,7 +267,7 @@ function realizeVNode(vnode: VNode, ns: string | null) {
   }
 }
 
-export function render(vnode: VNode, parent: Element) {
+export function render(vnode: VNode, parent: ParentNode) {
   if (isSSR) {
     throw new Error(
       "Cannot use render() in SSR mode, please use renderToString() instead."
@@ -278,7 +278,7 @@ export function render(vnode: VNode, parent: Element) {
   parent.replaceChildren(...layer.doms);
 }
 
-export function hydrate(vnode: VNode, parent: Element, replace?: Node) {
+export function hydrate(vnode: VNode, parent: ParentNode, replace?: ChildNode) {
   if (isSSR) {
     throw new Error(
       "Cannot use hydrate() in SSR mode, this is only allowed in browser."
