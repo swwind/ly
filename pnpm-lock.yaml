@@ -22,6 +22,25 @@ importers:
         specifier: ^5.3.2
         version: 5.3.2
 
+  packages/firefly:
+    dependencies:
+      '@swwind/ly':
+        specifier: workspace:^
+        version: link:../ly
+    devDependencies:
+      '@swwind/exbuild':
+        specifier: ^1.0.5
+        version: 1.0.5
+      shx:
+        specifier: ^0.3.4
+        version: 0.3.4
+      typescript:
+        specifier: ^5.5.2
+        version: 5.5.2
+      vite:
+        specifier: ^5.3.2
+        version: 5.3.2
+
   packages/ly:
     devDependencies:
       '@swwind/exbuild':
