@@ -7,15 +7,15 @@ import {
   isVNode,
   withSlots,
   type Props,
-  LyDOMAttributes,
+  type LyDOMAttributes,
   ComponentList,
-  Key,
+  type Key,
 } from "./vnode.ts";
-import { Layer, appendNodes, createLayer, withNodes } from "./layer.ts";
+import { type Layer, appendNodes, createLayer, withNodes } from "./layer.ts";
 import { layout, isComputed } from "./state.ts";
 import { isNumber, isVoidTag, toArray } from "./utils.ts";
-import { ClassName, ClassNames, clsx, hasComputedClass } from "./clsx.ts";
-import { CSSProperties, hasComputedStyle, styl } from "./styl.ts";
+import { type ClassNames, clsx, hasComputedClass } from "./clsx.ts";
+import { type CSSProperties, hasComputedStyle, styl } from "./styl.ts";
 import { isDEV, isSSR } from "./flags.ts";
 
 function execute<P extends Props>(
@@ -190,13 +190,19 @@ function realizeVNode(vnode: VNode, ns: string | null) {
         for (let i = 0; i < array.length; ++i) {
           const vnode = inside._map(array[i], i);
           if (!(vnode instanceof VNode)) {
-            throw new Error("vnode must be instanceof VNode");
+            throw new Error("return value must be instance of VNode");
           }
           vnodes.push(vnode);
           const key = vnode.key;
           if (key == null) {
             if (isDEV) {
               console.warn("vnode should have a key property");
+            }
+          } else if (keys.has(key)) {
+            if (isDEV) {
+              console.warn(
+                `duplicated key found: '${key}', this is undefined behavior`
+              );
             }
           } else {
             keys.add(key);

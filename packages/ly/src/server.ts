@@ -4,12 +4,12 @@ import { styl } from "./styl.ts";
 import { isArray, isVoidTag, toArray, valueOf } from "./utils.ts";
 import {
   ComponentList,
-  ComponentChildren,
-  ComponentType,
-  LyDOMAttributes,
-  Primitives,
-  Props,
-  Slots,
+  type ComponentChildren,
+  type ComponentType,
+  type LyDOMAttributes,
+  type Primitives,
+  type Props,
+  type Slots,
   VNode,
   isVNode,
   withSlots,

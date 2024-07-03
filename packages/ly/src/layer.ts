@@ -1,6 +1,6 @@
 import { isSSR } from "./flags.ts";
-import { type Comparable, createHeap, Heap } from "./heap.ts";
-import { Stack, current, popd, pushd, withd } from "./stack.ts";
+import { type Comparable, createHeap, type Heap } from "./heap.ts";
+import { type Stack, current, popd, pushd, withd } from "./stack.ts";
 
 const layers: Stack<Layer> = [];
 const nodes: Stack<Node[]> = [];

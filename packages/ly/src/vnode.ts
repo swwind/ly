@@ -1,7 +1,7 @@
 // deno-lint-ignore-file ban-types no-explicit-any
 
-import { Stack, current, popd, pushd } from "./stack.ts";
-import { type Computed, type Ref, isRef, MaybeComputed } from "./state.ts";
+import { type Stack, current, popd, pushd } from "./stack.ts";
+import { type Computed, type Ref, isRef, type MaybeComputed } from "./state.ts";
 import { isNumber, isString } from "./utils.ts";
 
 export type Key = string | number;

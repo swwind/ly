@@ -1,8 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { isDEV, isSSR } from "./flags.ts";
-import { LayerElement, createLayerElement } from "./layer.ts";
-import { Stack, current, popd, pushd } from "./stack.ts";
+import { type LayerElement, createLayerElement } from "./layer.ts";
+import { type Stack, current, popd, pushd } from "./stack.ts";
 import { enqueueUpdate } from "./update.ts";
 
 export type Ref<T = any> = { value: T; readonly previous: T };
