@@ -1,4 +1,4 @@
-import { Context } from "hono";
+import type { Context } from "hono";
 
 export interface Middleware<T = void> {
   (c: Context): T | Promise<T>;
@@ -10,9 +10,9 @@ export interface Middleware<T = void> {
  *
  * ## Throws Response
  *
- * - When you throw a response, blitz will catch it and renders an error page.
- * - When you throw a URL, blitz will catch it and returns 301 redirect.
- * - When you throw a Error (or anything else), blitz will catch it and renders an error page with 500 status.
+ * - When you throw a response, firefly will catch it and renders an error page.
+ * - When you throw a URL, firefly will catch it and returns 301 redirect.
+ * - When you throw a Error (or anything else), firefly will catch it and renders an error page with 500 status.
  *
  * ```js
  * export default middleware$((evt) => {

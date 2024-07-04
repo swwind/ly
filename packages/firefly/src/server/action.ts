@@ -1,9 +1,10 @@
-import { useAction } from "../client/action.ts";
-import { Context } from "hono";
+import type { Computed } from "@swwind/ly";
+import { injectAction } from "../client/action.ts";
+import type { Context } from "hono";
 
 export type ActionReturnValue = {} | null;
 export type ActionFunction<T extends ActionReturnValue = ActionReturnValue> = (
-  c: Context,
+  c: Context
 ) => T | Promise<T>;
 export interface Action<T extends ActionReturnValue = ActionReturnValue> {
   (): ActionHandler<T>;
@@ -17,7 +18,7 @@ export type ActionState<T> =
   | { state: "error"; data: null; error: Error };
 export type ActionHandler<T extends ActionReturnValue = ActionReturnValue> = {
   ref: string;
-  state: ActionState<T>;
+  state: Computed<ActionState<T>>;
   submit(data: FormData): Promise<void>;
 };
 
@@ -46,7 +47,7 @@ export type ActionHandler<T extends ActionReturnValue = ActionReturnValue> = {
  * ```jsx
  * // index.tsx
  * import { useLogin } from "./action.ts";
- * import { Form } from "@biliblitz/blitz";
+ * import { Form } from "@swwind/firefly";
  * export default function () {
  *   const login = useLogin();
  *   // automatically
@@ -60,9 +61,9 @@ export type ActionHandler<T extends ActionReturnValue = ActionReturnValue> = {
  * ```
  */
 export function action$<T extends ActionReturnValue>(
-  fn: ActionFunction<T>,
+  fn: ActionFunction<T>
 ): Action<T> {
-  const handler = () => useAction<T>(handler._ref);
+  const handler = () => injectAction<T>(handler._ref);
   handler._fn = fn;
   handler._ref = "";
   return handler;

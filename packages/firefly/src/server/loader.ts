@@ -1,16 +1,17 @@
-import { Context } from "hono";
-import { useLoader } from "../client/loader.ts";
+import type { Context } from "hono";
+import { injectLoader } from "../client/loader.ts";
+import type { Computed } from "@swwind/ly";
 
 export type LoaderReturnValue = {} | null;
 export type LoaderFunction<T extends LoaderReturnValue = LoaderReturnValue> = (
-  c: Context,
+  c: Context
 ) => T | Promise<T>;
 export interface Loader<T extends LoaderReturnValue = LoaderReturnValue> {
   (): LoaderHandler<T>;
   _fn?: LoaderFunction<T>;
   _ref?: string;
 }
-export type LoaderHandler<T extends LoaderReturnValue> = T;
+export type LoaderHandler<T extends LoaderReturnValue> = Computed<T>;
 
 /**
  * Perform data-query for frontend
@@ -46,9 +47,9 @@ export type LoaderHandler<T extends LoaderReturnValue> = T;
  * ```
  */
 export function loader$<T extends LoaderReturnValue>(
-  fn: LoaderFunction<T>,
+  fn: LoaderFunction<T>
 ): Loader<T> {
-  const handler = () => useLoader<T>(handler._ref);
+  const handler = () => injectLoader<T>(handler._ref);
   handler._fn = fn;
   handler._ref = "";
   return handler;

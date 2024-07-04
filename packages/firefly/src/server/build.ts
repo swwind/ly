@@ -1,9 +1,9 @@
-import { ComponentType } from "preact";
-import { MetaFunction } from "./meta.ts";
-import { Action } from "./action.ts";
-import { Loader } from "./loader.ts";
-import { StaticFunction } from "./static.ts";
-import { Middleware } from "./middleware.ts";
+import type { MetaFunction } from "./meta.ts";
+import type { Action } from "./action.ts";
+import type { Loader } from "./loader.ts";
+import type { StaticFunction } from "./static.ts";
+import type { Middleware } from "./middleware.ts";
+import type { ComponentType } from "@swwind/ly";
 
 export type Graph = {
   assets: string[];

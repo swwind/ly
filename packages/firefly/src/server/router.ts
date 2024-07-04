@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import type { Directory } from "./build.ts";
-import { ActionReturnValue } from "./action.ts";
-import { Meta } from "./meta.ts";
-import { LoaderReturnValue } from "./loader.ts";
+import type { ActionReturnValue } from "./action.ts";
+import type { Meta } from "./meta.ts";
+import type { LoaderReturnValue } from "./loader.ts";
 import { HTTPException } from "hono/http-exception";
 
 export type Params = [string, string][];
@@ -14,10 +14,6 @@ export type RedirectResponse = { ok: "redirect"; redirect: string };
 export type ActionResponse<T = ActionReturnValue> =
   | {
       ok: "action";
-      // meta: Meta;
-      // params: Params;
-      // loaders: LoaderStore;
-      // components: number[];
       action: T;
     }
   | ErrorResponse
@@ -63,7 +59,7 @@ export function createRouter({ route, children }: Directory) {
     app.get("/", async (c) => {
       const event = c.get("event");
       await event.runLayer(route.index);
-      return await c.render(event.runtime);
+      return await c.render(...event.runtime);
     });
 
     app.get("/_data.json", async (c) => {

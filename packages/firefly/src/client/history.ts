@@ -1,9 +1,9 @@
-import { useEffect } from "preact/hooks";
-import { LoaderStore } from "../server/event.ts";
-import { useRender } from "./navigate.ts";
-import { useRuntime } from "./runtime.ts";
-import { Meta } from "../server/meta.ts";
-import { Params } from "../server/router.ts";
+import type { LoaderStore } from "../server/event.ts";
+import { injectRender } from "./navigate.ts";
+import { injectRuntime } from "./runtime.ts";
+import type { Meta } from "../server/meta.ts";
+import type { Params } from "../server/router.ts";
+import { effect } from "@swwind/ly";
 
 /**
  * 古希腊掌管历史记录的神
@@ -28,23 +28,23 @@ export function pushState(state: HistoryState, url: string | URL) {
   history.pushState(state, "", url);
 }
 
-export function useHistoryRestore() {
-  const runtime = useRuntime();
-  const render = useRender();
+export function provideHistoryStore() {
+  const runtime = injectRuntime();
+  const render = injectRender();
 
   // listen runtime update
-  useEffect(() => {
+  effect(() => {
     replaceState({
-      meta: runtime.meta,
-      params: runtime.params,
-      loaders: runtime.loaders,
+      meta: runtime.value.meta,
+      params: runtime.value.params,
+      loaders: runtime.value.loaders,
       position: [scrollX, scrollY],
-      components: runtime.components,
+      components: runtime.value.components,
     });
-  }, [runtime]);
+  });
 
   // add popstate callback
-  useEffect(() => {
+  effect(() => {
     async function popstate(e: PopStateEvent) {
       const state = e.state as HistoryState;
       await render(state.meta, state.params, state.loaders, state.components);
@@ -62,5 +62,5 @@ export function useHistoryRestore() {
       removeEventListener("popstate", popstate);
       removeEventListener("scroll", scroll);
     };
-  }, []);
+  });
 }

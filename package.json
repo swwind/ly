@@ -3,7 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "cd packages/ly && pnpm clean && pnpm build",
+    "build": "pnpm build:ly && pnpm build:firefly",
+    "build:ly": "cd packages/ly && pnpm clean && pnpm build",
+    "build:firefly": "cd packages/firefly && pnpm clean && pnpm build",
     "example:basic": "cd examples/basic && pnpm dev",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",

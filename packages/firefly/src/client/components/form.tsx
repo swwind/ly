@@ -1,4 +1,4 @@
-import { effect, type JSX } from "@swwind/ly";
+import { component$, effect, type ComponentType, type JSX } from "@swwind/ly";
 import type { ActionHandler, ActionReturnValue } from "../../server/action.ts";
 
 type FormProps<T extends ActionReturnValue> = Omit<
@@ -10,15 +10,16 @@ type FormProps<T extends ActionReturnValue> = Omit<
   onError?: (error: Error) => void;
 };
 
-export function Form<T extends ActionReturnValue>(props: FormProps<T>) {
+export const Form = <T extends ActionReturnValue>(props: FormProps<T>) => {
   const { action, onSuccess, onError, ...remains } = props;
 
   // register callbacks
   effect(() => {
-    if (action.state.state === "ok") {
-      onSuccess?.(action.state.data);
-    } else if (action.state.state === "error" && onError) {
-      onError?.(action.state.error);
+    const state = action.state.value;
+    if (state.state === "ok") {
+      onSuccess?.(state.data);
+    } else if (state.state === "error") {
+      onError?.(state.error);
     }
   });
 
@@ -34,7 +35,7 @@ export function Form<T extends ActionReturnValue>(props: FormProps<T>) {
       {...remains}
     />
   );
-}
+};
 
 type ActionEffect<T extends ActionReturnValue> = {
   action: ActionHandler<T>;
@@ -47,11 +48,12 @@ export function useActionEffect<T extends ActionReturnValue>({
   success,
   error,
 }: ActionEffect<T>) {
-  useEffect(() => {
-    if (action.state.state === "ok" && success) {
-      return success(action.state.data);
-    } else if (action.state.state === "error" && error) {
-      return error(action.state.error);
+  effect(() => {
+    const state = action.state.value;
+    if (state.state === "ok" && success) {
+      return success(state.data);
+    } else if (state.state === "error" && error) {
+      return error(state.error);
     }
-  }, [action.state]);
+  });
 }

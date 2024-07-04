@@ -1,11 +1,11 @@
-import { useRuntime } from "../runtime.ts";
-import { LoaderStore } from "../../server/event.ts";
-import { Graph } from "../../server/build.ts";
+import { injectRuntime, injectRuntimeStatic } from "../runtime.ts";
+import type { LoaderStore } from "../../server/event.ts";
+import type { Graph } from "../../server/build.ts";
 import { getLinkPreloadAs, isAsset, isCss, isJs } from "../../utils/ext.ts";
 import { isSSR } from "../../utils/envs.ts";
-import { Meta } from "../../server/meta.ts";
-import { Params } from "../../server/router.ts";
-import { useMemo } from "preact/hooks";
+import type { Meta } from "../../server/meta.ts";
+import type { Params } from "../../server/router.ts";
+import { component$, computed, list$ } from "@swwind/ly";
 
 export function RouterHead() {
   return (
@@ -27,61 +27,68 @@ export type SerializedRuntime = {
 };
 
 function MetadataInjector() {
-  const runtime = useRuntime();
+  const runtime = injectRuntime();
+  const runtimeStatic = injectRuntimeStatic();
 
-  const serialized = useMemo(() => {
+  const serialized = computed(() => {
     const object: SerializedRuntime = {
-      meta: runtime.meta,
-      base: runtime.base,
-      graph: runtime.graph,
-      params: runtime.params,
-      loaders: runtime.loaders,
-      components: runtime.components,
+      meta: runtime.value.meta,
+      base: runtimeStatic.base,
+      graph: runtimeStatic.graph,
+      params: runtime.value.params,
+      loaders: runtime.value.loaders,
+      components: runtime.value.components,
     };
 
     return JSON.stringify(object).replaceAll("/", "\\/");
-  }, [runtime]);
+  });
 
   return (
     <script
       type="application/json"
-      data-blitz-metadata
-      dangerouslySetInnerHTML={{ __html: serialized }}
+      data-firefly-metadata
+      _dangerouslySetInnerHTML={{ __html: serialized }}
     />
   );
 }
 
 function PreloadHeads() {
-  const runtime = useRuntime();
+  const runtime = injectRuntime();
+  const preloads = computed(() => runtime.value.preloads);
+  const runtimeStatic = injectRuntimeStatic();
 
-  return (
-    <>
-      {runtime.preloads.map((id) => {
-        const href = runtime.base + runtime.graph.assets[id];
-        if (isJs(href)) return <link rel="modulepreload" href={href} />;
-        if (isCss(href)) return <link rel="stylesheet" href={href} />;
-        if (isAsset(href))
-          return <link rel="preload" href={href} as={getLinkPreloadAs(href)} />;
-      })}
-    </>
-  );
+  const PreloadLink = component$<{ id: number }>((props) => {
+    const href = runtimeStatic.base + runtimeStatic.graph.assets[props.id];
+
+    if (isJs(href)) return <link rel="modulepreload" href={href} />;
+    if (isCss(href)) return <link rel="stylesheet" href={href} />;
+    if (isAsset(href))
+      return <link rel="preload" href={href} as={getLinkPreloadAs(href)} />;
+
+    return null;
+  });
+
+  const List = list$(preloads, (id) => <PreloadLink key={id} id={id} />);
+
+  return <List />;
 }
 
-function DocumentHead() {
-  const runtime = useRuntime();
+const DocumentHead = component$(() => {
+  const runtime = injectRuntime();
+  const meta = computed(() => runtime.value.meta);
 
-  return (
+  return () => (
     <>
-      <title>{runtime.meta.title}</title>
-      {runtime.meta.description && (
-        <meta name="description" content={runtime.meta.description} />
+      <title>{meta.value.title}</title>
+      {meta.value.description && (
+        <meta name="description" content={meta.value.description} />
       )}
-      {runtime.meta.meta.map((props, index) => (
-        <meta {...props} key={index} />
+      {meta.value.meta.map((props) => (
+        <meta {...props} />
       ))}
-      {runtime.meta.link.map((props, index) => (
-        <link {...props} key={index} />
+      {meta.value.link.map((props) => (
+        <link {...props} />
       ))}
     </>
   );
-}
+});

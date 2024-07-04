@@ -1,27 +1,30 @@
-import { ComponentChildren, ComponentType, createContext } from "preact";
-import { useContext, useState } from "preact/hooks";
-import { FetchEvent, LoaderStore } from "../server/event.ts";
-import { ClientManifest, Graph, ServerManifest } from "../server/build.ts";
+import type { FetchEvent, LoaderStore } from "../server/event.ts";
+import type { ClientManifest, Graph, ServerManifest } from "../server/build.ts";
 import { unique } from "../utils/algorithms.ts";
-import { Meta } from "../server/meta.ts";
-import { Params } from "../server/router.ts";
+import type { Meta } from "../server/meta.ts";
+import type { Params } from "../server/router.ts";
 import {
-  NavigateContext,
-  RenderContext,
-  useNavigateCallback,
-  useRenderCallback,
-} from "./navigate.ts";
+  createContext,
+  inject,
+  provide,
+  ref,
+  type ComponentType,
+  type Ref,
+} from "@swwind/ly";
 
 export type Runtime = {
   meta: Meta;
-  base: string;
-  graph: Graph;
   params: Params;
   loaders: LoaderStore;
-  manifest: ClientManifest;
   location: URL;
   preloads: number[];
   components: number[];
+};
+
+export type RuntimeStatic = {
+  base: string;
+  graph: Graph;
+  components: ComponentType[];
 };
 
 export function createRuntime(
@@ -32,29 +35,33 @@ export function createRuntime(
   loaders: LoaderStore,
   manifest: ClientManifest,
   location: URL,
-  components: number[],
-): Runtime {
+  components: number[]
+): [Runtime, RuntimeStatic] {
   const preloads = unique([
     ...graph.entry,
     ...components.flatMap((id) => graph.components[id]),
   ]);
 
-  return {
-    meta,
-    base,
-    graph,
-    params,
-    loaders,
-    manifest,
-    location,
-    preloads,
-    components,
-  };
+  return [
+    {
+      meta,
+      params,
+      loaders,
+      location,
+      preloads,
+      components,
+    },
+    {
+      base,
+      graph,
+      components: manifest.components,
+    },
+  ];
 }
 
 export function createServerRuntime(
   manifest: ServerManifest,
-  event: FetchEvent,
+  event: FetchEvent
 ) {
   return createRuntime(
     event.metas,
@@ -64,49 +71,46 @@ export function createServerRuntime(
     event.loaders,
     manifest,
     event.url,
-    event.components,
+    event.components
   );
 }
 
-export async function runtimeLoad(runtime: Runtime, components: number[]) {
-  const { manifest, graph, base } = runtime;
+export async function runtimeLoad(
+  runtime: RuntimeStatic,
+  components: number[]
+) {
   await Promise.all(
     components
-      .filter((id) => !manifest.components[id])
+      .filter((id) => !runtime.components[id])
       .map(async (id) => {
-        const path = base + graph.assets[graph.components[id][0]];
+        const path =
+          runtime.base + runtime.graph.assets[runtime.graph.components[id][0]];
         const component = (await import(/* @vite-ignore */ path).then(
-          (module) => module.default,
+          (module) => module.default
         )) as ComponentType;
-        manifest.components[id] = component;
-      }),
+        runtime.components[id] = component;
+      })
   );
 }
 
-export const RuntimeContext = createContext<Runtime | null>(null);
+export const RuntimeContext = createContext<Ref<Runtime>>();
+export const RuntimeStaticContext = createContext<RuntimeStatic>();
 
-export function RuntimeProvider(props: {
-  value: Runtime;
-  children: ComponentChildren;
-}) {
-  const [runtime, setRuntime] = useState(props.value);
-  const render = useRenderCallback(runtime, setRuntime);
-  const navigate = useNavigateCallback(render);
-
-  return (
-    <RuntimeContext.Provider value={runtime}>
-      <RenderContext.Provider value={render}>
-        <NavigateContext.Provider value={navigate}>
-          {props.children}
-        </NavigateContext.Provider>
-      </RenderContext.Provider>
-    </RuntimeContext.Provider>
-  );
+export function provideRuntime(runtime: Runtime, runtimeStatic: RuntimeStatic) {
+  provide(RuntimeContext, ref(runtime));
+  provide(RuntimeStaticContext, runtimeStatic);
 }
 
-export function useRuntime() {
-  const runtime = useContext(RuntimeContext);
+export function injectRuntime() {
+  const runtime = inject(RuntimeContext);
   if (!runtime)
-    throw new Error("Please nest your project inside <BlitzCityProvider />");
+    throw new Error("Please nest your project inside <FireflyProvider />");
+  return runtime;
+}
+
+export function injectRuntimeStatic() {
+  const runtime = inject(RuntimeStaticContext);
+  if (!runtime)
+    throw new Error("Please nest your project inside <FireflyProvider />");
   return runtime;
 }

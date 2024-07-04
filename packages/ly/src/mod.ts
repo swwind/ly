@@ -6,7 +6,7 @@ export {
   list$,
 } from "./vnode.ts";
 export { ref, computed, effect, layout } from "./state.ts";
-export { provide, inject } from "./provide.ts";
+export { provide, inject, createContext } from "./provide.ts";
 export { nextTick } from "./update.ts";
 
 export type { Ref, Computed, MaybeRef, MaybeComputed } from "./state.ts";
@@ -17,3 +17,4 @@ export type {
   ComponentChild,
   ComponentChildren,
 } from "./vnode.ts";
+export type { Context } from "./provide.ts";

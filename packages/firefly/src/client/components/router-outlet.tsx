@@ -1,31 +1,30 @@
-import { isDev } from "../../utils/envs.ts";
-import { useRuntime } from "../runtime.ts";
-import { Outlet, OutletContext } from "./outlet.tsx";
+import { component$, h, type VNode } from "@swwind/ly";
+import { isDEV } from "../../utils/envs.ts";
+import { injectRuntime, injectRuntimeStatic } from "../runtime.ts";
 
-export function RouterOutlet() {
-  const runtime = useRuntime();
+export const RouterOutlet = component$(() => {
+  const runtime = injectRuntime();
+  const { components } = injectRuntimeStatic();
 
-  return (
-    <>
-      <OutletContext.Provider value={runtime.components}>
-        <Outlet />
-      </OutletContext.Provider>
-      <EntryPoint />
-    </>
-  );
-}
+  return () => {
+    const ids = runtime.value.components.toReversed();
+    let node: VNode | null = null;
+    for (const component of ids.map((x) => components[x])) {
+      node = h(component, null, node);
+    }
+    return node;
+  };
+});
 
-function EntryPoint() {
-  const runtime = useRuntime();
+export function EntryPoint() {
+  const runtime = injectRuntimeStatic();
 
   // dev specific entry
-  if (isDev) {
-    return (
-      <>
-        <script type="module" src={`${runtime.base}@vite/client`} />
-        <script type="module" src={`${runtime.base}app/entry.client.tsx`} />
-      </>
-    );
+  if (isDEV) {
+    return [
+      <script type="module" src={`${runtime.base}@vite/client`} />,
+      <script type="module" src={`${runtime.base}app/entry.client.tsx`} />,
+    ];
   }
 
   const src = runtime.base + runtime.graph.assets[runtime.graph.entry[0]];

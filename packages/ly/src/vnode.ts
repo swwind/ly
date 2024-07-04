@@ -42,12 +42,37 @@ export type ComponentType<P extends Props = {}> =
   | StaticComponent<P>
   | DynamicComponent<P>;
 
+/**
+ * Create a new component
+ *
+ * @example
+ * ```jsx
+ * const App = component$(() => {
+ *   return <div>hello world</div>;
+ * })
+ *
+ * render(<App />, document.getElementById('app'));
+ * ```
+ */
 export function component$<P extends Props = {}>(
   fn: ComponentType<P>
 ): ComponentType<P> {
   return fn;
 }
 
+/**
+ * Create a dynamic component
+ *
+ * @example
+ * ```jsx
+ * const show = ref(false);
+ * const App = dynamic$(() => (
+ *   show.value
+ *     ? <div>shown</div>
+ *     : <p>not shown</p>
+ * ));
+ * ```
+ */
 export function dynamic$<P extends Props = {}>(
   fn: (props: P) => VNode | VNode[] | null
 ): DynamicComponent<P> {
@@ -76,6 +101,21 @@ export class ComponentList<T> extends Array<VNode> {
   }
 }
 
+/**
+ * Create a list component.
+ *
+ * @example
+ * ```jsx
+ * const a = ref([2, 3, 4]);
+ * const List = list$(a, (x) => {
+ *   return <li key={x}>{x}</li>
+ * });
+ * // render
+ * <ul>
+ *   <List />
+ * </ul>
+ * ```
+ */
 export function list$<T>(
   array: Computed<T[]>,
   map: (item: T) => VNode

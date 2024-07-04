@@ -25,8 +25,11 @@ importers:
   packages/firefly:
     dependencies:
       '@swwind/ly':
-        specifier: workspace:^
+        specifier: ^0.0.1
         version: link:../ly
+      hono:
+        specifier: ^4.4.11
+        version: 4.4.11
     devDependencies:
       '@swwind/exbuild':
         specifier: ^1.0.5
@@ -637,6 +640,10 @@ packages:
   hasown@2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
+
+  hono@4.4.11:
+    resolution: {integrity: sha512-R5RADpjoRsR3/VsnFovpsYNLPnC1f+FgdfsePk3qIgjb4D41Sg7uW5QCj41kzEOwXCjBg0sVvOZMvUNZ0DKB7g==}
+    engines: {node: '>=16.0.0'}
 
   hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
@@ -1371,6 +1378,8 @@ snapshots:
   hasown@2.0.2:
     dependencies:
       function-bind: 1.1.2
+
+  hono@4.4.11: {}
 
   hookable@5.5.3: {}
 

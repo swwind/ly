@@ -1,12 +1,12 @@
-import { JSX } from "preact";
-import { useNavigate } from "../navigate.ts";
+import type { JSX } from "@swwind/ly";
+import { injectNavigate } from "../navigate.ts";
 
 interface LinkProps extends JSX.HTMLAttributes<HTMLAnchorElement> {
   href: string;
 }
 
 export function Link(props: LinkProps) {
-  const navigate = useNavigate();
+  const navigate = injectNavigate();
 
   return (
     <a

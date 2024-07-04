@@ -3,10 +3,10 @@ import type {
   ActionReturnValue,
   ActionState,
 } from "../server/action.ts";
-import { useNavigate, useRender } from "./navigate.ts";
-import { ActionResponse } from "../server/router.ts";
-import { useState } from "preact/hooks";
+import { injectNavigate, injectRender } from "./navigate.ts";
+import type { ActionResponse } from "../server/router.ts";
 import { fetchLoaders } from "./loader.ts";
+import { computed, ref } from "@swwind/ly";
 
 export async function fetchAction<T>(ref: string, data: FormData) {
   const target = new URL(location.href);
@@ -20,26 +20,26 @@ export async function fetchAction<T>(ref: string, data: FormData) {
   return (await response.json()) as ActionResponse<T>;
 }
 
-export function useAction<T extends ActionReturnValue>(
-  ref: string,
+export function injectAction<T extends ActionReturnValue>(
+  actionRef: string
 ): ActionHandler<T> {
-  const render = useRender();
-  const navigate = useNavigate();
+  const render = injectRender();
+  const navigate = injectNavigate();
 
-  const [state, setState] = useState<ActionState<T>>({
+  const state = ref<ActionState<T>>({
     state: "idle",
     data: null,
     error: null,
   });
 
   const submit = async (formData: FormData) => {
-    setState(() => ({ state: "waiting", data: null, error: null }));
+    state.value = { state: "waiting", data: null, error: null };
 
     try {
-      const resp = await fetchAction<T>(ref, formData);
+      const resp = await fetchAction<T>(actionRef, formData);
 
       if (resp.ok === "action") {
-        setState({ state: "ok", data: resp.action, error: null });
+        state.value = { state: "ok", data: resp.action, error: null };
 
         const data = await fetchLoaders(location.href);
 
@@ -61,13 +61,13 @@ export function useAction<T extends ActionReturnValue>(
       }
     } catch (e) {
       const error = e instanceof Error ? e : new Error(String(e));
-      setState({ state: "error", data: null, error });
+      state.value = { state: "error", data: null, error };
     }
   };
 
   return {
-    ref,
-    state,
+    ref: actionRef,
+    state: computed(() => state.value),
     submit,
   };
 }
