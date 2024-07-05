@@ -32,7 +32,7 @@ export function staticAdapter(options: Options): Plugin {
   }
 
   return {
-    name: "blitz-static-adapter",
+    name: "firefly-static-adapter",
 
     resolveId(id) {
       switch (id) {
@@ -74,8 +74,8 @@ export function staticAdapter(options: Options): Plugin {
 
 const staticAdapterEntryCode = (origin: string) => `
 import server from "./app/entry.static.tsx";
-import { manifest } from "blitz:manifest/server";
-import { generate } from "@biliblitz/vite/adapters/static";
+import { manifest } from "firefly:manifest/server";
+import { generate } from "@swwind/firefly-vite/adapters/static";
 
 await generate(server, manifest, ${JSON.stringify(origin)});
 `;
@@ -83,12 +83,10 @@ await generate(server, manifest, ${JSON.stringify(origin)});
 export async function generate(
   server: Hono,
   manifest: ServerManifest,
-  origin: string,
+  origin: string
 ) {
   console.log("");
-  console.log(
-    `${cyan(`blitz`)} ${green("generating static pages...")}`,
-  );
+  console.log(`${cyan(`firefly`)} ${green("generating static pages...")}`);
 
   const outdir = "dist/static";
   const pathnames = [] as string[];
@@ -100,7 +98,7 @@ export async function generate(
       if (dirname.startsWith("[") && dirname.endsWith("]")) {
         if (child.route.static === null) {
           throw new Error(
-            `static.ts is missing for route "${current + dirname + "/"}"`,
+            `static.ts is missing for route "${current + dirname + "/"}"`
           );
         }
         const param = dirname === "[...]" ? "$" : dirname.slice(1, -1);
@@ -129,7 +127,7 @@ export async function generate(
   async function handleRequest(
     pathname: string,
     dirname: string,
-    filename: string,
+    filename: string
   ) {
     const request = new Request(new URL(origin + manifest.base + pathname));
     const response = await app.fetch(request);
@@ -166,10 +164,7 @@ export async function generate(
 
       if (filename === "index.html") {
         console.log(
-          gray(dirname) +
-            white("index.html") +
-            " -> " +
-            gray(location),
+          gray(dirname) + white("index.html") + " -> " + gray(location)
         );
       }
       return;
@@ -195,7 +190,7 @@ export async function generate(
   const end = Date.now();
 
   console.log(
-    green(`✓ generated ${pathnames.length} pages in ${end - start}ms.`),
+    green(`✓ generated ${pathnames.length} pages in ${end - start}ms.`)
   );
 
   // sitemaps
@@ -204,8 +199,7 @@ export async function generate(
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
     ...pathnames.map(
-      (pathname) =>
-        `<url><loc>${origin}${manifest.base}${pathname}</loc></url>`,
+      (pathname) => `<url><loc>${origin}${manifest.base}${pathname}</loc></url>`
     ),
     `</urlset>`,
   ].join("\n");
@@ -218,9 +212,9 @@ export async function generate(
     redirects
       .map(
         (redr) =>
-          `${manifest.base}${redr.source} ${redr.destination} ${redr.code}`,
+          `${manifest.base}${redr.source} ${redr.destination} ${redr.code}`
       )
-      .join("\n"),
+      .join("\n")
   );
 
   // _headers
@@ -234,7 +228,7 @@ export async function generate(
           ...hdr.headers.map(([key, value]) => `  ${key}: ${value}`),
         ].join("\n")
       )
-      .join("\n\n"),
+      .join("\n\n")
   );
 
   // copy assets

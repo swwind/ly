@@ -45,7 +45,7 @@ export function firefly(): Plugin {
   let base = "/";
 
   return {
-    name: "blitz",
+    name: "firefly",
 
     resolveId(id) {
       switch (id) {
