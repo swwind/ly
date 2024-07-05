@@ -68,6 +68,7 @@ function PreloadHeads() {
     return null;
   });
 
+  // @ts-ignore TODO
   const List = list$(preloads, (id) => <PreloadLink key={id} id={id} />);
 
   return <List />;
