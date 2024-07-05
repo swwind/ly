@@ -23,7 +23,7 @@ export function EntryPoint() {
   if (isDEV) {
     return [
       <script type="module" src={`${runtime.base}@vite/client`} />,
-      <script type="module" src={`${runtime.base}app/entry.client.tsx`} />,
+      <script type="module" src={`${runtime.base}src/entry.client.tsx`} />,
     ];
   }
 

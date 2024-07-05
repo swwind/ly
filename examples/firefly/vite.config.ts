@@ -4,8 +4,11 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [
-    firefly(),
     tsconfigPaths(),
+    firefly(),
     fireflyMdx({ jsxImportSource: "preact" }),
   ],
+  build: {
+    target: "esnext",
+  },
 });

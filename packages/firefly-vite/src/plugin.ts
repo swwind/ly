@@ -28,14 +28,14 @@ export function firefly(): Plugin {
   let project: Project | null = null;
   async function getProject() {
     if (!project) {
-      const structure = await scanProjectStructure("./app/routes");
+      const structure = await scanProjectStructure("./src/routes");
       project = await resolveProject(structure);
     }
     return project;
   }
   function getEntries(project: Project) {
     const cwd = process.cwd();
-    const entry = "app/entry.client.tsx";
+    const entry = "src/entry.client.tsx";
     const components = project.structure.componentPaths.map((path) =>
       relative(cwd, path)
     );
@@ -82,6 +82,8 @@ export function firefly(): Plugin {
           return toAssetsManifestCode(graph, base);
         }
       }
+
+      return null;
     },
 
     async transform(code, id, options) {
@@ -125,6 +127,7 @@ export function firefly(): Plugin {
             },
           };
         }
+
         // build server
         else {
           return {
@@ -145,9 +148,7 @@ export function firefly(): Plugin {
       // dev mode
       if (env.command === "serve") {
         isDev = true;
-        return {
-          appType: "custom",
-        };
+        return { appType: "custom" };
       }
     },
 
@@ -171,7 +172,7 @@ export function firefly(): Plugin {
             }
           }
 
-          const module = await vite.ssrLoadModule("./app/entry.dev.tsx");
+          const module = await vite.ssrLoadModule("./src/entry.dev.tsx");
           const app = module.default as Hono;
 
           const listener = getRequestListener((req) => app.fetch(req));

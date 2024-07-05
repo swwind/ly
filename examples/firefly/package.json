@@ -9,14 +9,18 @@
     "build:server": "vite build --outDir dist/server --ssr src/entry.server.tsx",
     "build:static": "vite build --outDir dist/static --ssr -c adapters/static/vite.config.ts",
     "start": "node server.js",
-    "start:static": "node server-static.js"
+    "start:static": "node server-static.js",
+    "dev": "vite"
   },
   "dependencies": {
+    "@hono/node-server": "^1.12.0",
     "@swwind/firefly": "workspace:^",
-    "@swwind/ly": "workspace:^"
+    "@swwind/ly": "workspace:^",
+    "hono": "^4.4.11"
   },
   "devDependencies": {
     "@swwind/firefly-vite": "workspace:^",
+    "@types/node": "^20.14.9",
     "typescript": "^5.5.2",
     "vite": "^5.3.2",
     "vite-tsconfig-paths": "^4.3.2"

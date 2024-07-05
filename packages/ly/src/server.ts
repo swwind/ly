@@ -59,7 +59,7 @@ function serializeVNode(vnode: VNode): string {
 
     for (const [key, value] of Object.entries(vnode.props)) {
       if (key === "_dangerouslySetInnerHTML") {
-        children = String(valueOf(value._html));
+        children = String(valueOf(value.__html));
       } else if (key === "class") {
         attributes.push([key, clsx(value)]);
       } else if (key === "style") {

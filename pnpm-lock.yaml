@@ -22,6 +22,37 @@ importers:
         specifier: ^5.3.2
         version: 5.3.2(@types/node@20.14.9)
 
+  examples/firefly:
+    dependencies:
+      '@hono/node-server':
+        specifier: ^1.12.0
+        version: 1.12.0
+      '@swwind/firefly':
+        specifier: workspace:^
+        version: link:../../packages/firefly
+      '@swwind/ly':
+        specifier: workspace:^
+        version: link:../../packages/ly
+      hono:
+        specifier: ^4.4.11
+        version: 4.4.11
+    devDependencies:
+      '@swwind/firefly-vite':
+        specifier: workspace:^
+        version: link:../../packages/firefly-vite
+      '@types/node':
+        specifier: ^20.14.9
+        version: 20.14.9
+      typescript:
+        specifier: ^5.5.2
+        version: 5.5.2
+      vite:
+        specifier: ^5.3.2
+        version: 5.3.2(@types/node@20.14.9)
+      vite-tsconfig-paths:
+        specifier: ^4.3.2
+        version: 4.3.2(typescript@5.5.2)(vite@5.3.2(@types/node@20.14.9))
+
   packages/firefly:
     dependencies:
       '@swwind/ly':
@@ -55,6 +86,9 @@ importers:
       '@mdx-js/mdx':
         specifier: ^3.0.1
         version: 3.0.1
+      '@swc/core':
+        specifier: ^1.6.7
+        version: 1.6.7
       '@swwind/find-exports':
         specifier: ^2.0.0
         version: 2.0.0
@@ -83,9 +117,6 @@ importers:
         specifier: ^5.3.2
         version: 5.3.2(@types/node@20.14.9)
     devDependencies:
-      '@swc/core':
-        specifier: ^1.6.7
-        version: 1.6.7
       '@swwind/exbuild':
         specifier: ^1.0.5
         version: 1.0.5
@@ -1217,6 +1248,16 @@ packages:
   trough@2.2.0:
     resolution: {integrity: sha512-tmMpK00BjZiUyVyvrBK7knerNgmgvcV/KLVyuma/SC+TQN167GrMRciANTz09+k3zW8L8t60jWO1GpfkZdjTaw==}
 
+  tsconfck@3.1.1:
+    resolution: {integrity: sha512-00eoI6WY57SvZEVjm13stEVE90VkEdJAFGgpFLTsZbJyW/LwFQ7uQxJHWpZ2hzSWgCPKc9AnBnNP+0X7o3hAmQ==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
+    peerDependencies:
+      typescript: ^5.0.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   typescript@5.5.2:
     resolution: {integrity: sha512-NcRtPEOsPFFWjobJEtfihkLCZCXZt/os3zf8nTxjVH3RvTSxjrCamJpbExGvYOF+tFHc3pA65qpdwPbzjohhew==}
     engines: {node: '>=14.17'}
@@ -1257,6 +1298,14 @@ packages:
 
   vfile@6.0.1:
     resolution: {integrity: sha512-1bYqc7pt6NIADBJ98UiG0Bn/CHIVOoZ/IyEkqIruLg0mE1BKzkOXY2D6CSqQIcKqgadppE5lrxgWXJmXd7zZJw==}
+
+  vite-tsconfig-paths@4.3.2:
+    resolution: {integrity: sha512-0Vd/a6po6Q+86rPlntHye7F31zA2URZMbH8M3saAZ/xR9QoGN/L21bxEGfXdWmFdNkqPpRdxFT7nmNe12e9/uA==}
+    peerDependencies:
+      vite: '*'
+    peerDependenciesMeta:
+      vite:
+        optional: true
 
   vite@5.3.2:
     resolution: {integrity: sha512-6lA7OBHBlXUxiJxbO5aAY2fsHHzDr1q7DvXYnyZycRs2Dz+dXBWuhpWHvmljTRTpQC2uvGmUFFkSHF2vGo90MA==}
@@ -2621,6 +2670,10 @@ snapshots:
 
   trough@2.2.0: {}
 
+  tsconfck@3.1.1(typescript@5.5.2):
+    optionalDependencies:
+      typescript: 5.5.2
+
   typescript@5.5.2: {}
 
   undici-types@5.26.5: {}
@@ -2682,6 +2735,17 @@ snapshots:
       '@types/unist': 3.0.2
       unist-util-stringify-position: 4.0.0
       vfile-message: 4.0.2
+
+  vite-tsconfig-paths@4.3.2(typescript@5.5.2)(vite@5.3.2(@types/node@20.14.9)):
+    dependencies:
+      debug: 4.3.5
+      globrex: 0.1.2
+      tsconfck: 3.1.1(typescript@5.5.2)
+    optionalDependencies:
+      vite: 5.3.2(@types/node@20.14.9)
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
 
   vite@5.3.2(@types/node@20.14.9):
     dependencies:

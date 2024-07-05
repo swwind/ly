@@ -73,7 +73,7 @@ export function staticAdapter(options: Options): Plugin {
 }
 
 const staticAdapterEntryCode = (origin: string) => `
-import server from "./app/entry.static.tsx";
+import server from "./src/entry.static.tsx";
 import { manifest } from "firefly:manifest/server";
 import { generate } from "@swwind/firefly-vite/adapters/static";
 

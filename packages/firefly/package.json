@@ -1,5 +1,5 @@
 {
-  "name": "@swwind/firefly-vite",
+  "name": "@swwind/firefly",
   "version": "0.0.1",
   "type": "module",
   "types": "./dist/types/client/mod.d.ts",
@@ -12,10 +12,13 @@
     "./server": {
       "types": "./dist/types/server/mod.d.ts",
       "import": "./dist/esm/server/mod.mjs"
+    },
+    "./env": {
+      "types": "./dist/types/env.d.ts"
     }
   },
   "scripts": {
-    "build": "tsc --build && exbuild",
+    "build": "tsc --build && shx cp src/env.d.ts dist/types && exbuild",
     "clean": "shx rm -rf dist"
   },
   "peerDependencies": {

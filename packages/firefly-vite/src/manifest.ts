@@ -1,6 +1,7 @@
 import { transform } from "@swc/core";
 import type { ActionMeta, LoaderMeta, Project } from "./scanner.ts";
 import type { Graph } from "@swwind/firefly/server";
+import { fileURLToPath } from "url";
 
 export function toClientManifestCode({ structure }: Project) {
   return [
@@ -14,41 +15,36 @@ export function toClientManifestCode({ structure }: Project) {
 export function toServerManifestCode(
   project: Project,
   graph: Graph,
-  base: string,
+  base: string
 ) {
   const { structure, actions, loaders, middlewares, metas } = project;
 
   return [
     ...structure.componentPaths.map(
-      (filePath, i) => `import c${i} from "${filePath}";`,
+      (filePath, i) => `import c${i} from "${filePath}";`
     ),
     ...actions.map(
       (actions, i) =>
-        `import { ${
-          actions
-            .map(({ name }, j) => `${name} as a${i}_${j}`)
-            .join(", ")
-        } } from "${structure.componentPaths[i]}";`,
+        `import { ${actions
+          .map(({ name }, j) => `${name} as a${i}_${j}`)
+          .join(", ")} } from "${structure.componentPaths[i]}";`
     ),
     ...loaders.map(
       (loaders, i) =>
-        `import { ${
-          loaders
-            .map(({ name }, j) => `${name} as l${i}_${j}`)
-            .join(", ")
-        } } from "${structure.componentPaths[i]}";`,
+        `import { ${loaders
+          .map(({ name }, j) => `${name} as l${i}_${j}`)
+          .join(", ")} } from "${structure.componentPaths[i]}";`
     ),
-    ...metas
-      .flatMap((hasMeta, i) =>
-        hasMeta
-          ? [`import { meta as t${i} } from "${structure.componentPaths[i]}";`]
-          : []
-      ),
+    ...metas.flatMap((hasMeta, i) =>
+      hasMeta
+        ? [`import { meta as t${i} } from "${structure.componentPaths[i]}";`]
+        : []
+    ),
     ...structure.middlewarePaths.map(
-      (filePath, i) => `import m${i} from "${filePath}";`,
+      (filePath, i) => `import m${i} from "${filePath}";`
     ),
     ...structure.staticPaths.map(
-      (filePath, i) => `import s${i} from "${filePath}";`,
+      (filePath, i) => `import s${i} from "${filePath}";`
     ),
 
     // assign ref
@@ -63,25 +59,22 @@ export function toServerManifestCode(
     // export
     `const base = ${JSON.stringify(base)};`,
     `const graph = ${JSON.stringify(graph)};`,
-    `const metas = [${
-      structure.componentPaths.map((_, i) => (metas[i] ? `t${i}` : "null"))
-        .join(", ")
-    }];`,
-    `const actions = [${
-      actions.map((a, i) => `[${a.map((_, j) => `a${i}_${j}`).join(", ")}]`)
-        .join(", ")
-    }];`,
-    `const loaders = [${
-      loaders.map((l, i) => `[${l.map((_, j) => `l${i}_${j}`).join(", ")}]`)
-        .join(", ")
-    }];`,
-    `const statics = [${
-      structure.staticPaths.map((_, i) => `s${i}`).join(", ")
-    }];`,
+    `const metas = [${structure.componentPaths
+      .map((_, i) => (metas[i] ? `t${i}` : "null"))
+      .join(", ")}];`,
+    `const actions = [${actions
+      .map((a, i) => `[${a.map((_, j) => `a${i}_${j}`).join(", ")}]`)
+      .join(", ")}];`,
+    `const loaders = [${loaders
+      .map((l, i) => `[${l.map((_, j) => `l${i}_${j}`).join(", ")}]`)
+      .join(", ")}];`,
+    `const statics = [${structure.staticPaths
+      .map((_, i) => `s${i}`)
+      .join(", ")}];`,
     `const directory = ${JSON.stringify(structure.directory)};`,
-    `const components = [${
-      structure.componentPaths.map((_, i) => `c${i}`).join(", ")
-    }];`,
+    `const components = [${structure.componentPaths
+      .map((_, i) => `c${i}`)
+      .join(", ")}];`,
     `const middlewares = [${middlewares.map((_, i) => `m${i}`).join(", ")}];`,
     `export const manifest = { base, graph, metas, actions, loaders, statics, directory, components, middlewares };`,
   ].join("\n");
@@ -91,7 +84,7 @@ export async function removeClientServerExports(
   source: string,
   actions: ActionMeta,
   loaders: LoaderMeta,
-  hasMeta: boolean,
+  hasMeta: boolean
 ) {
   const removes = [
     ...actions.map(({ name }) => name),
@@ -99,6 +92,14 @@ export async function removeClientServerExports(
     ...(hasMeta ? ["meta"] : []),
   ];
 
+  // fix https://github.com/swc-project/swc/issues/3247
+  const wasm = fileURLToPath(
+    new URL(
+      "../../node_modules/@swwind/remove-exports/remove_exports.wasm",
+      import.meta.url
+    )
+  );
+  // console.log("wasm", wasm);
   const { code } = await transform(source, {
     jsc: {
       parser: {
@@ -106,9 +107,7 @@ export async function removeClientServerExports(
         jsx: false,
       },
       experimental: {
-        plugins: [
-          ["@swwind/remove-exports", { removes }],
-        ],
+        plugins: [[wasm, { removes }]],
       },
     },
   });
@@ -116,35 +115,29 @@ export async function removeClientServerExports(
   const lines: string[] = [];
 
   if (actions.length > 0) {
-    lines.push(
-      `import { useAction as __useAction } from "@swwind/firefly";`,
-    );
+    lines.push(`import { useAction as __useAction } from "@swwind/firefly";`);
   }
   if (loaders.length > 0) {
-    lines.push(
-      `import { useLoader as __useLoader } from "@swwind/firefly";`,
-    );
+    lines.push(`import { useLoader as __useLoader } from "@swwind/firefly";`);
   }
   lines.push(
     ...actions.map(
       (action) =>
-        `export const ${action.name} = () => __useAction("${action.ref}");`,
-    ),
+        `export const ${action.name} = () => __useAction("${action.ref}");`
+    )
   );
   lines.push(
     ...loaders.map(
       (loader) =>
-        `export const ${loader.name} = () => __useLoader("${loader.ref}");`,
-    ),
+        `export const ${loader.name} = () => __useLoader("${loader.ref}");`
+    )
   );
 
   return lines.join("\n") + code;
 }
 
 export function toAssetsManifestCode(graph: Graph, base: string) {
-  return `export default [${
-    graph.assets
-      .map((asset) => JSON.stringify(base + asset))
-      .join(", ")
-  }];`;
+  return `export default [${graph.assets
+    .map((asset) => JSON.stringify(base + asset))
+    .join(", ")}];`;
 }

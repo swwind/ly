@@ -7,7 +7,7 @@ import { find } from "@swwind/find-exports";
 import { parse } from "@swc/core";
 
 async function findExports(code: string, funcs: string[]) {
-  const program = await parse(code, { syntax: "ecmascript", jsx: false });
+  const program = await parse(code, { syntax: "typescript", tsx: true });
   return find(program, funcs);
 }
 
@@ -42,7 +42,6 @@ function isMiddleware(filename: string) {
 
 export async function scanProjectStructure(entrance: string) {
   entrance = resolve(entrance);
-  // console.log(`start scanning from ${entrance}`);
 
   const staticPaths: string[] = [];
   const componentPaths: string[] = [];
@@ -138,7 +137,7 @@ export type LoaderMeta = { name: string; ref: string }[];
 
 export async function parseActionsAndLoaders(
   filePath: string,
-  index: number,
+  index: number
 ): Promise<{
   actions: ActionMeta;
   loaders: LoaderMeta;
@@ -157,13 +156,13 @@ export async function parseActionsAndLoaders(
       actionFounds.map(async ({ name }) => ({
         name,
         ref: await hashRef(`action-${index}-${name}`),
-      })),
+      }))
     ),
     loaders: await Promise.all(
       loaderFounds.map(async ({ name }) => ({
         name,
         ref: await hashRef(`loader-${index}-${name}`),
-      })),
+      }))
     ),
     hasMeta: metaFounds.some(({ name }) => name === "meta"),
   };
@@ -179,10 +178,10 @@ export async function resolveProject(structure: ProjectStructure) {
   const components = await Promise.all(
     structure.componentPaths.map((filepath, index) =>
       parseActionsAndLoaders(filepath, index)
-    ),
+    )
   );
   const middlewares = await Promise.all(
-    structure.middlewarePaths.map(parseMiddleware),
+    structure.middlewarePaths.map(parseMiddleware)
   );
 
   return {

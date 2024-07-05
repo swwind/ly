@@ -29,6 +29,8 @@ export function fireflyMdx(options?: CompileOptions): Plugin {
 
         return [toMetaCode(frontmatter), String(mdx)].join("\n");
       }
+
+      return null;
     },
   };
 }
