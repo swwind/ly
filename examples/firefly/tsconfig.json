@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ESNext", "DOM", "WebWorker"],
+    "noEmit": true,
+    "strict": true,
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@swwind/ly",
+    "allowImportingTsExtensions": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    "types": ["node", "vite/client", "@swwind/firefly/env"],
+    "paths": {
+      "~/*": ["./src/*"],
+    },
+  },
+  "include": [
+    "src",
+    "adapters",
+    "vite.config.ts",
+    "server.js",
+    "server-static.js",
+  ],
+}
