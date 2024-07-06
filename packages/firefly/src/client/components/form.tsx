@@ -33,7 +33,9 @@ export const Form = <T extends ActionReturnValue>(props: FormProps<T>) => {
         action.submit(formData);
       }}
       {...remains}
-    />
+    >
+      <slot />
+    </form>
   );
 };
 

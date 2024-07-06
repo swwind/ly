@@ -79,7 +79,7 @@ export function dynamic$<P extends Props = {}>(
   return (p) => () => fn(p);
 }
 
-export const Fragment = component$(() => createVNode("slot", null));
+export const Fragment = () => createVNode("slot", null);
 
 const slots: Stack<Slots> = [];
 

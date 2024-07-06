@@ -50,10 +50,12 @@ function updateStates() {
     }
   }
 
-  // trigger nextTick() callbacks
-  const resolves = nextTickPromises;
-  nextTickPromises = [];
-  for (const resolve of resolves) {
-    resolve();
-  }
+  (async () => {
+    // trigger nextTick() callbacks
+    const resolves = nextTickPromises;
+    nextTickPromises = [];
+    for (const resolve of resolves) {
+      resolve();
+    }
+  })();
 }

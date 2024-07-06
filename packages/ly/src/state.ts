@@ -137,6 +137,7 @@ function createComputed<T>(fn: () => T): Computed<T> {
   });
 
   setup(elem);
+  console.log("initialze computed");
   previous = state = pending!;
 
   return new (class extends ComputedClass {

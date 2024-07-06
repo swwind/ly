@@ -108,21 +108,25 @@ export async function removeClientServerExports(
   const lines: string[] = [];
 
   if (actions.length > 0) {
-    lines.push(`import { useAction as __useAction } from "@swwind/firefly";`);
+    lines.push(
+      `import { injectAction as __injectAction } from "@swwind/firefly";`
+    );
   }
   if (loaders.length > 0) {
-    lines.push(`import { useLoader as __useLoader } from "@swwind/firefly";`);
+    lines.push(
+      `import { injectLoader as __injectLoader } from "@swwind/firefly";`
+    );
   }
   lines.push(
     ...actions.map(
       (action) =>
-        `export const ${action.name} = () => __useAction("${action.ref}");`
+        `export const ${action.name} = () => __injectAction("${action.ref}");`
     )
   );
   lines.push(
     ...loaders.map(
       (loader) =>
-        `export const ${loader.name} = () => __useLoader("${loader.ref}");`
+        `export const ${loader.name} = () => __injectLoader("${loader.ref}");`
     )
   );
 

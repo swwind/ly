@@ -1,4 +1,12 @@
-import { dynamic$, component$, computed, effect, ref, list$ } from "@swwind/ly";
+import {
+  dynamic$,
+  component$,
+  computed,
+  effect,
+  ref,
+  list$,
+  Ref,
+} from "@swwind/ly";
 import { HITLogo } from "./src/HIT.tsx";
 import { MathML } from "./src/MathML.tsx";
 

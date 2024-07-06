@@ -6,7 +6,7 @@ import type {
 import { injectNavigate, injectRender } from "./navigate.ts";
 import type { ActionResponse } from "../server/router.ts";
 import { fetchLoaders } from "./loader.ts";
-import { computed, ref } from "@swwind/ly";
+import { computed, nextTick, ref } from "@swwind/ly";
 
 export async function fetchAction<T>(ref: string, data: FormData) {
   const target = new URL(location.href);

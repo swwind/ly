@@ -1,19 +1,30 @@
-import { component$, h, type VNode } from "@swwind/ly";
+import { component$, computed, h, type Computed, type VNode } from "@swwind/ly";
 import { isDEV } from "../../utils/envs.ts";
 import { injectRuntime, injectRuntimeStatic } from "../runtime.ts";
 
 export const RouterOutlet = component$(() => {
   const runtime = injectRuntime();
-  const { components } = injectRuntimeStatic();
+  const runtimeStatic = injectRuntimeStatic();
 
-  return () => {
-    const ids = runtime.value.components.toReversed();
-    let node: VNode | null = null;
-    for (const component of ids.map((x) => components[x])) {
-      node = h(component, null, node);
-    }
-    return node;
-  };
+  const components = computed(() => runtime.value.components);
+  const Layout = component$<{ current: number }>((props) => {
+    const currentComponent = computed(() => components.value[props.current]);
+
+    return () => {
+      if (currentComponent.value == null) {
+        return null;
+      }
+      const Component = runtimeStatic.components[currentComponent.value];
+
+      return (
+        <Component>
+          <Layout current={props.current + 1} />
+        </Component>
+      );
+    };
+  });
+
+  return <Layout current={0} />;
 });
 
 export function EntryPoint() {

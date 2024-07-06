@@ -20,6 +20,8 @@ export function Link(props: LinkProps) {
         }
       }}
       {...props}
-    />
+    >
+      <slot />
+    </a>
   );
 }
