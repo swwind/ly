@@ -99,8 +99,8 @@ importers:
         specifier: ^0.0.1
         version: link:../ly
       '@swwind/remove-exports':
-        specifier: ^2.0.1
-        version: 2.0.1
+        specifier: ^2.1.1
+        version: 2.1.1
       hono:
         specifier: ^4.4.11
         version: 4.4.11
@@ -565,8 +565,8 @@ packages:
   '@swwind/find-exports@2.0.0':
     resolution: {integrity: sha512-XDh1vRAERucqQvlXXh9MpAXG6tZxtdjaJlHVb6uQRWe2dn9qiX4QEeE3fTpMKFeGhPklHDhJTvNe8LCi1rBc6Q==}
 
-  '@swwind/remove-exports@2.0.1':
-    resolution: {integrity: sha512-mg8QA/DGOCBGuIP5dUYn5NSMHc1RfmwK8weS2TQhvCtKZY94S/zP+sSWQyppMi5saQqNTaFe3idjbyHPUS1Tow==}
+  '@swwind/remove-exports@2.1.1':
+    resolution: {integrity: sha512-RZQmGWOT08+BnwhV7NyAuAmNTZrhoxXRrQHsmdWETqt4uHD+q7piEitHZb+oDuftfa6PDXEEUuqG4T9FUOmKEQ==}
 
   '@types/acorn@4.0.6':
     resolution: {integrity: sha512-veQTnWP+1D/xbxVrPC3zHnCZRjSrKfhbMUlEA43iMZLu7EsnTtkJklIuwrCPbOi8YkvDQAiW05VQQFvvz9oieQ==}
@@ -1668,7 +1668,7 @@ snapshots:
 
   '@swwind/find-exports@2.0.0': {}
 
-  '@swwind/remove-exports@2.0.1': {}
+  '@swwind/remove-exports@2.1.1': {}
 
   '@types/acorn@4.0.6':
     dependencies:

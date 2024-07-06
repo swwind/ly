@@ -1,7 +1,7 @@
 import { transform } from "@swc/core";
 import type { ActionMeta, LoaderMeta, Project } from "./scanner.ts";
 import type { Graph } from "@swwind/firefly/server";
-import { fileURLToPath } from "url";
+import removeExportsWasm from "@swwind/remove-exports";
 
 export function toClientManifestCode({ structure }: Project) {
   return [
@@ -92,13 +92,6 @@ export async function removeClientServerExports(
     ...(hasMeta ? ["meta"] : []),
   ];
 
-  // fix https://github.com/swc-project/swc/issues/3247
-  const wasm = fileURLToPath(
-    new URL(
-      "../../node_modules/@swwind/remove-exports/remove_exports.wasm",
-      import.meta.url
-    )
-  );
   // console.log("wasm", wasm);
   const { code } = await transform(source, {
     jsc: {
@@ -107,7 +100,7 @@ export async function removeClientServerExports(
         jsx: false,
       },
       experimental: {
-        plugins: [[wasm, { removes }]],
+        plugins: [[removeExportsWasm, { removes }]],
       },
     },
   });
