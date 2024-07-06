@@ -19,7 +19,7 @@
     "clean": "shx rm -rf dist"
   },
   "devDependencies": {
-    "@swwind/exbuild": "^1.0.5",
+    "@swwind/exbuild": "^1.0.6",
     "@types/node": "^20.14.9",
     "shx": "^0.3.4",
     "typescript": "^5.5.2"
