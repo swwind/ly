@@ -2,23 +2,23 @@
   "name": "@swwind/firefly",
   "version": "0.0.1",
   "type": "module",
-  "types": "./dist/types/client/mod.d.ts",
-  "module": "./dist/esm/client/mod.mjs",
+  "types": "./dist/client/mod.d.ts",
+  "module": "./dist/client/mod.mjs",
   "exports": {
     ".": {
-      "types": "./dist/types/client/mod.d.ts",
-      "import": "./dist/esm/client/mod.mjs"
+      "types": "./dist/client/mod.d.ts",
+      "import": "./dist/client/mod.mjs"
     },
     "./server": {
-      "types": "./dist/types/server/mod.d.ts",
-      "import": "./dist/esm/server/mod.mjs"
+      "types": "./dist/server/mod.d.ts",
+      "import": "./dist/server/mod.mjs"
     },
     "./env": {
-      "types": "./dist/types/env.d.ts"
+      "types": "./dist/env.d.ts"
     }
   },
   "scripts": {
-    "build": "tsc --build && shx cp src/env.d.ts dist/types && exbuild",
+    "build": "tsc --build && shx cp src/env.d.ts dist && exbuild",
     "clean": "shx rm -rf dist"
   },
   "peerDependencies": {
@@ -26,7 +26,7 @@
     "hono": "^4"
   },
   "devDependencies": {
-    "@swwind/exbuild": "^1.0.6",
+    "@swwind/exbuild": "^1.0.8",
     "@types/node": "^20.14.9",
     "shx": "^0.3.4",
     "typescript": "^5.5.2",

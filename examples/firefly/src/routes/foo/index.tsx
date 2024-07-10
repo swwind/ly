@@ -1,6 +1,10 @@
 import { Form, Link } from "@swwind/firefly";
-import { action$ } from "@swwind/firefly/server";
+import { action$, loader$, RedirectException } from "@swwind/firefly/server";
 import { component$, computed, effect } from "@swwind/ly";
+
+export const redirect = loader$(() => {
+  throw new RedirectException("https://baidu.com/");
+});
 
 export const injectAction = action$(() => {
   if (Math.random() < 0.5) throw new Error("my error");

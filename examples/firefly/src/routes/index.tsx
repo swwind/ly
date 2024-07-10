@@ -1,7 +1,9 @@
 import { loader$ } from "@swwind/firefly/server";
 import { component$, effect, ref } from "@swwind/ly";
 
-export const useData = loader$(() => {
+export const useData = loader$((c) => {
+  c.header("X-Message", "Hello!!!");
+
   return Math.random();
 });
 
