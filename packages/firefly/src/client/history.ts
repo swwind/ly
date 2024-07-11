@@ -16,6 +16,15 @@ export type HistoryState = {
   components: number[];
 };
 
+let currentTimeout: number | null = null;
+// fix: too many calls to history API when scrolling
+function slowdown(fn: () => void, timeout = 500) {
+  if (currentTimeout !== null) {
+    clearTimeout(currentTimeout);
+  }
+  currentTimeout = setTimeout(fn, timeout);
+}
+
 export function replaceState(state: Partial<HistoryState>) {
   history.replaceState({ ...history.state, ...state }, "");
 }
@@ -52,7 +61,9 @@ export function provideHistoryStore() {
     }
 
     function scroll() {
-      replaceState({ position: [scrollX, scrollY] });
+      slowdown(() => {
+        replaceState({ position: [scrollX, scrollY] });
+      });
     }
 
     addEventListener("popstate", popstate);
