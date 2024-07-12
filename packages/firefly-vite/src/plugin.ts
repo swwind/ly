@@ -1,4 +1,4 @@
-import type { Plugin } from "vite";
+import type { Plugin, ResolvedConfig } from "vite";
 import { relative } from "node:path";
 import {
   manifestAssets,
@@ -9,6 +9,7 @@ import {
 import { getRequestListener } from "@hono/node-server";
 import {
   type Project,
+  type ProjectStructure,
   resolveProject,
   scanProjectStructure,
 } from "./scanner.ts";
@@ -25,24 +26,26 @@ export function firefly(): Plugin {
   const vmods = [manifestClient, manifestServer];
   let isDev = false;
 
+  let structure: ProjectStructure | null = null;
   let project: Project | null = null;
-  async function getProject() {
-    if (!project) {
-      const structure = await scanProjectStructure("./src/routes");
-      project = await resolveProject(structure);
-    }
-    return project;
-  }
-  function getEntries(project: Project) {
+  const getStructure = async () => {
+    return (structure =
+      structure || (await scanProjectStructure("./src/routes")));
+  };
+  const getProject = async () => {
+    return (project = project || (await resolveProject(await getStructure())));
+  };
+
+  const getEntries = (structure: ProjectStructure) => {
     const cwd = process.cwd();
     const entry = "src/entry.client.tsx";
-    const components = project.structure.componentPaths.map((path) =>
+    const components = structure.componentPaths.map((path) =>
       relative(cwd, path)
     );
     return { entry, components };
-  }
+  };
 
-  let base = "/";
+  let resolvedConfig: ResolvedConfig;
 
   return {
     name: "firefly",
@@ -61,25 +64,32 @@ export function firefly(): Plugin {
     async load(id) {
       switch (id) {
         case resolve(manifestClient): {
-          return toClientManifestCode(await getProject());
+          const structure = await getStructure();
+          return toClientManifestCode(structure);
         }
 
         case resolve(manifestServer): {
-          const project = await getProject();
-          const { entry, components } = getEntries(project);
+          const structure = await getStructure();
+          const { entry, components } = getEntries(structure);
           const graph = isDev
             ? await loadDevGraph(entry, components)
             : await loadClientGraph(entry, components);
-          return toServerManifestCode(project, graph, base);
+          const project = await getProject();
+          return toServerManifestCode(
+            project,
+            structure,
+            graph,
+            resolvedConfig.base
+          );
         }
 
         case resolve(manifestAssets): {
-          const project = await getProject();
-          const { entry, components } = getEntries(project);
+          const structure = await getStructure();
+          const { entry, components } = getEntries(structure);
           const graph = isDev
             ? await loadDevGraph(entry, components)
             : await loadClientGraph(entry, components);
-          return toAssetsManifestCode(graph, base);
+          return toAssetsManifestCode(graph, resolvedConfig.base);
         }
       }
 
@@ -89,16 +99,12 @@ export function firefly(): Plugin {
     async transform(code, id, options) {
       // remove action/loader in browser
       if (!options?.ssr) {
+        const structure = await getStructure();
         const project = await getProject();
 
-        const index = project.structure.componentPaths.indexOf(id);
+        const index = structure.componentPaths.indexOf(id);
         if (index > -1) {
-          return await removeClientServerExports(
-            code,
-            project.actions[index],
-            project.loaders[index],
-            project.metas[index]
-          );
+          return await removeClientServerExports(code, project.raw[index]);
         }
       }
 
@@ -109,8 +115,8 @@ export function firefly(): Plugin {
       if (env.command === "build") {
         // build client
         if (!config.build?.ssr) {
-          const project = await getProject();
-          const entries = getEntries(project);
+          const structure = await getStructure();
+          const entries = getEntries(structure);
 
           return {
             build: {
@@ -125,6 +131,9 @@ export function firefly(): Plugin {
               },
               copyPublicDir: false,
             },
+            optimizeDeps: {
+              include: ["@swwind/ly", "@swwind/firefly"],
+            },
           };
         }
 
@@ -133,13 +142,16 @@ export function firefly(): Plugin {
           return {
             build: {
               rollupOptions: {
-                external: [/^node:/],
+                external: [/^node:/, /node_modules/],
                 output: {
                   assetFileNames: "build/assets/[hash].[ext]",
                 },
               },
               copyPublicDir: false,
               cssMinify: true,
+            },
+            optimizeDeps: {
+              include: ["@swwind/ly", "@swwind/firefly"],
             },
           };
         }
@@ -148,16 +160,27 @@ export function firefly(): Plugin {
       // dev mode
       if (env.command === "serve") {
         isDev = true;
-        return { appType: "custom" };
+        return {
+          appType: "custom",
+          build: {
+            rollupOptions: {
+              input: ["./src/entry.dev.tsx"],
+            },
+          },
+          optimizeDeps: {
+            include: ["@swwind/ly", "@swwind/firefly"],
+          },
+        };
       }
     },
 
     configResolved(config) {
-      base = config.base;
+      resolvedConfig = config;
     },
 
     handleHotUpdate(ctx) {
       // TODO
+      structure = null;
       project = null;
     },
 

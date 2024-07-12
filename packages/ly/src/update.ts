@@ -15,6 +15,10 @@ export function enqueueUpdate(node: LayerElement) {
 
 let nextTickPromises: (() => void)[] = [];
 export function nextTick(): Promise<void> {
+  if (!dirtyStates.size) {
+    return Promise.resolve();
+  }
+
   return new Promise((resolve) => {
     nextTickPromises.push(resolve);
   });

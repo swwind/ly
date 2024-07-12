@@ -6,9 +6,13 @@ import type {
 import { injectNavigate, injectRender } from "./navigate.ts";
 import type { ActionResponse } from "../server/router.ts";
 import { fetchLoaders } from "./loader.ts";
-import { computed, nextTick, ref } from "@swwind/ly";
+import { computed, ref } from "@swwind/ly";
 
-export async function fetchAction<T>(ref: string, data: FormData) {
+export async function fetchAction<T>(
+  ref: string,
+  method: string,
+  data: FormData
+) {
   const target = new URL(location.href);
   if (!target.pathname.endsWith("/")) {
     target.pathname += "/";
@@ -16,12 +20,13 @@ export async function fetchAction<T>(ref: string, data: FormData) {
   target.hash = "";
   target.pathname += "_data.json";
   target.searchParams.set("_action", ref);
-  const response = await fetch(target, { method: "POST", body: data });
+  const response = await fetch(target, { method, body: data });
   return (await response.json()) as ActionResponse<T>;
 }
 
 export function injectAction<T extends ActionReturnValue>(
-  actionRef: string
+  actionRef: string,
+  actionMethod: string
 ): ActionHandler<T> {
   const render = injectRender();
   const navigate = injectNavigate();
@@ -36,7 +41,7 @@ export function injectAction<T extends ActionReturnValue>(
     state.value = { state: "waiting", data: null, error: null };
 
     try {
-      const resp = await fetchAction<T>(actionRef, formData);
+      const resp = await fetchAction<T>(actionRef, actionMethod, formData);
 
       if (resp.ok === "action") {
         state.value = { state: "ok", data: resp.action, error: null };
@@ -69,5 +74,6 @@ export function injectAction<T extends ActionReturnValue>(
     ref: actionRef,
     state: computed(() => state.value),
     submit,
+    method: actionMethod,
   };
 }

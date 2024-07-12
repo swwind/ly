@@ -11,6 +11,9 @@ type FrontMatter = {
 };
 
 export function fireflyMdx(options?: CompileOptions): Plugin {
+  options ??= {};
+  options.jsxImportSource ??= "@swwind/ly";
+
   return {
     name: "firefly-mdx",
 
@@ -22,15 +25,10 @@ export function fireflyMdx(options?: CompileOptions): Plugin {
         matter(source, { strip: true });
         const frontmatter = source.data.matter || {};
 
-        const mdx = await compile(
-          source,
-          options || { jsxImportSource: "@swwind/ly" }
-        );
+        const mdx = await compile(source, options);
 
         return [toMetaCode(frontmatter), String(mdx)].join("\n");
       }
-
-      return null;
     },
   };
 }

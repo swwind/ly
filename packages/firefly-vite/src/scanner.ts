@@ -1,14 +1,13 @@
 import { extname, join, resolve } from "node:path";
 import { readdir, readFile, stat } from "node:fs/promises";
 import { isJs, isJsOrMdx, isMdx } from "./utils/ext.ts";
-import { hashRef } from "./utils/crypto.ts";
 import type { Directory, Route } from "@swwind/firefly/server";
-import { find } from "@swwind/find-exports";
 import { parse } from "@swc/core";
+import { analyze, type AnalyzeResult } from "./analyze.ts";
 
-async function findExports(code: string, funcs: string[]) {
-  const program = await parse(code, { syntax: "typescript", tsx: true });
-  return find(program, funcs);
+async function analyzeCode(code: string, index: number) {
+  const module = await parse(code, { syntax: "typescript", tsx: true });
+  return analyze(module, index);
 }
 
 function getFilenameWithoutExt(filename: string) {
@@ -132,64 +131,38 @@ export async function scanProjectStructure(entrance: string) {
 
 export type ProjectStructure = Awaited<ReturnType<typeof scanProjectStructure>>;
 
-export type ActionMeta = { name: string; ref: string }[];
-export type LoaderMeta = { name: string; ref: string }[];
-
-export async function parseActionsAndLoaders(
+export async function analyzeLayoutOrIndex(
   filePath: string,
   index: number
-): Promise<{
-  actions: ActionMeta;
-  loaders: LoaderMeta;
-  hasMeta: boolean;
-}> {
-  if (isMdx(filePath)) return { actions: [], loaders: [], hasMeta: true };
+): Promise<AnalyzeResult> {
+  if (isMdx(filePath)) {
+    return {
+      action: [],
+      loader: [],
+      meta: true,
+      middleware: false,
+      component: true,
+    };
+  }
 
   const source = await readFile(filePath, "utf8");
-  const found = await findExports(source, ["action$", "loader$", "meta$"]);
-  const actionFounds = found.filter((x) => x.callee === "action$");
-  const loaderFounds = found.filter((x) => x.callee === "loader$");
-  const metaFounds = found.filter((x) => x.callee === "meta$");
-
-  return {
-    actions: await Promise.all(
-      actionFounds.map(async ({ name }) => ({
-        name,
-        ref: await hashRef(`action-${index}-${name}`),
-      }))
-    ),
-    loaders: await Promise.all(
-      loaderFounds.map(async ({ name }) => ({
-        name,
-        ref: await hashRef(`loader-${index}-${name}`),
-      }))
-    ),
-    hasMeta: metaFounds.some(({ name }) => name === "meta"),
-  };
+  return await analyzeCode(source, index);
 }
-
-export async function parseMiddleware(_: string, index: number) {
-  return { ref: await hashRef(`middleware-${index}`) };
-}
-
-export type MiddlewareMeta = Awaited<ReturnType<typeof parseMiddleware>>;
 
 export async function resolveProject(structure: ProjectStructure) {
   const components = await Promise.all(
     structure.componentPaths.map((filepath, index) =>
-      parseActionsAndLoaders(filepath, index)
+      analyzeLayoutOrIndex(filepath, index)
     )
-  );
-  const middlewares = await Promise.all(
-    structure.middlewarePaths.map(parseMiddleware)
   );
 
   return {
-    metas: components.map((c) => c.hasMeta),
-    actions: components.map((c) => c.actions),
-    loaders: components.map((c) => c.loaders),
-    structure,
-    middlewares,
+    raw: components,
+    metas: components.map((c) => c.meta),
+    actions: components.map((c) => c.action),
+    loaders: components.map((c) => c.loader),
+    components: components.map((c) => c.component),
+    middlewares: components.map((c) => c.middleware),
   };
 }
 

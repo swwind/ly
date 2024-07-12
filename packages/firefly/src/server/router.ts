@@ -100,9 +100,9 @@ export function createRouter({ route, children }: Directory) {
     });
   }
 
-  const catches = [] as [string, Directory][];
-  const params = [] as [string, Directory][];
   const fakes = [] as [string, Directory][];
+  const params = [] as [string, Directory][];
+  const catches = [] as [string, Directory][];
   const matches = [] as [string, Directory][];
 
   for (const [dirname, child] of children) {
