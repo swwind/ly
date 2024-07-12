@@ -118,8 +118,8 @@ importers:
         version: 5.3.2(@types/node@20.14.9)
     devDependencies:
       '@swwind/exbuild':
-        specifier: ^1.0.7
-        version: 1.0.7
+        specifier: ^1.0.8
+        version: 1.0.8
       '@types/node':
         specifier: ^20.14.9
         version: 20.14.9
@@ -557,10 +557,6 @@ packages:
 
   '@swc/types@0.1.9':
     resolution: {integrity: sha512-qKnCno++jzcJ4lM4NTfYifm1EFSCeIfKiAHAfkENZAV5Kl9PjJIyd2yeeVv6c/2CckuLyv2NmRC5pv6pm2WQBg==}
-
-  '@swwind/exbuild@1.0.7':
-    resolution: {integrity: sha512-cK0yO8CfXXSDlE68C8O4TSQaeJS68S8iQnrxsormQyOfa0ERuFhEZr+yb9AgepuEiW66owqocvqJrQRRXN0iGw==}
-    hasBin: true
 
   '@swwind/exbuild@1.0.8':
     resolution: {integrity: sha512-ZrC52IEVI9eLgyFFXOkNuuQzZGxDrby+qKXN5tDL9QPPgrlAFK6Mzb3WDHjE2ug/v5zM8ZInZ0LD2zyjNmHBFw==}
@@ -1662,13 +1658,6 @@ snapshots:
   '@swc/types@0.1.9':
     dependencies:
       '@swc/counter': 0.1.3
-
-  '@swwind/exbuild@1.0.7':
-    dependencies:
-      '@swc/core': 1.6.7
-      tiny-glob: 0.2.9
-    transitivePeerDependencies:
-      - '@swc/helpers'
 
   '@swwind/exbuild@1.0.8':
     dependencies:

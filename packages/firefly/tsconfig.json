@@ -16,7 +16,7 @@
     "lib": ["ESNext", "DOM"],
     "types": ["vite/client"],
     "jsx": "react-jsx",
-    "jsxImportSource": "@swwind/ly",
+    "jsxImportSource": "@swwind/ly"
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

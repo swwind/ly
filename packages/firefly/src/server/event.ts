@@ -1,5 +1,5 @@
 import type { Loader, LoaderReturnValue } from "./loader.ts";
-import type { Context } from "hono";
+import type { Context, Next } from "hono";
 import { type MetaFunction, createDefaultMeta } from "./meta.ts";
 import type { ServerManifest } from "./build.ts";
 import { createServerRuntime } from "../client/runtime.tsx";
@@ -19,11 +19,11 @@ export function createFetchEvent(context: Context, manifest: ServerManifest) {
   const metafns = [] as MetaFunction[];
 
   return {
-    async runMiddleware(id: number | null) {
+    async runMiddleware(id: number | null, next: Next) {
       if (id === null) return;
 
       const middleware = manifest.middlewares[id];
-      const data = await middleware(context);
+      const data = await middleware(context, next);
       middlewareStore.set(middleware._ref!, data);
     },
 

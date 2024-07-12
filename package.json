@@ -3,11 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm build:ly && pnpm build:firefly-swc-plugin && pnpm build:firefly && pnpm build:firefly-vite",
+    "build": "pnpm build:ly && pnpm build:firefly && pnpm build:firefly-vite",
     "build:ly": "cd packages/ly && pnpm clean && pnpm build",
     "build:firefly": "cd packages/firefly && pnpm clean && pnpm build",
     "build:firefly-vite": "cd packages/firefly-vite && pnpm clean && pnpm build",
-    "build:firefly-swc-plugin": "cd packages/firefly-swc-plugin && pnpm build",
     "example:basic": "cd examples/basic && pnpm dev",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",

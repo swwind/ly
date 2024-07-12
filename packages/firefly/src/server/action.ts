@@ -25,11 +25,88 @@ export type ActionHandler<T extends ActionReturnValue = ActionReturnValue> = {
   submit(data: FormData): Promise<void>;
 };
 
-function action(method: string) {
+interface DefineAction {
+  <T extends ActionReturnValue>(fn: ActionFunction<T>): Action<T>;
+  <T extends ActionReturnValue>(
+    m1: Middleware,
+    fn: ActionFunction<T>
+  ): Action<T>;
+  <T extends ActionReturnValue>(
+    m1: Middleware,
+    m2: Middleware,
+    fn: ActionFunction<T>
+  ): Action<T>;
+  <T extends ActionReturnValue>(
+    m1: Middleware,
+    m2: Middleware,
+    m3: Middleware,
+    fn: ActionFunction<T>
+  ): Action<T>;
+  <T extends ActionReturnValue>(
+    m1: Middleware,
+    m2: Middleware,
+    m3: Middleware,
+    m4: Middleware,
+    fn: ActionFunction<T>
+  ): Action<T>;
+  <T extends ActionReturnValue>(
+    m1: Middleware,
+    m2: Middleware,
+    m3: Middleware,
+    m4: Middleware,
+    m5: Middleware,
+    fn: ActionFunction<T>
+  ): Action<T>;
+  <T extends ActionReturnValue>(
+    ...args: (Middleware | ActionFunction<T>)[]
+  ): Action<T>;
+  <T extends ActionReturnValue>(name: string, fn: ActionFunction<T>): Action<T>;
+  <T extends ActionReturnValue>(
+    name: string,
+    m1: Middleware,
+    fn: ActionFunction<T>
+  ): Action<T>;
+  <T extends ActionReturnValue>(
+    name: string,
+    m1: Middleware,
+    m2: Middleware,
+    fn: ActionFunction<T>
+  ): Action<T>;
+  <T extends ActionReturnValue>(
+    name: string,
+    m1: Middleware,
+    m2: Middleware,
+    m3: Middleware,
+    fn: ActionFunction<T>
+  ): Action<T>;
+  <T extends ActionReturnValue>(
+    name: string,
+    m1: Middleware,
+    m2: Middleware,
+    m3: Middleware,
+    m4: Middleware,
+    fn: ActionFunction<T>
+  ): Action<T>;
+  <T extends ActionReturnValue>(
+    name: string,
+    m1: Middleware,
+    m2: Middleware,
+    m3: Middleware,
+    m4: Middleware,
+    m5: Middleware,
+    fn: ActionFunction<T>
+  ): Action<T>;
+  <T extends ActionReturnValue>(
+    name: string,
+    ...args: (Middleware | ActionFunction<T>)[]
+  ): Action<T>;
+}
+
+function action(method: string): DefineAction {
   return <T extends ActionReturnValue>(
     ...args:
-      | [...Middleware[], ActionFunction<T>]
-      | [string, ...Middleware[], ActionFunction<T>]
+      | [...(Middleware | ActionFunction<T>)[]]
+      | [string, ...(Middleware | ActionFunction<T>)[]]
   ): Action<T> => {
     const handler = () => injectAction<T>(handler._ref, method);
     handler._ref = typeof args[0] === "string" ? (args.shift() as string) : "";

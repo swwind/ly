@@ -77,7 +77,9 @@ export function toServerManifestCode(
     `const components = [${components
       .map((has, i) => (has ? `c${i}` : "null"))
       .join(", ")}];`,
-    `const middlewares = [${middlewares.map((_, i) => `m${i}`).join(", ")}];`,
+    `const middlewares = [${middlewares
+      .map((has, i) => (has ? `m${i}` : "null"))
+      .join(", ")}];`,
     `export const manifest = { base, graph, metas, actions, loaders, statics, directory, components, middlewares };`,
   ]
     .map((x) => x || "")

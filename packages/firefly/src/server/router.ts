@@ -36,8 +36,7 @@ export function createRouter({ route, children }: Directory) {
   // middleware for loaders/actions
   app.use(async (c, next) => {
     const event = c.get("event");
-    await event.runMiddleware(route.middleware);
-    await next();
+    await event.runMiddleware(route.middleware, next);
   });
 
   // middleware for running loader
