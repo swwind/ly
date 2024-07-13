@@ -131,9 +131,9 @@ export function firefly(): Plugin {
               },
               copyPublicDir: false,
             },
-            optimizeDeps: {
-              include: ["@swwind/ly", "@swwind/firefly"],
-            },
+            // optimizeDeps: {
+            //   include: ["@swwind/ly", "@swwind/firefly"],
+            // },
           };
         }
 
@@ -150,9 +150,9 @@ export function firefly(): Plugin {
               copyPublicDir: false,
               cssMinify: true,
             },
-            optimizeDeps: {
-              include: ["@swwind/ly", "@swwind/firefly"],
-            },
+            // optimizeDeps: {
+            //   include: ["@swwind/ly", "@swwind/firefly"],
+            // },
           };
         }
       }
@@ -167,9 +167,9 @@ export function firefly(): Plugin {
               input: ["./src/entry.dev.tsx"],
             },
           },
-          optimizeDeps: {
-            include: ["@swwind/ly", "@swwind/firefly"],
-          },
+          // optimizeDeps: {
+          //   include: ["@swwind/ly", "@swwind/firefly"],
+          // },
         };
       }
     },
