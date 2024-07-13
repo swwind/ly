@@ -24,7 +24,7 @@ export type Runtime = {
 export type RuntimeStatic = {
   base: string;
   graph: Graph;
-  components: ComponentType[];
+  components: (ComponentType | null)[];
 };
 
 export function createRuntime(
@@ -43,19 +43,8 @@ export function createRuntime(
   ]);
 
   return [
-    {
-      meta,
-      params,
-      loaders,
-      location,
-      preloads,
-      components,
-    },
-    {
-      base,
-      graph,
-      components: manifest.components,
-    },
+    { meta, params, loaders, location, preloads, components },
+    { base, graph, components: manifest.components },
   ];
 }
 

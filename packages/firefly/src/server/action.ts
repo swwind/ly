@@ -12,6 +12,7 @@ export interface Action<T extends ActionReturnValue = ActionReturnValue> {
   _m?: Middleware;
   _fn?: ActionFunction<T>;
   _ref?: string;
+  _mthd?: string;
 }
 export type ActionState<T> =
   | { state: "idle"; data: null; error: null }
@@ -109,6 +110,7 @@ function action(method: string): DefineAction {
       | [string, ...(Middleware | ActionFunction<T>)[]]
   ): Action<T> => {
     const handler = () => injectAction<T>(handler._ref, method);
+    handler._mthd = method;
     handler._ref = typeof args[0] === "string" ? (args.shift() as string) : "";
     handler._fn = args.pop() as ActionFunction<T>;
     handler._m = middleware$(...(args as Middleware[]));

@@ -46,9 +46,6 @@ export function toServerManifestCode(
         has &&
         `import { middleware as m${i} } from "${structure.componentPaths[i]}";`
     ),
-    ...structure.staticPaths.map(
-      (filePath, i) => `import s${i} from "${filePath}";`
-    ),
 
     // assign ref
     ...actions.flatMap((actions, i) =>
@@ -70,9 +67,6 @@ export function toServerManifestCode(
     `const loaders = [${loaders
       .map((l, i) => `[${l.map((_, j) => `l${i}$${j}`).join(", ")}]`)
       .join(", ")}];`,
-    `const statics = [${structure.staticPaths
-      .map((_, i) => `s${i}`)
-      .join(", ")}];`,
     `const directory = ${JSON.stringify(structure.directory)};`,
     `const components = [${components
       .map((has, i) => (has ? `c${i}` : "null"))
@@ -80,7 +74,7 @@ export function toServerManifestCode(
     `const middlewares = [${middlewares
       .map((has, i) => (has ? `m${i}` : "null"))
       .join(", ")}];`,
-    `export const manifest = { base, graph, metas, actions, loaders, statics, directory, components, middlewares };`,
+    `export const manifest = { base, graph, metas, actions, loaders, directory, components, middlewares };`,
   ]
     .map((x) => x || "")
     .join("\n");

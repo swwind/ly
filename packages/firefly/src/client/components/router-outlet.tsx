@@ -16,11 +16,15 @@ export const RouterOutlet = component$(() => {
       }
       const Component = runtimeStatic.components[currentComponent.value];
 
-      return (
-        <Component>
-          <Layout current={props.current + 1} />
-        </Component>
-      );
+      if (Component) {
+        return (
+          <Component>
+            <Layout current={props.current + 1} />
+          </Component>
+        );
+      }
+
+      return <Layout current={props.current + 1} />;
     };
   });
 

@@ -96,19 +96,20 @@ export async function generate(
     if (route.index !== null) pathnames.push(current);
     for (const [dirname, child] of children) {
       if (dirname.startsWith("[") && dirname.endsWith("]")) {
-        if (child.route.static === null) {
-          throw new Error(
-            `static.ts is missing for route "${current + dirname + "/"}"`
-          );
-        }
-        const param = dirname === "[...]" ? "$" : dirname.slice(1, -1);
-        const static1 = manifest.statics[child.route.static];
-        const possibles = await static1(env);
-        for (const possible of possibles) {
-          env.params.set(param, possible);
-          await dfs(child, current + possible + "/");
-        }
-        env.params.delete(param);
+        // if (child.route.layout == null) {
+        //   throw new Error(
+        //     `static.ts is missing for route "${current + dirname + "/"}"`
+        //   );
+        // }
+        // const param = dirname === "[...]" ? "$" : dirname.slice(1, -1);
+        // const static1 = manifest.statics[child.route.static];
+        // const possibles = await static1(env);
+        // for (const possible of possibles) {
+        //   env.params.set(param, possible);
+        //   await dfs(child, current + possible + "/");
+        // }
+        // env.params.delete(param);
+        throw new Error("TODO: fixme");
       } else if (dirname.startsWith("(") && dirname.endsWith(")")) {
         await dfs(child, current);
       } else {
