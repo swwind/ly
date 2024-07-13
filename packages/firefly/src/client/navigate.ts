@@ -15,6 +15,7 @@ import {
   computed,
   createContext,
   inject,
+  nextTick,
   provide,
   type Computed,
   type Ref,
@@ -45,6 +46,7 @@ export function createRender(
 
     // async load modules
     await runtimeLoad(runtimeStatic, components);
+    await nextTick();
 
     // apply new values
     runtime.value = {

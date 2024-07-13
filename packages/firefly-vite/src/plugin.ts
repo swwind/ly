@@ -76,8 +76,8 @@ export function firefly(): Plugin {
             : await loadClientGraph(entry, components);
           const project = await getProject();
           return toServerManifestCode(
-            project,
             structure,
+            project,
             graph,
             resolvedConfig.base
           );

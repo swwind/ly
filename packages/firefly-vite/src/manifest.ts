@@ -14,8 +14,8 @@ export function toClientManifestCode(structure: ProjectStructure) {
 }
 
 export function toServerManifestCode(
-  project: Project,
   structure: ProjectStructure,
+  project: Project,
   graph: Graph,
   base: string
 ) {
@@ -92,7 +92,7 @@ export async function removeClientServerExports(
   ];
 
   // console.log("wasm", wasm);
-  const { code, map } = await transform(source, {
+  const { code } = await transform(source, {
     jsc: {
       parser: {
         syntax: "ecmascript",
@@ -101,11 +101,25 @@ export async function removeClientServerExports(
       experimental: {
         plugins: [removeExportsWasm({ removes })],
       },
+      preserveAllComments: true,
     },
-    sourceMaps: true,
+    // sourceMaps: true,
   });
 
-  return { code, map };
+  return {
+    code: [
+      `import { injectAction as __injectAction, injectLoader as __injectLoader } from "@swwind/firefly";`,
+      ...result.action.map(
+        (x) =>
+          `export const ${x.name} = () => __injectAction("${x.ref}", "${x.method}");`
+      ),
+      ...result.loader.map(
+        (x) => `export const ${x.name} = () => __injectLoader("${x.ref}");`
+      ),
+      code,
+      result.component ? "" : "export default null;",
+    ].join("\n"),
+  };
 }
 
 export function toAssetsManifestCode(graph: Graph, base: string) {

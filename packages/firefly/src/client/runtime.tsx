@@ -24,7 +24,7 @@ export type Runtime = {
 export type RuntimeStatic = {
   base: string;
   graph: Graph;
-  components: (ComponentType | null)[];
+  manifest: ClientManifest;
 };
 
 export function createRuntime(
@@ -44,7 +44,7 @@ export function createRuntime(
 
   return [
     { meta, params, loaders, location, preloads, components },
-    { base, graph, components: manifest.components },
+    { base, graph, manifest },
   ];
 }
 
@@ -70,14 +70,13 @@ export async function runtimeLoad(
 ) {
   await Promise.all(
     components
-      .filter((id) => !runtime.components[id])
+      .filter((id) => !(id in runtime.manifest.components))
       .map(async (id) => {
         const path =
           runtime.base + runtime.graph.assets[runtime.graph.components[id][0]];
-        const component = (await import(/* @vite-ignore */ path).then(
-          (module) => module.default
-        )) as ComponentType;
-        runtime.components[id] = component;
+        const module = await import(/* @vite-ignore */ path);
+        runtime.manifest.components[id] =
+          module.default as ComponentType | null;
       })
   );
 }

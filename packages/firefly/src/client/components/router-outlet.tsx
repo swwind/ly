@@ -1,4 +1,4 @@
-import { component$, computed, h, type Computed, type VNode } from "@swwind/ly";
+import { component$, computed } from "@swwind/ly";
 import { isDEV } from "../../utils/envs.ts";
 import { injectRuntime, injectRuntimeStatic } from "../runtime.ts";
 
@@ -14,7 +14,9 @@ export const RouterOutlet = component$(() => {
       if (currentComponent.value == null) {
         return null;
       }
-      const Component = runtimeStatic.components[currentComponent.value];
+
+      const Component =
+        runtimeStatic.manifest.components[currentComponent.value];
 
       if (Component) {
         return (
